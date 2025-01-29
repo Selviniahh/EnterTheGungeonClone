@@ -24,6 +24,7 @@ namespace ETG::Globals
     extern sf::Font Font;
     extern sf::Vector2u ScreenSize;
     extern float DefaultScale;
+    static int FPS = 170;
 
     //For Zooming 
     extern sf::View MainView;

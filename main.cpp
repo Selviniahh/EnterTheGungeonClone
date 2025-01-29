@@ -1,4 +1,5 @@
 #include "Managers/GameManager.h"
+#include <thread>
 
 int main()
 {
@@ -7,12 +8,18 @@ int main()
 
     while (ETG::GameManager::IsRunning())
     {
-        //If window is not focused freeze the game  
-        if (!ETG::Globals::Window->hasFocus()) continue;
-        
+        //Track every Frame 
+        GM.ProcessEvents();
+
+        //If the window unfocused, sleep the thread
+        if (!GM.WindowHasFocus())
+        {
+            sf::sleep(sf::milliseconds(10));
+        }
+
         GM.Update();
-        GM.Draw();        
+        GM.Draw();
     }
-    
+
     return 0;
 }

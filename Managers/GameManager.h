@@ -14,11 +14,14 @@ namespace ETG
         //For now I don't have anything other than hero and UI  
         //Hero class
         Hero Hero{sf::Vector2f(0, 0)};
+        bool HasFocus = true;
 
     public:
         UserInterface UI;
 
         void Initialize();
+        void ProcessEvents();
+        bool WindowHasFocus() const {return HasFocus;}
 
         //I might delete this later on 
         static bool IsRunning() { return Window->isOpen(); };
