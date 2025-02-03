@@ -9,19 +9,19 @@ set(CMAKE_CXX_STANDARD 23)
 
 # Specify only source files
 add_executable(ETG main.cpp
-        UI/UserInterface.cpp
-        Managers/Globals.cpp
-        Animation/Animation.cpp
-        Managers/GameManager.cpp
-        Characters/Hero.cpp
-        Managers/Misc.cpp
-        Characters/Components/AnimationComponent.h
-        Characters/Components/AnimationComponent.cpp
-        Characters/Components/InputComponent.cpp
-        Characters/Components/InputComponent.h
-        Characters/Components/MoveComponent.cpp
-        Characters/Components/MoveComponent.h
-        Managers/SpriteBatch.h
+        src/UI/UserInterface.cpp
+        src/Managers/Globals.cpp
+        src/Animation/Animation.cpp
+        src/Managers/GameManager.cpp
+        src/Characters/Hero.cpp
+        src/Managers/Misc.cpp
+        src/Characters/Components/AnimationComponent.h
+        src/Characters/Components/AnimationComponent.cpp
+        src/Characters/Components/InputComponent.cpp
+        src/Characters/Components/InputComponent.h
+        src/Characters/Components/MoveComponent.cpp
+        src/Characters/Components/MoveComponent.h
+        src/Managers/SpriteBatch.h
 )
 
 # Easiest and fastest way is VCPKG 
