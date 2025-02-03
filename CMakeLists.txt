@@ -21,6 +21,7 @@ add_executable(ETG main.cpp
         Characters/Components/InputComponent.h
         Characters/Components/MoveComponent.cpp
         Characters/Components/MoveComponent.h
+        Managers/SpriteBatch.h
 )
 
 # Easiest and fastest way is VCPKG 

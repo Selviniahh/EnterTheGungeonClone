@@ -60,13 +60,13 @@ namespace ETG
         gun.setTexture(Gun);
         gun.setPosition(static_cast<float>(GunPosition.x), static_cast<float>(GunPosition.y));
         gun.setScale(3.f,3.f);
-        Globals::Window->draw(gun);
-
+        ETG::Globals::SpriteBatch.draw(gun);
+        
         // Draw ammo bar
         sf::Sprite ammo;
         ammo.setTexture(AmmoBar);
         ammo.setPosition(static_cast<float>(AmmoBarPosition.x), static_cast<float>(AmmoBarPosition.y));
-        Globals::Window->draw(ammo);
+        ETG::Globals::SpriteBatch.draw(ammo);
         
         // // Draw ammo display. Because gun not implemented yet, let it stay like this
         // sf::Sprite ammoDisplaySprite;

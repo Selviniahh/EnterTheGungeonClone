@@ -26,19 +26,24 @@ void ETG::GameManager::Draw()
 {
     Window->clear(sf::Color::Black);
 
-    //Draw the main game scene with Custom view. These draws will be drawn zoomed
+    //NOTE: Draw the main game scene with Custom view. These draws will be drawn zoomed
     Window->setView(Globals::MainView);
 
+    SpriteBatch.begin();
     Hero.Draw();
+    SpriteBatch.end(*Window);
 
-    //Switch to the default (un-zoomed) view for overlays. These draws will be drawn in screen coords.
-    //Which means, even though The view zoomed or moved, these draws will always stay persistent in initial given coords
+
+    //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.
+    //NOTE: Which means, even though The view zoomed or moved, these draws will always stay persistent in initial given coords
     Window->setView(Window->getDefaultView());
-    UI.Draw();
 
-    //Debug texts will be drawn in screen coords. 
+    SpriteBatch.begin();
+    UI.Draw();
+    SpriteBatch.end(*Window);
+
+    //NOTE: non batch draws here. 
     DebugText::Draw(*Window);
-    // DebugText::DrawDebugText(Hero.DebugRectString, *Window);
 
     //Display the frame
     Window->display();

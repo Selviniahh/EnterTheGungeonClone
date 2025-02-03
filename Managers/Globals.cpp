@@ -1,5 +1,4 @@
 #include "Globals.h"
-
 #include <complex>
 #include <filesystem>
 
@@ -14,12 +13,13 @@ namespace ETG::Globals
     sf::Clock clock;
     sf::Clock tickClock;
     sf::View MainView;
+    class SpriteBatch SpriteBatch;
 
     void Initialize(const std::shared_ptr<sf::RenderWindow>& window)
     {
         Window = window;
         ScreenSize = window->getSize();
-
+        SpriteBatch.begin();
         //Load font
         if (!Font.loadFromFile((std::filesystem::current_path().parent_path() / "Resources" / "Fonts" / "SegoeUI.ttf").string()))
         {
@@ -72,7 +72,7 @@ namespace ETG::Globals
         frame.setPosition(Loc); // Position it at the specified location
 
         // Draw the sprite
-        Globals::Window->draw(frame);
+        Globals::SpriteBatch.draw(frame);
         return false;
     }
 
@@ -100,7 +100,7 @@ namespace ETG::Globals
         frame.setScale(Globals::DefaultScale, Globals::DefaultScale);
         frame.setPosition(pos); // Position it at the specified location
 
-        Globals::Window->draw(frame);
+        ETG::Globals::SpriteBatch.draw(frame);
     }
 }
 

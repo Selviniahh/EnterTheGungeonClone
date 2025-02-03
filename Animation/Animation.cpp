@@ -1,5 +1,6 @@
 #include "Animation.h"
 #include "../Managers/Globals.h"
+#include "../Managers/SpriteBatch.h"
 
 Animation::Animation(const sf::Texture& texture, const float eachFrameSpeed, const int frameX, const int frameY, const int row)
     : EachFrameSpeed(eachFrameSpeed), AnimTimeLeft(EachFrameSpeed), FrameX(frameX), FrameY(frameY), Texture(texture)
@@ -43,7 +44,7 @@ void Animation::Draw(const sf::Vector2f position, float layerDepth) const
     frame.setOrigin(Origin);
     frame.setScale(ETG::Globals::DefaultScale * flipX, ETG::Globals::DefaultScale); //Idk why I should set it 5f
 
-    ETG::Globals::Window->draw(frame);
+    ETG::Globals::SpriteBatch.draw(frame);
 }
 
 void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const float scale) const
@@ -57,7 +58,7 @@ void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, co
     frame.setOrigin(origin);
     frame.setScale(scale, scale);
 
-    ETG::Globals::Window->draw(frame);
+    ETG::Globals::SpriteBatch.draw(frame);
 }
 
 void Animation::Restart()

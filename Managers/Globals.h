@@ -1,11 +1,12 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
 #include <memory>
 #include <filesystem>
-
+#include "SpriteBatch.h"
 #include "StateEnums.h"
+
+class SpriteBatch;
 
 namespace ETG::Globals
 {
@@ -25,6 +26,7 @@ namespace ETG::Globals
     extern sf::Vector2u ScreenSize;
     extern float DefaultScale;
     static int FPS = 170;
+    extern SpriteBatch SpriteBatch;
 
     //For Zooming 
     extern sf::View MainView;

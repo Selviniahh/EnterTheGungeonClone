@@ -1,5 +1,4 @@
 #include "Managers/GameManager.h"
-#include <thread>
 
 int main()
 {
