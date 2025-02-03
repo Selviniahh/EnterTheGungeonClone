@@ -9,7 +9,7 @@ ETG::Direction ETG::Hero::CurrentDirection{};
 ETG::Hero::Hero(const sf::Vector2f Position) : HandPos({}), HandTex({})
 {
     HeroPosition = Position;
-    if (!HandTex.loadFromFile((std::filesystem::current_path().parent_path() / "Resources" / "Player" / "rogue_hand_001.PNG").string()))
+    if (!HandTex.loadFromFile((std::filesystem::current_path().parent_path().parent_path() / "Resources" / "Player" / "rogue_hand_001.PNG").string()))
         std::cerr << "Failed to load hand texture" << std::endl;
 }
 

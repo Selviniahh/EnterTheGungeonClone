@@ -21,7 +21,7 @@ namespace ETG::Globals
         ScreenSize = window->getSize();
         SpriteBatch.begin();
         //Load font
-        if (!Font.loadFromFile((std::filesystem::current_path().parent_path() / "Resources" / "Fonts" / "SegoeUI.ttf").string()))
+        if (!Font.loadFromFile((std::filesystem::current_path().parent_path().parent_path() / "Resources" / "Fonts" / "SegoeUI.ttf").string()))
         {
             throw std::runtime_error("Failed to load font");
         }

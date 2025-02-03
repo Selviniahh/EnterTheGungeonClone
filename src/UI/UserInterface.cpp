@@ -12,7 +12,7 @@ namespace ETG
 
     void UserInterface::Initialize()
     {
-        std::string ResPath = (std::filesystem::current_path().parent_path() / "Resources").string();
+        std::string ResPath = (std::filesystem::current_path().parent_path().parent_path() / "Resources").string();
         Frame.loadFromFile(ResPath + "/UI/Frame.png");
         Gun.loadFromFile(ResPath + "/Guns/RogueSpecial_Idle.png");
         AmmoBar.loadFromFile(ResPath + "/UI/AmmoBarUI.png");

@@ -4,7 +4,7 @@
 
 void ETG::GameManager::Initialize()
 {
-    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(1920, 1080), "SFML example");
+    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(1200, 1000), "SFML example");
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
     Globals::Initialize(Window);
