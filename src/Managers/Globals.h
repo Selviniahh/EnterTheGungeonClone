@@ -40,7 +40,7 @@ namespace ETG::Globals
     //length: Compute the magnitude of the vector using the formula sqrt(x^2 + y^2)
     // Division: Divide the vector components by the magnitude to scale it to a unit vector (length 1).
     sf::Vector2<float> Normalize(const sf::Vector2f& vector);
-    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc);
+    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, sf::Vector2i scale = {1,1});
 
     std::string StringifyDirection(Direction dir);
 }

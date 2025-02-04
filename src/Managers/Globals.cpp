@@ -26,7 +26,7 @@ namespace ETG::Globals
             throw std::runtime_error("Failed to load font");
         }
 
-        //NOTE: Temporary. Set camera Location and zoom. After enemy, UI, Gun, Hero are handled, better camera and hero locations will be implemented.   
+        //NOTE: Set camera Location and zoom. After enemy, UI, Gun, Hero are handled, better camera and hero locations will be implemented.   
         MainView = window->getDefaultView();
         MainView.setCenter(0.f, 0.f);
         MainView.zoom(0.1f);
@@ -53,7 +53,7 @@ namespace ETG::Globals
         return vector / length;
     }
 
-    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc)
+    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, const sf::Vector2i scale)
     {
         static sf::Texture tex;
         static bool isLoaded = false;
@@ -66,13 +66,15 @@ namespace ETG::Globals
         }
 
         // Set up the sprite with the 1x1 green texture
+        //NOTE: Order of sprite setting should be Texture -> Origin -> Scale -> Position
         sf::Sprite frame;
         frame.setTexture(tex);
-        frame.setScale(DefaultScale, DefaultScale);
+        frame.setOrigin(0.5f, 0.5f);  // Center of 1x1 pixel
+        frame.setScale(scale.x, scale.y);
         frame.setPosition(Loc); // Position it at the specified location
-
+        
         // Draw the sprite
-        Globals::SpriteBatch.draw(frame);
+        SpriteBatch.draw(frame);
         return false;
     }
 

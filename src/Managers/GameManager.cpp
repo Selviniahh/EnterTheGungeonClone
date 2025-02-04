@@ -4,7 +4,8 @@
 
 void ETG::GameManager::Initialize()
 {
-    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(1200, 1000), "SFML example");
+    auto VideoMode = sf::VideoMode::getDesktopMode();
+    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width/2, VideoMode.height/2), "SFML example");
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
     Globals::Initialize(Window);
@@ -56,5 +57,11 @@ void ETG::GameManager::ProcessEvents()
         if (event.type == sf::Event::Closed) Window->close();
         if (event.type == sf::Event::LostFocus) HasFocus = false;
         if (event.type == sf::Event::GainedFocus) HasFocus = true;
+        
+        // Handle window resize
+        if (event.type == sf::Event::Resized)
+        {
+            // Update the main view to match the new window size
+        }
     }
 }

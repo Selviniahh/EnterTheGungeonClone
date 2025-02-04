@@ -19,9 +19,9 @@ namespace ETG
         AmmoDisplay.loadFromFile(ResPath + "/UI/AmmoDisplay.png");
 
         const sf::Vector2u frameSize = Frame.getSize();
-        FrameOffsetX = Globals::ScreenSize.x * 0.25; //%25 of the screensize
-        FrameOffsetY = Globals::ScreenSize.y * 0.25; //%25 of the screensize
-        
+        int FrameOffsetX = Globals::ScreenSize.x * (frameOffsetPercX / 100); //%25 of the screensize
+        int FrameOffsetY = Globals::ScreenSize.y * (frameOffsetPercY / 100); //%25 of the screensize
+
         FramePosition = {
             static_cast<int>(Globals::ScreenSize.x / 2.f + frameSize.x / 2.f + FrameOffsetX),
             static_cast<int>(Globals::ScreenSize.y / 2.f + frameSize.y / 2.f + FrameOffsetY)
@@ -29,15 +29,11 @@ namespace ETG
 
         std::cout << std::unitbuf;
 
-        GunPosition = {
-            static_cast<int>(FramePosition.x + Frame.getSize().x / 2 - GunOffsetX),
-            static_cast<int>(FramePosition.y + Frame.getSize().y / 2 - GunOffsetY)
-        };
+        GunPosition = {FramePosition.x, FramePosition.y};
 
-        // FramePosition.y + Frame.getSize().y / 2 - GunOffsetY; //idk what this doing
         AmmoBarPosition = {
-            static_cast<int>(FramePosition.x + 10 + Frame.getSize().x),
-            FramePosition.y - 30
+            static_cast<int>(FramePosition.x + Frame.getSize().x / 2) + AmmoBarOffsetX,
+            FramePosition.y
         };
     }
 
@@ -53,21 +49,27 @@ namespace ETG
         // Draw the frame
         frame.setTexture(Frame);
         frame.setPosition(static_cast<float>(FramePosition.x), static_cast<float>(FramePosition.y));
+        frame.setOrigin(Frame.getSize().x / 2, Frame.getSize().y / 2);
+        Globals::DrawSinglePixelAtLoc(frame.getPosition(), {5, 5});
         Globals::Window->draw(frame);
 
         // Draw the gun
         sf::Sprite gun;
         gun.setTexture(Gun);
         gun.setPosition(static_cast<float>(GunPosition.x), static_cast<float>(GunPosition.y));
-        gun.setScale(3.f,3.f);
+        gun.setOrigin(Gun.getSize().x / 2, Gun.getSize().y / 2);
+        gun.setScale(3.f, 3.f);
+        Globals::DrawSinglePixelAtLoc(gun.getPosition(), {5, 5});
         ETG::Globals::SpriteBatch.draw(gun);
-        
+
         // Draw ammo bar
         sf::Sprite ammo;
         ammo.setTexture(AmmoBar);
+        ammo.setOrigin(AmmoBar.getSize().x / 2, AmmoBar.getSize().y / 2);
         ammo.setPosition(static_cast<float>(AmmoBarPosition.x), static_cast<float>(AmmoBarPosition.y));
+        Globals::DrawSinglePixelAtLoc(ammo.getPosition(), {5, 5});
         ETG::Globals::SpriteBatch.draw(ammo);
-        
+
         // // Draw ammo display. Because gun not implemented yet, let it stay like this
         // sf::Sprite ammoDisplaySprite;
         // ammoDisplaySprite.setTexture(AmmoDisplay);
