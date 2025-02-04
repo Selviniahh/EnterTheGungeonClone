@@ -33,7 +33,6 @@ void ETG::GameManager::Draw()
     Hero.Draw();
     SpriteBatch.end(*Window);
 
-
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.
     //NOTE: Which means, even though The view zoomed or moved, these draws will always stay persistent in initial given coords
     Window->setView(Window->getDefaultView());
