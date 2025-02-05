@@ -19,20 +19,19 @@ namespace ETG
         AmmoDisplay.loadFromFile(ResPath + "/UI/AmmoDisplay.png");
 
         const sf::Vector2u frameSize = Frame.getSize();
-        int FrameOffsetX = Globals::ScreenSize.x * (frameOffsetPercX / 100); //%25 of the screensize
-        int FrameOffsetY = Globals::ScreenSize.y * (frameOffsetPercY / 100); //%25 of the screensize
+
+        const float FrameOffsetX = Globals::ScreenSize.x * (FrameOffsetPerc.x / 100);
+        const float FrameOffsetY = Globals::ScreenSize.y * (FrameOffsetPerc.y / 100);
 
         FramePosition = {
-            static_cast<int>(Globals::ScreenSize.x / 2.f + frameSize.x / 2.f + FrameOffsetX),
-            static_cast<int>(Globals::ScreenSize.y / 2.f + frameSize.y / 2.f + FrameOffsetY)
+            (Globals::ScreenSize.x - FrameOffsetX - frameSize.x / 2),
+            (Globals::ScreenSize.y - FrameOffsetY - frameSize.y / 2)
         };
-
-        std::cout << std::unitbuf;
 
         GunPosition = {FramePosition.x, FramePosition.y};
 
         AmmoBarPosition = {
-            static_cast<int>(FramePosition.x + Frame.getSize().x / 2) + AmmoBarOffsetX,
+            (FramePosition.x + (Frame.getSize().x / 2) + (Globals::ScreenSize.x * AmmoBarOffsetPercX / 100)),
             FramePosition.y
         };
     }
@@ -48,7 +47,7 @@ namespace ETG
 
         // Draw the frame
         frame.setTexture(Frame);
-        frame.setPosition(static_cast<float>(FramePosition.x), static_cast<float>(FramePosition.y));
+        frame.setPosition(FramePosition.x, FramePosition.y);
         frame.setOrigin(Frame.getSize().x / 2, Frame.getSize().y / 2);
         Globals::DrawSinglePixelAtLoc(frame.getPosition(), {5, 5});
         Globals::Window->draw(frame);

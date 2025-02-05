@@ -21,10 +21,10 @@ namespace ETG
 
         void Initialize();
         void ProcessEvents();
-        bool WindowHasFocus() const {return HasFocus;}
+        bool WindowHasFocus() const { return HasFocus; }
 
         //I might delete this later on 
-        static bool IsRunning() { return Window->isOpen(); };
+        static bool IsRunning() { return Window->isOpen(); }
         void Update();
         void Draw();
     };
