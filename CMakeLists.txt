@@ -15,13 +15,9 @@ add_executable(ETG main.cpp
         src/Managers/GameManager.cpp
         src/Characters/Hero.cpp
         src/Managers/Misc.cpp
-        src/Characters/Components/AnimationComponent.h
         src/Characters/Components/AnimationComponent.cpp
         src/Characters/Components/InputComponent.cpp
-        src/Characters/Components/InputComponent.h
         src/Characters/Components/MoveComponent.cpp
-        src/Characters/Components/MoveComponent.h
-        src/Managers/SpriteBatch.h
 )
 
 # Easiest and fastest way is VCPKG 
@@ -38,6 +34,8 @@ target_compile_options(ETG PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-ftemplate-backtrace-limit=0 -ferror-limit=0>
         $<$<CXX_COMPILER_ID:Clang>:-ftemplate-backtrace-limit=0 -ferror-limit=0>
 )
+
+target_compile_definitions(ETG PRIVATE RESOURCE_PATH="${CMAKE_SOURCE_DIR}/Resources")
 
 target_link_libraries(ETG PRIVATE
         sfml-audio

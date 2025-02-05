@@ -63,10 +63,10 @@ namespace ETG
     void AnimationComponent::SetAnimations()
     {
         const auto runAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Resources/Player/Run/Back", "rogue_run_back_hands_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Run/BackWard", "rogue_run_backward_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Run/Forward", "rogue_run_forward_hands_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Run/Front", "rogue_run_front_hands_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/Back", "rogue_run_back_hands_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/BackWard", "rogue_run_backward_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/Forward", "rogue_run_forward_hands_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/Front", "rogue_run_front_hands_001", "PNG", 0.15f),
         };
 
         auto animManagerRun = AnimationManager{};
@@ -78,10 +78,10 @@ namespace ETG
         AnimManagerDict[HeroStateEnum::Run] = animManagerRun;
 
         const auto idleAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Resources/Player/Idle/Back", "rogue_idle_back_hand_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Idle/BackWard", "rogue_idle_backwards_hands2_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Idle/Front", "rogue_idle_front_hand_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Idle/Right", "rogue_idle_hands_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/Back", "rogue_idle_back_hand_left_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/BackWard", "rogue_idle_backwards_hands2_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/Front", "rogue_idle_front_hand_left_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/Right", "rogue_idle_hands_001", "PNG", 0.15f),
         };
 
         auto animManagerIdle = AnimationManager{};
@@ -93,11 +93,11 @@ namespace ETG
         AnimManagerDict[HeroStateEnum::Idle] = animManagerIdle;
 
         const auto dashAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Resources/Player/Dash/Back", "rogue_dodge_back_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Dash/BackWard", "rogue_dodge_left_back_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Dash/Front", "rogue_dodge_front_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Dash/Left", "rogue_dodge_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Resources/Player/Dash/Right", "rogue_dodge_left_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Left", "rogue_dodge_left_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "PNG", 0.15f),
         };
 
         auto animManagerDash = AnimationManager{};

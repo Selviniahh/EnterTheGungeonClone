@@ -94,7 +94,7 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
     std::vector<sf::Image> imageArr;
     int counter;
     int totalWidth = 0, maxHeight = 0;
-    std::string basePath = (std::filesystem::current_path().parent_path().parent_path() / RelativePath / FileName).string();
+    std::string basePath = (std::filesystem::path(RESOURCE_PATH) / RelativePath / FileName).string();
     char LastChar = basePath[basePath.length() -1];
     counter = LastChar - '0';
     basePath[basePath.length() -1] = counter + '0';
