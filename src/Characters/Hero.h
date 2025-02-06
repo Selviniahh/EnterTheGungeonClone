@@ -1,6 +1,9 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
+
+#include "../Core/GameObject.h"
+#include "../Guns/Base/GunBase.h"
 #include "Components/AnimationComponent.h"
 #include "../Managers/StateEnums.h"
 #include "Components/MoveComponent.h"
@@ -8,11 +11,7 @@
 
 namespace ETG
 {
-}
-
-namespace ETG
-{
-    class Hero
+    class Hero : public GameObject
     {
     public:
         static sf::Vector2f HeroPosition;
@@ -20,13 +19,15 @@ namespace ETG
         static Direction CurrentDirection;
 
         explicit Hero(sf::Vector2f Position);
-        void Update();
-        void Draw();
+        void Update() override;
+        void Draw() override;
         void DrawHeroBounds() const;
         sf::FloatRect HeroBounds() const;
 
         HeroStateEnum CurrentHeroState{HeroStateEnum::Idle};
         bool IsDashing = false;
+
+        GunBase Gun;
 
     private:
         AnimationComponent AnimationComp;

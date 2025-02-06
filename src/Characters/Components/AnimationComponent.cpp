@@ -1,6 +1,8 @@
 #include "AnimationComponent.h"
 #include <iostream>
 
+#include "../../Guns/Base/GunBase.h"
+
 namespace ETG
 {
     AnimationComponent::AnimationComponent()
@@ -26,13 +28,13 @@ namespace ETG
 
     void AnimationComponent::Draw(sf::Vector2f position)
     {
-        float depth = 0.01f;
+        float depth = 1;
         if (!AnimManagerDict.contains(CurrentHeroState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
             
         AnimManagerDict[CurrentHeroState].Draw(position, depth);
     }
 
-    sf::Vector2f AnimationComponent::FlipSprites(const Direction& currentDirection)
+    sf::Vector2f AnimationComponent::FlipSprites(const Direction& currentDirection, GunBase& Gun)
     {
         if (!AnimManagerDict.contains(CurrentHeroState)) return {8.f, 5.f};
 
@@ -44,18 +46,20 @@ namespace ETG
             currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight)
         {
             currAnimState.flipX = 1.f;
+            Gun.Scale.y = 1.f;
             relativeHandLoc = {8.f, 5.f};
         }
         else
         {
             currAnimState.flipX = -1.f;
-            relativeHandLoc = {-8.f, 5.f};
+            Gun.Scale.y = -1.f;
+            relativeHandLoc = {-7.f, 5.f};
         }
 
-        if (currentDirection == Direction::BackDiagonalRight)
-            relativeHandLoc = {-8.f, 5.f};
-        else if (currentDirection == Direction::BackDiagonalLeft)
-            relativeHandLoc = {8.f, 5.f};
+        // if (currentDirection == Direction::BackDiagonalRight)
+        //     relativeHandLoc = {-8.f, 5.f};
+        // else if (currentDirection == Direction::BackDiagonalLeft)
+        //     relativeHandLoc = {8.f, 5.f};
 
         return relativeHandLoc;
     }
@@ -79,7 +83,7 @@ namespace ETG
 
         const auto idleAnims = std::vector<Animation>{
             Animation::CreateSpriteSheet("Player/Idle/Back", "rogue_idle_back_hand_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Idle/BackWard", "rogue_idle_backwards_hands2_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/BackWard", "rogue_idle_backwards_001", "PNG", 0.15f),
             Animation::CreateSpriteSheet("Player/Idle/Front", "rogue_idle_front_hand_left_001", "PNG", 0.15f),
             Animation::CreateSpriteSheet("Player/Idle/Right", "rogue_idle_hands_001", "PNG", 0.15f),
         };

@@ -16,7 +16,7 @@ struct always_false : std::false_type
 };
 
 //Variant necessary to provide hashing based on the given type.   
-using AnimationKey = std::variant<std::string, int, ETG::RunEnum, ETG::IdleEnum, ETG::DashEnum>;
+using AnimationKey = std::variant<std::string, int, ETG::RunEnum, ETG::IdleEnum, ETG::DashEnum, ETG::GunStateEnum>;
 
 // 3) Custom hash + equality
 //Based on given key of variant, convert it to hash
@@ -82,12 +82,7 @@ public:
     void Draw(sf::Vector2f position, float layerDepth);
 
     // Overloaded draw for more complex parameters
-    void Draw(const sf::Texture& texture,
-              sf::Vector2f position,
-              sf::Color color,
-              float rotation,
-              sf::Vector2f origin,
-              float scale);
+    void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, float depth);
 
     // Optionally set origin
     template <typename T>
@@ -141,17 +136,12 @@ inline void AnimationManager::Draw(const sf::Vector2f position, const float laye
     }
 }
 
-inline void AnimationManager::Draw(const sf::Texture& texture,
-                                   const sf::Vector2f position,
-                                   const sf::Color color,
-                                   const float rotation,
-                                   const sf::Vector2f origin,
-                                   const float scale)
+inline void AnimationManager::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth)
 {
     auto it = AnimationDict.find(LastKey);
     if (it != AnimationDict.end())
     {
-        it->second.Draw(texture, position, color, rotation, origin, scale);
+        it->second.Draw(texture, position, color, rotation, origin, scale, depth);
     }
 }
 

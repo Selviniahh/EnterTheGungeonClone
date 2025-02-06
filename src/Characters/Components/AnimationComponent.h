@@ -6,6 +6,11 @@
 
 namespace ETG
 {
+    class GunBase;
+}
+
+namespace ETG
+{
     enum class HeroStateEnum;
 
     class AnimationComponent
@@ -20,7 +25,7 @@ namespace ETG
         void SetAnimations();
         void Update(const HeroStateEnum& heroState, const AnimationKey& animState);
         void Draw(sf::Vector2f position);
-        sf::Vector2f FlipSprites(const Direction& currentDirection);
+        sf::Vector2f FlipSprites(const Direction& currentDirection, GunBase& Gun);
         
     private:
         std::unordered_map<HeroStateEnum, AnimationManager> AnimManagerDict{};

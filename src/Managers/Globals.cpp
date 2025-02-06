@@ -31,7 +31,7 @@ namespace ETG::Globals
         //NOTE: Set camera Location and zoom. After enemy, UI, Gun, Hero are handled, better camera and hero locations will be implemented.   
         MainView = window->getDefaultView();
         MainView.setCenter(0.f, 0.f);
-        MainView.zoom(0.1f);
+        MainView.zoom(0.2f);
     }
 
     void Update()
@@ -55,7 +55,7 @@ namespace ETG::Globals
         return vector / length;
     }
 
-    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, const sf::Vector2i scale)
+    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, const sf::Vector2i scale, const float rotation)
     {
         static sf::Texture tex;
         static bool isLoaded = false;
@@ -74,9 +74,10 @@ namespace ETG::Globals
         frame.setOrigin(0.5f, 0.5f);  // Center of 1x1 pixel
         frame.setScale(scale.x, scale.y);
         frame.setPosition(Loc); // Position it at the specified location
+        frame.setRotation(rotation);
         
         // Draw the sprite
-        SpriteBatch.draw(frame);
+        SpriteBatch.draw(frame,0);
         return false;
     }
 
@@ -97,14 +98,17 @@ namespace ETG::Globals
         return "Unknown Direction";
     }
 
-    void Renderer::SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos)
+    void Renderer::SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos, const float Rotation, const sf::Vector2f origin, const float Scale, const float depth)
     {
         sf::Sprite frame;
         frame.setTexture(tex);
-        frame.setScale(Globals::DefaultScale, Globals::DefaultScale);
+        frame.setScale(Scale, Scale);
         frame.setPosition(pos); // Position it at the specified location
+        frame.setRotation(Rotation);
+        frame.setOrigin(origin);
+        frame.setColor(sf::Color::White);
 
-        ETG::Globals::SpriteBatch.draw(frame);
+        SpriteBatch.draw(frame,depth);
     }
 }
 

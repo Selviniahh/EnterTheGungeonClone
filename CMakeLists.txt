@@ -18,6 +18,13 @@ add_executable(ETG main.cpp
         src/Characters/Components/AnimationComponent.cpp
         src/Characters/Components/InputComponent.cpp
         src/Characters/Components/MoveComponent.cpp
+        src/Guns/Base/GunBase.cpp
+        src/Guns/Base/GunBase.h
+        src/Core/GameObject.h
+        src/Projectile/ProjectileBase.h
+        src/Projectile/ProjectileBase.cpp
+        src/Guns/Base/GunAnimComp.cpp
+        src/Guns/Base/GunAnimComp.h
 )
 
 # Easiest and fastest way is VCPKG 

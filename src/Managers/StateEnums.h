@@ -35,6 +35,13 @@ namespace ETG
         Die
     };
 
+    enum class GunStateEnum
+    {
+        Idle,
+        Shoot,
+        Reload
+    };
+
     enum class Direction
     {
         Right,

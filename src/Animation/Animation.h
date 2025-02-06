@@ -34,7 +34,7 @@ public:
     /// \brief decrement `AnimTimeLeft` If AnimTimeLeft is 0, increment CurrentFrame, restart CurrentFrame counter
     void Update();
     void Draw(sf::Vector2f position, float layerDepth) const;
-    void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, float scale) const;
+    void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, const float depth) const;
 
     /// Restart the animation. Set `CurrentFrame` = 0, `AnimTimeLeft` = `EachFrameSpeed`
     void Restart();
@@ -43,5 +43,5 @@ public:
 
     //Omit FileName's last number. If file's name is "SpriteSheet_001" Give "SpriteSheet_00"
     //There's no Y axis sprite sheet creation. Only X 
-    static Animation CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, float eachFrameSpeed);
+    static Animation CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, float eachFrameSpeed, bool IsSingleSprite = false);
 };

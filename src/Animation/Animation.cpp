@@ -42,12 +42,12 @@ void Animation::Draw(const sf::Vector2f position, float layerDepth) const
     frame.setColor(sf::Color::White);
     frame.setRotation(0.f);
     frame.setOrigin(Origin);
-    frame.setScale(ETG::Globals::DefaultScale * flipX, ETG::Globals::DefaultScale); //Idk why I should set it 5f
+    frame.setScale(ETG::Globals::DefaultScale * flipX, ETG::Globals::DefaultScale);
 
-    ETG::Globals::SpriteBatch.draw(frame);
+    ETG::Globals::SpriteBatch.draw(frame,layerDepth);
 }
 
-void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const float scale) const
+void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth) const
 {
     sf::Sprite frame;
     frame.setTexture(Texture);
@@ -56,9 +56,9 @@ void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, co
     frame.setColor(color);
     frame.rotate(rotation);
     frame.setOrigin(origin);
-    frame.setScale(scale, scale);
+    frame.setScale( scale);
 
-    ETG::Globals::SpriteBatch.draw(frame);
+    ETG::Globals::SpriteBatch.draw(frame,depth);
 }
 
 void Animation::Restart()
@@ -72,7 +72,8 @@ const sf::Texture& Animation::GetCurrentFrameAsTexture() const
     //Ensure the cache is large enough
     if (textureCache.size() <= CurrentFrame) textureCache.resize(CurrentFrame + 1);
 
-    if (!textureCache[CurrentFrame].getSize().x == 0)
+    //Reconsider to refactor here
+    if (textureCache[CurrentFrame].getSize().x == 0)
     {
         const sf::IntRect sourceRectangle = FrameRects[CurrentFrame];
         sf::Image frameImage;
@@ -88,18 +89,29 @@ bool Animation::IsAnimationFinished() const
     return CurrentFrame == FrameX - 1;
 }
 
-Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, const float eachFrameSpeed)
+Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, const float eachFrameSpeed, bool IsSingleSprite)
 {
     //Initial setup
     std::vector<sf::Image> imageArr;
     int counter;
     int totalWidth = 0, maxHeight = 0;
     std::string basePath = (std::filesystem::path(RESOURCE_PATH) / RelativePath / FileName).string();
-    char LastChar = basePath[basePath.length() -1];
-    counter = LastChar - '0';
-    basePath[basePath.length() -1] = counter + '0';
-    basePath.erase(basePath.length() -1, basePath.length() -2);
-    std::string filePath = basePath + std::to_string(counter) +   "." + Extension;
+    char LastChar = basePath[basePath.length() - 1];
+    std::string filePath;
+
+    //If lastChar is number, it means it will be a spritesheet. If not the spritesheet will be single.
+    if (static_cast<int>(LastChar) >= 48 && static_cast<int>(LastChar) <= 57)
+    {
+        counter = LastChar - '0';
+        basePath[basePath.length() - 1] = counter + '0';
+        basePath.erase(basePath.length() - 1, basePath.length() - 2);
+        filePath = basePath + std::to_string(counter) + "." + Extension;
+    }
+    else
+    {
+        filePath = basePath + "." + Extension;
+    }
+
 
     //Check firstly if filepath is valid
     if (!std::filesystem::exists(filePath)) throw std::runtime_error("File not found at: " + filePath);
@@ -108,7 +120,10 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
     while (true)
     {
         sf::Image singleImage;
-        filePath = basePath + std::to_string(counter) + "." + Extension;
+
+        //If the sprite is single, just load and exist the loop. If it's multiple sprites, load all 
+        IsSingleSprite ? filePath = basePath + "." + Extension : filePath = basePath + std::to_string(counter) + "." + Extension; 
+        
         if (!std::filesystem::exists(filePath)) break;
 
         if (!singleImage.loadFromFile(filePath))
@@ -119,6 +134,8 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
 
         totalWidth += int(singleImage.getSize().x);
         maxHeight = std::max(maxHeight, int(singleImage.getSize().y));
+
+        if (IsSingleSprite) break;
     }
 
     //Create the spritesheet as image

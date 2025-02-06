@@ -1,9 +1,11 @@
 #pragma once
 #include <SFML/Graphics/Texture.hpp>
 
+#include "../Core/GameObject.h"
+
 namespace ETG
 {
-    class UserInterface
+    class UserInterface : public GameObject
     {
     private:
         sf::Texture Frame;
@@ -25,8 +27,8 @@ namespace ETG
 
     public:
         UserInterface();
-        void Initialize();
-        void Update();
-        void Draw();
+        void Initialize() override;
+        void Update() override;
+        void Draw() override;
     };
 }

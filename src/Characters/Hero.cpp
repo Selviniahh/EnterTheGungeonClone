@@ -6,7 +6,7 @@ sf::Vector2f ETG::Hero::HeroPosition = {0.f, 0.f};
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
 
-ETG::Hero::Hero(const sf::Vector2f Position) : HandPos({}), HandTex({})
+ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), Gun(HandPos), HandTex({}), HandPos({})
 {
     HeroPosition = Position;
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.PNG").string()))
@@ -15,31 +15,36 @@ ETG::Hero::Hero(const sf::Vector2f Position) : HandPos({}), HandTex({})
 
 void ETG::Hero::Update()
 {
+    //Hero self animation handling
     AnimationKey animState = IdleEnum::Idle_Back;
     
     InputComp.Update(*this);
     MoveComp.UpdateMovement(*this);
     
     if (CurrentHeroState == HeroStateEnum::Dash)
-    {
         animState = InputComponent::GetDashDirectionEnum();
-    }
+    
     else if (CurrentHeroState == HeroStateEnum::Run)
-    {
         animState = GetRunEnum(CurrentDirection);
-    }
+    
     else if (CurrentHeroState == HeroStateEnum::Idle)
-    {
         animState = GetIdleDirectionEnum(CurrentDirection);
-    }
 
     AnimationComp.Update(CurrentHeroState, animState);
-    RelativeHandLoc = AnimationComp.FlipSprites(CurrentDirection);
+    RelativeHandLoc = AnimationComp.FlipSprites(CurrentDirection, Gun);
     SetHandTexLoc();
+
+    //Gun
+    Gun.Position = HandPos + sf::Vector2f{2,2};
+    Gun.Rotation = MouseAngle;
+    Gun.Update();
 }
 
 void ETG::Hero::Draw()
 {
+    Gun.Draw();
+    
+    //Hero self animation draw
     AnimationComp.Draw(HeroPosition);
     Globals::Renderer::SimpleDraw(HandTex, HandPos);
     Globals::DrawSinglePixelAtLoc(HeroPosition);

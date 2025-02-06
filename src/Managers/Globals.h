@@ -13,7 +13,7 @@ namespace ETG::Globals
     class Renderer
     {
     public:
-        static void SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos);
+        static void SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos, float Rotation = 0, sf::Vector2f origin = {1,1}, float Scale = 1, float depth = 1);
     };
 
     //Elapsed time in seconds
@@ -40,7 +40,7 @@ namespace ETG::Globals
     //length: Compute the magnitude of the vector using the formula sqrt(x^2 + y^2)
     // Division: Divide the vector components by the magnitude to scale it to a unit vector (length 1).
     sf::Vector2<float> Normalize(const sf::Vector2f& vector);
-    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, sf::Vector2i scale = {1,1});
+    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, sf::Vector2i scale = {1,1}, float rotation = 0);
 
     std::string StringifyDirection(Direction dir);
 }

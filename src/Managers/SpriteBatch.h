@@ -14,7 +14,7 @@ public:
     }
 
     //NOTE: Sprites added to a batch are transformed based on the active view 
-    void draw(const sf::Sprite& sprite)
+    void draw(const sf::Sprite& sprite, float depth)
     {
         const sf::Texture* texture = sprite.getTexture();
         if (!texture) return;
@@ -47,15 +47,20 @@ public:
             vertice.color = color;
 
         // Add to the list
-        sprites.emplace_back(vertices[0], vertices[1], vertices[2], vertices[3], texture);
+        sprites.emplace_back(vertices[0], vertices[1], vertices[2], vertices[3], texture, depth,drawCounter++);
     }
 
     void end(sf::RenderWindow& window) {
         if (sprites.empty()) return;
 
-        // Sort sprites by texture to minimize switches. NOTE THAT it's sorting based on given memory addresses
+        // Sort sprites by draw order. If draw order same, draw the one has higher order. 
         std::sort(sprites.begin(), sprites.end(), 
-            [](const SpriteQuad& a, const SpriteQuad& b) { return a.texture < b.texture; });
+            [](const SpriteQuad& a, const SpriteQuad& b)
+            {
+                if (a.depth == b.depth)
+                    return a.drawOrder < b.drawOrder;
+                return a.depth > b.depth;
+            });
 
         const sf::Texture* currentTexture = sprites[0].texture;
         sf::VertexArray va(sf::Quads);
@@ -86,12 +91,15 @@ private:
         sf::Vertex v2;
         sf::Vertex v3;
         const sf::Texture* texture;
+        float depth;
+        int drawOrder;
 
-        SpriteQuad(const sf::Vertex& v0, const sf::Vertex& v1, const sf::Vertex& v2, const sf::Vertex& v3, const sf::Texture* texture)
-            : v0(v0), v1(v1), v2(v2), v3(v3), texture(texture)
+        SpriteQuad(const sf::Vertex& v0, const sf::Vertex& v1, const sf::Vertex& v2, const sf::Vertex& v3, const sf::Texture* texture, const float depth, const int drawOrder)
+            : v0(v0), v1(v1), v2(v2), v3(v3), texture(texture), depth(depth), drawOrder(drawOrder)
         {
         }
     };
 
     std::vector<SpriteQuad> sprites;
+    int drawCounter = 0;
 };
