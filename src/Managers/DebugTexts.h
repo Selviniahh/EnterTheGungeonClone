@@ -43,6 +43,7 @@ namespace ETG
             DrawDebugText("View Center: " + std::to_string(Globals::MainView.getCenter().x) + " " + std::to_string(Globals::MainView.getCenter().y), window);
             DrawDebugText("View Size: " + std::to_string(Globals::MainView.getSize().x) + " " + std::to_string(Globals::MainView.getSize().y), window);
             DrawDebugText("CurrentDirection: " + Globals::StringifyDirection(Hero::CurrentDirection), window);
+            DrawDebugText(std::string("Is Shooting: ") + (Hero::IsShooting ? "True" : "False"), window);
         }
 
         static void DrawDebugText(const std::string& str, sf::RenderWindow& window)

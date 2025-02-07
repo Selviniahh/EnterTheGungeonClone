@@ -5,26 +5,28 @@ ETG::GunAnimComp::GunAnimComp()
     SetAnimations();
 }
 
-void ETG::GunAnimComp::Update(const GunStateEnum& GunState, const AnimationKey& animState)
+void ETG::GunAnimComp::Update(const GunStateEnum& GunState, const AnimationKey& key)
 {
     CurrentGunState = GunState;
-    CurrentAnimState = animState;
+    CurrentAnimState = key;
 
-    auto& currAnimManager = AnimManagerDict[CurrentGunState];
-    currAnimManager.Update(CurrentAnimState);
+    auto& animManager = AnimManagerDict[CurrentGunState];
+    animManager.Update(CurrentAnimState);
 
-    const auto& currAnimState = currAnimManager.AnimationDict[CurrentAnimState];
-    CurrTexRect = currAnimState.CurrRect;
-    CurrentTex = currAnimState.GetCurrentFrameAsTexture();
-    RelativeOrigin = currAnimManager.AnimationDict[AnimManagerDict[CurrentGunState].LastKey].Origin;
+    const auto& animState = animManager.AnimationDict[CurrentAnimState];
+    CurrTexRect = animState.CurrRect;
+    CurrentTex = animState.GetCurrentFrameAsTexture();
+
+    // Get the origin from the last key animation
+    RelativeOrigin = animManager.AnimationDict[animManager.LastKey].Origin;
 }
+
 void ETG::GunAnimComp::Draw(const sf::Vector2f position, const sf::Vector2f Origin, const sf::Vector2f Scale, const float Rotation, const float depth)
 {
     if (!AnimManagerDict.contains(CurrentGunState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
-            
-    AnimManagerDict[CurrentGunState].Draw(CurrentTex, position, sf::Color::White,Rotation, Origin,Scale, depth);
-}
 
+    AnimManagerDict[CurrentGunState].Draw(CurrentTex, position, sf::Color::White, Rotation, Origin, Scale, depth);
+}
 
 
 void ETG::GunAnimComp::SetAnimations()
@@ -38,17 +40,12 @@ void ETG::GunAnimComp::SetAnimations()
     AnimManagerDict[GunStateEnum::Idle] = IdleAnimManager;
 
     //Shoot animations
-    const auto ShootAnims = std::vector<Animation>{
-        Animation::CreateSpriteSheet("Guns/RogueSpecial/Fire", "knav3_fire_001", "PNG", 0.15f),
-    };
+    const auto ShootAnim = Animation::CreateSpriteSheet("Guns/RogueSpecial/Fire", "knav3_fire_001", "PNG", 0.15f);
 
     auto ShootAnimManager = AnimationManager();
-    for (int i = 0; i < ShootAnims.size(); ++i)
-    {
-        ShootAnimManager.AddAnimation(GunStateEnum::Shoot, ShootAnims[i]);
-        ShootAnimManager.SetOrigin(GunStateEnum::Shoot, sf::Vector2f{(float)(ShootAnims[i].FrameRects[0].width / 2), (float)(ShootAnims[i].FrameRects[0].width / 2),});
-    }
-    
+    ShootAnimManager.AddAnimation(GunStateEnum::Shoot, ShootAnim);
+    ShootAnimManager.SetOrigin(GunStateEnum::Shoot, sf::Vector2f{(float)(ShootAnim.FrameRects[0].width / 2), (float)(ShootAnim.FrameRects[0].width / 2),});
+
     AnimManagerDict[GunStateEnum::Shoot] = ShootAnimManager;
 
     //Reload Animation

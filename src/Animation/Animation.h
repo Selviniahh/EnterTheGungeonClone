@@ -9,7 +9,6 @@ private:
     int CurrentFrame = 0;
     int FrameX;
     int FrameY;
-    bool Active = true;
     mutable std::vector<sf::Texture> textureCache; 
 
 public:
@@ -19,6 +18,7 @@ public:
     std::vector<sf::Rect<int>> FrameRects;
     bool IsValid = true;
     float flipX = 1.0f;
+    bool Active = true;
 
     //NOTE: Rule of Five: Destructor, Copy Constructor, Copy Assignment, Move Constructor, Move Assignment
     Animation(const sf::Texture& texture, float eachFrameSpeed, int frameX, int frameY, int row = 1);
@@ -33,7 +33,7 @@ public:
 
     /// \brief decrement `AnimTimeLeft` If AnimTimeLeft is 0, increment CurrentFrame, restart CurrentFrame counter
     void Update();
-    void Draw(sf::Vector2f position, float layerDepth) const;
+    void Draw(sf::Vector2f position, float layerDepth, float rotation = 0) const;
     void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, const float depth) const;
 
     /// Restart the animation. Set `CurrentFrame` = 0, `AnimTimeLeft` = `EachFrameSpeed`

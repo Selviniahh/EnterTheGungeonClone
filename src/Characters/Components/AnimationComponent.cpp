@@ -56,11 +56,6 @@ namespace ETG
             relativeHandLoc = {-7.f, 5.f};
         }
 
-        // if (currentDirection == Direction::BackDiagonalRight)
-        //     relativeHandLoc = {-8.f, 5.f};
-        // else if (currentDirection == Direction::BackDiagonalLeft)
-        //     relativeHandLoc = {8.f, 5.f};
-
         return relativeHandLoc;
     }
 

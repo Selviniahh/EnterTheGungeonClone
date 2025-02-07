@@ -48,6 +48,9 @@ namespace ETG
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) direction.y--;
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) direction.y++;
 
+            //shooting
+            Hero::IsShooting = sf::Mouse::isButtonPressed(sf::Mouse::Left); 
+
             //Camera Effects:
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) Globals::MainView.zoom(1.0f - adjustedZoomFactor);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) Globals::MainView.zoom(1.0f + adjustedZoomFactor);

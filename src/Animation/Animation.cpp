@@ -33,14 +33,16 @@ void Animation::Update()
     CurrRect = FrameRects[CurrentFrame];
 }
 
-void Animation::Draw(const sf::Vector2f position, float layerDepth) const
+void Animation::Draw(const sf::Vector2f position, const float layerDepth, const float rotation) const
 {
+    if (!Active) return;
+    
     sf::Sprite frame;
     frame.setTexture(Texture);
     frame.setTextureRect(FrameRects[CurrentFrame]);
     frame.setPosition(position);
     frame.setColor(sf::Color::White);
-    frame.setRotation(0.f);
+    frame.setRotation(rotation);
     frame.setOrigin(Origin);
     frame.setScale(ETG::Globals::DefaultScale * flipX, ETG::Globals::DefaultScale);
 
@@ -49,6 +51,8 @@ void Animation::Draw(const sf::Vector2f position, float layerDepth) const
 
 void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth) const
 {
+    if (!Active) return;
+
     sf::Sprite frame;
     frame.setTexture(Texture);
     frame.setTextureRect(FrameRects[CurrentFrame]);

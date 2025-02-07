@@ -5,8 +5,9 @@
 sf::Vector2f ETG::Hero::HeroPosition = {0.f, 0.f};
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
+bool ETG::Hero::IsShooting{};
 
-ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), Gun(HandPos), HandTex({}), HandPos({})
+ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), Gun(HandPos, 0.35f, 200.f, 5000.f, 0.f, false), HandTex({}), HandPos({})
 {
     HeroPosition = Position;
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.PNG").string()))
@@ -38,6 +39,7 @@ void ETG::Hero::Update()
     Gun.Position = HandPos + sf::Vector2f{2,2};
     Gun.Rotation = MouseAngle;
     Gun.Update();
+    if (IsShooting) Gun.Shoot();
 }
 
 void ETG::Hero::Draw()

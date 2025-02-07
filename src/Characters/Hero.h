@@ -17,6 +17,7 @@ namespace ETG
         static sf::Vector2f HeroPosition;
         static float MouseAngle;
         static Direction CurrentDirection;
+        static bool IsShooting;
 
         explicit Hero(sf::Vector2f Position);
         void Update() override;
