@@ -13,9 +13,10 @@ namespace ETG
     class GunAnimComp
     {
     public:
+        virtual ~GunAnimComp() = default;
         GunAnimComp();
         
-        void SetAnimations();
+        virtual void SetAnimations();
 
         //Since there's no different animations for directions, GunState and key will be same  
         void Update(const GunStateEnum& GunState, const AnimationKey& key);

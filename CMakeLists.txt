@@ -25,6 +25,8 @@ add_executable(ETG main.cpp
         src/Projectile/ProjectileBase.cpp
         src/Guns/Base/GunAnimComp.cpp
         src/Guns/Base/GunAnimComp.h
+        src/Guns/RogueSpecial/RogueSpecial.cpp
+        src/Guns/RogueSpecial/RogueSpecial.h
 )
 
 # Easiest and fastest way is VCPKG 

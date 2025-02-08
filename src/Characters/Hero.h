@@ -1,9 +1,8 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
-
 #include "../Core/GameObject.h"
-#include "../Guns/Base/GunBase.h"
+#include "../Guns/RogueSpecial/RogueSpecial.h"
 #include "Components/AnimationComponent.h"
 #include "../Managers/StateEnums.h"
 #include "Components/MoveComponent.h"
@@ -28,7 +27,7 @@ namespace ETG
         HeroStateEnum CurrentHeroState{HeroStateEnum::Idle};
         bool IsDashing = false;
 
-        GunBase Gun;
+        std::unique_ptr<RogueSpecial> RogueSpecial;
 
     private:
         AnimationComponent AnimationComp;

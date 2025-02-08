@@ -25,7 +25,9 @@ namespace ETG
         void SetAnimations();
         void Update(const HeroStateEnum& heroState, const AnimationKey& animState);
         void Draw(sf::Vector2f position);
-        sf::Vector2f FlipSprites(const Direction& currentDirection, GunBase& Gun);
+        
+        template<typename... TObjects>
+         sf::Vector2f FlipSprites(const Direction& currentDirection, TObjects&... objects);
         
     private:
         std::unordered_map<HeroStateEnum, AnimationManager> AnimManagerDict{};

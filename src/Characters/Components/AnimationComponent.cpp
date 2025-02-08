@@ -1,7 +1,14 @@
 #include "AnimationComponent.h"
-#include <iostream>
-
 #include "../../Guns/Base/GunBase.h"
+#include "../../Guns/RogueSpecial/RogueSpecial.h"
+
+namespace ETG
+{
+    class RogueSpecial;
+}
+
+template sf::Vector2f ETG::AnimationComponent::FlipSprites<ETG::GunBase>(const Direction&, ETG::GunBase&);
+template sf::Vector2f ETG::AnimationComponent::FlipSprites<ETG::RogueSpecial>(const Direction&, RogueSpecial&);
 
 namespace ETG
 {
@@ -34,29 +41,34 @@ namespace ETG
         AnimManagerDict[CurrentHeroState].Draw(position, depth);
     }
 
-    sf::Vector2f AnimationComponent::FlipSprites(const Direction& currentDirection, GunBase& Gun)
+    template<typename... TObjects>
+    sf::Vector2f AnimationComponent::FlipSprites(const Direction& currentDirection, TObjects&... objects)
     {
         if (!AnimManagerDict.contains(CurrentHeroState)) return {8.f, 5.f};
 
         auto& currAnimManager = AnimManagerDict[CurrentHeroState];
         auto& currAnimState = currAnimManager.AnimationDict[CurrentAnimState];
-        sf::Vector2f relativeHandLoc;
 
-        if (currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
-            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight)
-        {
-            currAnimState.flipX = 1.f;
-            Gun.Scale.y = 1.f;
-            relativeHandLoc = {8.f, 5.f};
-        }
-        else
-        {
-            currAnimState.flipX = -1.f;
-            Gun.Scale.y = -1.f;
-            relativeHandLoc = {-7.f, 5.f};
-        }
+        bool facingRight =
+        (currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
+         currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight);
 
-        return relativeHandLoc;
+        //set flipX accordingly
+        currAnimState.flipX = facingRight ? 1.f : -1.f;
+
+        //Scale factor to apply in Y
+        float flipFactor = facingRight ? 1.f : -1.f;
+
+        //lambda that applies the scale flip to an object
+        auto flipObjectScale = [flipFactor](auto& obj)
+        {
+            obj.Scale.y = flipFactor;
+        };
+
+        //Apply the flip to all passed objects
+        (flipObjectScale(objects), ...);
+
+        return facingRight ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
     }
 
     void AnimationComponent::SetAnimations()

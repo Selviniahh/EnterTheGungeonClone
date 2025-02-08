@@ -2,6 +2,9 @@
 #include "GunAnimComp.h"
 #include "../../Animation/Animation.h"
 #include "../../Core/GameObject.h"
+#include <vector>
+#include <SFML/Graphics.hpp>
+#include <memory>
 
 class ProjectileBase;
 
@@ -10,50 +13,47 @@ namespace ETG
     class GunBase : public GameObject
     {
     public:
-        explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity, bool isAttacking);
+        explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity);
         ~GunBase() override;
         void Initialize() override;
         void Update() override;
         void Draw() override;
-        void Shoot();
+        virtual void Shoot();
         
-        // void Shoot(const sf::Vector2f& projectileVelocity);
-        // void Shoot(const sf::Vector2f& projectileVelocity, const sf::Vector2f& spawnLocation);
-        // void Shoot(const sf::Vector2f& projectileVelocity, const sf::Vector2f& spawnLocation, float delay, size_t numberOfProjectiles);
-
-    public:
         float Rotation{};
-        
+    
     protected:
-        sf::Vector2f RotateVector(const sf::Vector2f& arrowOffset) const;
+        // Rotates an offset vector according to the gun's current rotation.
+        sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
         
         std::vector<ProjectileBase*> projectiles;
-
         sf::Texture GunTexture;
         sf::Texture ProjTexture;
-
-        //Muzzle Flash
+        
+        // Muzzle flash variables (instance sets up its own animation).
         Animation muzzleFlashAnim;
-        float MuzzleFlashEachFrameSpeed = 0.10f;
+        float MuzzleFlashEachFrameSpeed;
         sf::Vector2f MuzzleFlashPos;
         sf::Vector2f MuzzleFlashOffset;
-
+        
         float pressTime;
         float velocity;
         float maxProjectileRange;
         float timerForVelocity;
-        float isAttacking;
-
-        sf::Vector2f OriginOffset{1.f, 10.f};
-
-        //Arrow
+        bool isAttacking{};
+        
+        // Origin offset for spawning projectiles.
+        sf::Vector2f OriginOffset;
+        
+        // Arrow variables (common to all guns). Arrow will be disabled in Release
         sf::Texture ArrowTex;
         sf::Vector2f arrowOffset;
         sf::Vector2f arrowOrigin;
-        sf::Vector2f arrowOriginOffset{-6,0};
+        sf::Vector2f arrowOriginOffset;
         sf::Vector2f arrowPos;
 
-        GunAnimComp AnimationComp;
+        //Gun Animation
+        std::unique_ptr<GunAnimComp> AnimationComp;
         GunStateEnum CurrentGunState{GunStateEnum::Idle};
     };
 }
