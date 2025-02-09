@@ -1,6 +1,6 @@
 #include "Globals.h"
-#include <complex>
 #include <filesystem>
+#include "SpriteBatch.h"
 
 namespace ETG::Globals
 {
@@ -13,13 +13,12 @@ namespace ETG::Globals
     sf::Clock clock;
     sf::Clock tickClock;
     sf::View MainView;
-    class SpriteBatch SpriteBatch;
 
     void Initialize(const std::shared_ptr<sf::RenderWindow>& window)
     {
         Window = window;
         ScreenSize = window->getSize();
-        SpriteBatch.begin();
+        GlobSpriteBatch.begin();
         
         //Load font
         const std::filesystem::path FullPath = std::filesystem::path(RESOURCE_PATH) / "Fonts" / "SegoeUI.ttf";
@@ -46,15 +45,6 @@ namespace ETG::Globals
         FrameTick = elapsedTime.asSeconds();
     }
 
-
-    sf::Vector2<float> Normalize(const sf::Vector2f& vector)
-    {
-        const float length = std::sqrt(vector.x * vector.x + vector.y * vector.y);
-        if (length == 0) throw std::runtime_error("length is 0. Vector is: " + std::to_string(vector.x) + " " + std::to_string(vector.y));
-
-        return vector / length;
-    }
-
     bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, const sf::Vector2i scale, const float rotation)
     {
         static sf::Texture tex;
@@ -77,38 +67,8 @@ namespace ETG::Globals
         frame.setRotation(rotation);
         
         // Draw the sprite
-        SpriteBatch.draw(frame,0);
+        GlobSpriteBatch.draw(frame,0);
         return false;
-    }
-
-    std::string StringifyDirection(Direction dir)
-    {
-        switch (dir)
-        {
-        case Direction::Right: return "Right";
-        case Direction::FrontHandRight: return "FrontHandRight";
-        case Direction::FrontHandLeft: return "FrontHandLeft";
-        case Direction::Left: return "Left";
-        case Direction::BackDiagonalLeft: return "BackDiagonalLeft";
-        case Direction::BackHandLeft: return "BackHandLeft";
-        case Direction::BackHandRight: return "BackHandRight";
-        case Direction::BackDiagonalRight: return "BackDiagonalRight";
-        }
-        // If there’s no match, return something
-        return "Unknown Direction";
-    }
-
-    void Renderer::SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos, const float Rotation, const sf::Vector2f origin, const float Scale, const float depth)
-    {
-        sf::Sprite frame;
-        frame.setTexture(tex);
-        frame.setScale(Scale, Scale);
-        frame.setPosition(pos); // Position it at the specified location
-        frame.setRotation(Rotation);
-        frame.setOrigin(origin);
-        frame.setColor(sf::Color::White);
-
-        SpriteBatch.draw(frame,depth);
     }
 }
 

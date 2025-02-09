@@ -9,6 +9,7 @@ public:
     GameObject() = default;
     virtual ~GameObject() = default;
 
+protected:
     virtual void Initialize() {}
     virtual void Update() {}
     virtual void Draw() {}
@@ -17,4 +18,10 @@ public:
     sf::Vector2f Position{0.f, 0.f};
     sf::Vector2f Origin{0.f, 0.f};
     sf::Vector2f Scale = {1,1};
+    float Rotation{};
+
+
+public:
+    [[nodiscard]] sf::Vector2f& GetPosition() {return Position;}
+    [[nodiscard]] sf::Vector2f& GetScale() {return Scale;}
 };

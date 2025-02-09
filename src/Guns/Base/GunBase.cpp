@@ -2,8 +2,8 @@
 #include <filesystem>
 #include <iostream>
 #include <numbers>
-#include "../../Managers/Globals.h"
 #include "../../Projectile/ProjectileBase.h"
+#include "../../Managers/SpriteBatch.h"
 
 using namespace ETG;
 
@@ -83,7 +83,7 @@ void GunBase::Draw()
     Globals::DrawSinglePixelAtLoc(Position, {1, 1}, Rotation);
 
     // Draw the arrow representation.
-    Globals::Renderer::SimpleDraw(ArrowTex, arrowPos, Rotation, arrowOrigin);
+    SpriteBatch::SimpleDraw(ArrowTex, arrowPos, Rotation, arrowOrigin);
     Globals::DrawSinglePixelAtLoc(arrowPos, {1, 1}, Rotation);
 
     // Draw projectiles.

@@ -1,15 +1,17 @@
 #include "Hero.h"
 #include <iostream>
+#include "../Managers/GameState.h"
 #include "../Managers/InputManager.h"
+#include "../Managers/SpriteBatch.h"
 
-sf::Vector2f ETG::Hero::HeroPosition = {0.f, 0.f};
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
 bool ETG::Hero::IsShooting{};
 
 ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
 {
-    HeroPosition = Position;
+    this->Position = Position;
+    GameState::GetInstance().SetHero(this);
     RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.PNG").string()))
         std::cerr << "Failed to load hand texture" << std::endl;
@@ -21,23 +23,23 @@ void ETG::Hero::Update()
     AnimationKey animState = IdleEnum::Idle_Back;
     
     InputComp.Update(*this);
-    MoveComp.UpdateMovement(*this);
+    MoveComp.Update();
     
     if (CurrentHeroState == HeroStateEnum::Dash)
         animState = InputComponent::GetDashDirectionEnum();
     
     else if (CurrentHeroState == HeroStateEnum::Run)
-        animState = GetRunEnum(CurrentDirection);
+        animState = DirectionUtils::GetRunEnum(CurrentDirection);
     
     else if (CurrentHeroState == HeroStateEnum::Idle)
-        animState = GetIdleDirectionEnum(CurrentDirection);
+        animState = DirectionUtils::GetIdleDirectionEnum(CurrentDirection);
 
     AnimationComp.Update(CurrentHeroState, animState);
     RelativeHandLoc = AnimationComp.FlipSprites(CurrentDirection, *RogueSpecial);
     SetHandTexLoc();
 
     //Gun
-    RogueSpecial->Position = HandPos + sf::Vector2f{2,2};
+    RogueSpecial->GetPosition() = HandPos + sf::Vector2f{2,2};
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();
@@ -48,9 +50,9 @@ void ETG::Hero::Draw()
     RogueSpecial->Draw();
     
     //Hero self animation draw
-    AnimationComp.Draw(HeroPosition);
-    Globals::Renderer::SimpleDraw(HandTex, HandPos);
-    Globals::DrawSinglePixelAtLoc(HeroPosition);
+    AnimationComp.Draw(Position);
+    SpriteBatch::SimpleDraw(HandTex, HandPos);
+    Globals::DrawSinglePixelAtLoc(Position);
 
     // Debug bounds drawing
     DrawHeroBounds();
@@ -60,8 +62,8 @@ sf::FloatRect ETG::Hero::HeroBounds() const
 {
     const auto& currTexRect = AnimationComp.CurrTexRect;
     return {
-        HeroPosition.x - currTexRect.width / 2.f,
-        HeroPosition.y - currTexRect.height / 2.f,
+        Position.x - currTexRect.width / 2.f,
+        Position.y - currTexRect.height / 2.f,
         static_cast<float>(currTexRect.width),
         static_cast<float>(currTexRect.height)
     };
@@ -80,25 +82,7 @@ void ETG::Hero::DrawHeroBounds() const
 
 void ETG::Hero::SetHandTexLoc()
 {
-    HandPos = HeroPosition + RelativeHandLoc;
+    HandPos = Position + RelativeHandLoc;
     HandPos.x -= static_cast<float>(HandTex.getSize().x) / 2;
     HandPos.y -= static_cast<float>(HandTex.getSize().y) / 2;
-}
-
-ETG::RunEnum ETG::Hero::GetRunEnum(const Direction currDir)
-{
-    if (currDir == Direction::BackHandRight || currDir == Direction::BackHandLeft) return RunEnum::Run_Back;
-    if (currDir == Direction::BackDiagonalRight || currDir == Direction::BackDiagonalLeft) return RunEnum::Run_BackWard;
-    if (currDir == Direction::Right || currDir == Direction::Left) return RunEnum::Run_Forward;
-    if (currDir == Direction::FrontHandRight || currDir == Direction::FrontHandLeft) return RunEnum::Run_Front;
-    return RunEnum::Run_Forward; // Default case
-}
-
-ETG::IdleEnum ETG::Hero::GetIdleDirectionEnum(const Direction currDir)
-{
-    if (currDir == Direction::BackHandRight || currDir == Direction::BackHandLeft) return IdleEnum::Idle_Back;
-    if (currDir == Direction::BackDiagonalRight || currDir == Direction::BackDiagonalLeft) return IdleEnum::Idle_BackWard;
-    if (currDir == Direction::Right || currDir == Direction::Left) return IdleEnum::Idle_Right;
-    if (currDir == Direction::FrontHandRight || currDir == Direction::FrontHandLeft) return IdleEnum::Idle_Front;
-    return IdleEnum::Idle_Back; // Default case
 }

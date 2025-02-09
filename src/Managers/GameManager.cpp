@@ -1,6 +1,7 @@
 #include "GameManager.h"
 #include "DebugTexts.h"
 #include "InputManager.h"
+#include "SpriteBatch.h"
 
 void ETG::GameManager::Initialize()
 {
@@ -32,20 +33,20 @@ void ETG::GameManager::Draw()
     //NOTE: Draw the main game scene with Custom view. These draws will be drawn zoomed
     Window->setView(Globals::MainView);
 
-    SpriteBatch.begin();
+    ETG::GlobSpriteBatch.begin();
     Hero.Draw();
-    SpriteBatch.end(*Window);
+    ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.
     //NOTE: Which means, even though The view zoomed or moved, these draws will always stay persistent in initial given coords
     Window->setView(Window->getDefaultView());
 
-    SpriteBatch.begin();
+    ETG::GlobSpriteBatch.begin();
     UI.Draw();
-    SpriteBatch.end(*Window);
+    ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: non batch draws here. 
-    DebugText::Draw(*Window);
+    DebugText.Draw(*Window);
 
     //Display the frame
     Window->display();

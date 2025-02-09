@@ -3,8 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include "Globals.h"
-#include <iostream>
 #include "../Characters/Hero.h"
+#include "../Managers/GameState.h"
 
 namespace ETG
 {
@@ -18,6 +18,9 @@ namespace ETG
         inline static float MoveFactor = 5.0f;
         inline static float MinMoveSpeed = 0.25f;
         inline static float MaxMoveSpeed = 3.f;
+
+        //Hero Pointer. To avoid reference fetching in every frame, Hero ptr defined as member variable
+        inline static Hero* HeroPtr = nullptr;
 
     public:
         inline static sf::Vector2f direction{};
@@ -36,6 +39,8 @@ namespace ETG
 
         static void Update()
         {
+            if (!HeroPtr) HeroPtr = GameState::GetInstance().GetHero();
+            
             ZoomScale = GetZoomScale(Globals::MainView, *Globals::Window);
 
             const float adjustedZoomFactor = AdjustZoomFactor();
@@ -103,11 +108,8 @@ namespace ETG
         // In InputManager.h
         static float GetMouseAngleRelativeToHero()
         {
-            // Now calculate angle relative to the hero
-            const sf::Vector2f diff = WorldMousePos - Hero::HeroPosition;
-            const float angleRad = std::atan2(diff.y, diff.x);
-
-            return angleRad;
+            const sf::Vector2f diff = WorldMousePos - HeroPtr->GetPosition();
+            return std::atan2(diff.y, diff.x);
         }
 
         //I spent so much time to correctly get mouse position after zoom or move with View.  

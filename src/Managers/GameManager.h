@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DebugTexts.h"
+#include "GameState.h"
 #include "../Animation/AnimationManager.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
@@ -15,6 +17,7 @@ namespace ETG
         //Hero class
         Hero Hero{sf::Vector2f(0, 0)};
         bool HasFocus = true;
+        DebugText DebugText;
 
     public:
         UserInterface UI;

@@ -13,7 +13,6 @@ namespace ETG
     class Hero : public GameObject
     {
     public:
-        static sf::Vector2f HeroPosition;
         static float MouseAngle;
         static Direction CurrentDirection;
         static bool IsShooting;
@@ -28,18 +27,17 @@ namespace ETG
         bool IsDashing = false;
 
         std::unique_ptr<RogueSpecial> RogueSpecial;
+        MoveComponent MoveComp;
 
     private:
         AnimationComponent AnimationComp;
         InputComponent InputComp;
-        MoveComponent MoveComp;
 
         sf::Texture HandTex;
         sf::Vector2f HandPos;
         sf::Vector2f RelativeHandLoc{8, 4};
 
-        static IdleEnum GetIdleDirectionEnum(Direction currDir);
-        static RunEnum GetRunEnum(Direction currDir);
+        
         void SetHandTexLoc();
     };
 }

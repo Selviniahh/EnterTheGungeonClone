@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "../../Managers/Misc.h"
+#include "../../Utils/DirectionUtils.h"
 
 namespace ETG
 {
@@ -27,8 +27,6 @@ namespace ETG
 
     private:
         std::unordered_map<std::pair<int, int>, Direction, PairHash> DirectionMap{};
-        void SetRanges();
         void UpdateDirection(Hero& hero) const;
-        Direction GetDirectionFromAngle(float angle) const;
     };
 }

@@ -14,7 +14,6 @@ add_executable(ETG main.cpp
         src/Animation/Animation.cpp
         src/Managers/GameManager.cpp
         src/Characters/Hero.cpp
-        src/Managers/Misc.cpp
         src/Characters/Components/AnimationComponent.cpp
         src/Characters/Components/InputComponent.cpp
         src/Characters/Components/MoveComponent.cpp
@@ -27,6 +26,17 @@ add_executable(ETG main.cpp
         src/Guns/Base/GunAnimComp.h
         src/Guns/RogueSpecial/RogueSpecial.cpp
         src/Guns/RogueSpecial/RogueSpecial.h
+        src/Managers/GameState.h
+        src/Utils/DirectionUtils.cpp
+        src/Utils/DirectionUtils.h
+        src/Enemy/EnemyBase.cpp
+        src/Enemy/EnemyBase.h
+        src/Core/Components/HealthComp.cpp
+        src/Core/Components/HealthComp.h
+        src/Core/Components/MoveComp.cpp
+        src/Core/Components/MoveComp.h
+        src/Utils/Math.h
+        src/Managers/SpriteBatch.cpp
 )
 
 # Easiest and fastest way is VCPKG 

@@ -1,6 +1,6 @@
 #include "ProjectileBase.h"
-
 #include "../Managers/Globals.h"
+#include "../Managers/SpriteBatch.h" // <-- Add this include
 
 ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spawnPos, const sf::Vector2f projVelocity, const float maxProjectileRange, const float rotation)
 {
@@ -27,5 +27,5 @@ void ProjectileBase::Draw()
     frame.setOrigin(frame.getTexture()->getSize().x /2,frame.getTexture()->getSize().y /2);
     frame.setPosition(Position);
     frame.setRotation(Rotation);
-    ETG::Globals::SpriteBatch.draw(frame,0);
+    ETG::GlobSpriteBatch.draw(frame,0);
 }

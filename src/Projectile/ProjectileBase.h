@@ -13,5 +13,4 @@ public:
 
     sf::Vector2f ProjVelocity;
     float MaxProjectileRang;
-    float Rotation;
 };

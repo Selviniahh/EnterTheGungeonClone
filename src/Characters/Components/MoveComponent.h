@@ -1,14 +1,21 @@
 #pragma once
+#include "../../Core/Components/MoveComp.h"
 
-namespace ETG
-{
-    class Hero;
-    
-    class MoveComponent
+namespace ETG {
+    class Hero;  // Forward-declare the hero.
+
+    class MoveComponent : public MoveComp
     {
     public:
-        float Speed{100.f};
         MoveComponent();
-        void UpdateMovement(Hero& hero) const;
+
+        // Update movement using input.
+        void UpdateMovement();
+
+        // Override Update to include our movement update.
+        void Update() override;
+
+        // Pointer to the associated Hero (set from GameState or elsewhere).
+        Hero* HeroPtr = nullptr;
     };
 }

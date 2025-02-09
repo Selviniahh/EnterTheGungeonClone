@@ -1,8 +1,7 @@
 #include "UserInterface.h"
 #include <filesystem>
-#include <iostream>
-
 #include "../Managers/Globals.h"
+#include "../Managers/SpriteBatch.h"
 
 namespace ETG
 {
@@ -59,7 +58,7 @@ namespace ETG
         gun.setOrigin(Gun.getSize().x / 2, Gun.getSize().y / 2);
         gun.setScale(3.f, 3.f);
         Globals::DrawSinglePixelAtLoc(gun.getPosition(), {5, 5});
-        ETG::Globals::SpriteBatch.draw(gun,0);
+        GlobSpriteBatch.draw(gun,0);
 
         // Draw ammo bar
         sf::Sprite ammo;
@@ -67,7 +66,7 @@ namespace ETG
         ammo.setOrigin(AmmoBar.getSize().x / 2, AmmoBar.getSize().y / 2);
         ammo.setPosition(static_cast<float>(AmmoBarPosition.x), static_cast<float>(AmmoBarPosition.y));
         Globals::DrawSinglePixelAtLoc(ammo.getPosition(), {5, 5});
-        ETG::Globals::SpriteBatch.draw(ammo, 0);
+        GlobSpriteBatch.draw(ammo, 0);
 
         // // Draw ammo display. Because gun not implemented yet, let it stay like this
         // sf::Sprite ammoDisplaySprite;

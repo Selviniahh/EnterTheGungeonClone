@@ -62,7 +62,7 @@ namespace ETG
         //lambda that applies the scale flip to an object
         auto flipObjectScale = [flipFactor](auto& obj)
         {
-            obj.Scale.y = flipFactor;
+            obj.GetScale().y = flipFactor;
         };
 
         //Apply the flip to all passed objects
