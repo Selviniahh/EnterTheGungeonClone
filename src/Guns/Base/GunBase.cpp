@@ -50,8 +50,8 @@ void GunBase::Update()
     timerForVelocity += Globals::FrameTick;
 
     // If the shoot animation finished, revert to idle.
-    if (AnimationComp->CurrentGunState == GunStateEnum::Shoot &&
-        AnimationComp->AnimManagerDict[AnimationComp->CurrentGunState].IsAnimationFinished())
+    if (AnimationComp->CurrentState == GunStateEnum::Shoot &&
+        AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
     {
         CurrentGunState = GunStateEnum::Idle;
     }

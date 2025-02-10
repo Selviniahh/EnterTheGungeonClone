@@ -1,4 +1,4 @@
-#include "MoveComponent.h"
+#include "HeroMoveComp.h"
 #include "../../Managers/InputManager.h"
 #include "../../Managers/GameState.h"
 #include "../../Utils/Math.h"
@@ -6,20 +6,20 @@
 
 namespace ETG {
 
-    MoveComponent::MoveComponent() : MoveComp(200.f, 200.f, 800.f) // Adjust parameters as needed.
+    HeroMoveComp::HeroMoveComp() : BaseMoveComp(200.f, 8000.f, 8000.f) // Adjust parameters as needed.
     {
     }
 
-    void MoveComponent::Update()
+    void HeroMoveComp::Update()
     {
         // Call the base update (it doing nothing for now)
-        MoveComp::Update();
+        BaseMoveComp::Update();
         
         // Then update movement based on current input.
         UpdateMovement();
     }
 
-    void MoveComponent::UpdateMovement()
+    void HeroMoveComp::UpdateMovement()
     {
         // Ensure we have a valid hero pointer.
         if (!HeroPtr) HeroPtr = GameState::GetInstance().GetHero();
@@ -41,7 +41,6 @@ namespace ETG {
         }
 
         // Use the base helper to update velocity and position.
-        // Assumes Hero has a method GetPosition() returning a reference to its position.
-        MoveComp::UpdateMovement(inputDir, HeroPtr->GetPosition());
+        BaseMoveComp::UpdateMovement(inputDir, HeroPtr->GetPosition());
     }
 }

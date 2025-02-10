@@ -1,65 +1,40 @@
-#include "AnimationComponent.h"
+#include "HeroAnimComp.h"
 #include "../../Guns/Base/GunBase.h"
 #include "../../Guns/RogueSpecial/RogueSpecial.h"
+#include "../../Managers/GameState.h"
 
 namespace ETG
 {
     class RogueSpecial;
 }
 
-template sf::Vector2f ETG::AnimationComponent::FlipSprites<ETG::GunBase>(const Direction&, ETG::GunBase&);
-template sf::Vector2f ETG::AnimationComponent::FlipSprites<ETG::RogueSpecial>(const Direction&, RogueSpecial&);
+template sf::Vector2f ETG::HeroAnimComp::FlipSprites<ETG::GunBase>(const Direction&, ETG::GunBase&);
+template sf::Vector2f ETG::HeroAnimComp::FlipSprites<ETG::RogueSpecial>(const Direction&, RogueSpecial&);
 
 namespace ETG
 {
-    AnimationComponent::AnimationComponent()
+    HeroAnimComp::HeroAnimComp()
     {
-        SetAnimations();
-    }
-
-    void AnimationComponent::Update(const HeroStateEnum& heroState, const AnimationKey& animState)
-    {
-        CurrentHeroState = heroState;
-        CurrentAnimState = animState;
-
-        if (!AnimManagerDict.contains(CurrentHeroState)) return;
-
-        auto& currAnimManager = AnimManagerDict[CurrentHeroState];
-        currAnimManager.Update(CurrentAnimState);
-
-        const auto& currAnimState = currAnimManager.AnimationDict[CurrentAnimState];
-        CurrTexRect = currAnimState.CurrRect;
-        CurrentTex = currAnimState.GetCurrentFrameAsTexture();
-        RelativeOrigin = currAnimManager.AnimationDict[AnimManagerDict[CurrentHeroState].LastKey].Origin;
-    }
-
-    void AnimationComponent::Draw(sf::Vector2f position)
-    {
-        float depth = 1;
-        if (!AnimManagerDict.contains(CurrentHeroState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
-            
-        AnimManagerDict[CurrentHeroState].Draw(position, depth);
+        HeroPtr = GameState::GetInstance().GetHero();
+        HeroAnimComp::SetAnimations();
     }
 
     template<typename... TObjects>
-    sf::Vector2f AnimationComponent::FlipSprites(const Direction& currentDirection, TObjects&... objects)
+    sf::Vector2f HeroAnimComp::FlipSprites(const Direction& currentDirection, TObjects&... objects)
     {
-        if (!AnimManagerDict.contains(CurrentHeroState)) return {8.f, 5.f};
+        if (!AnimManagerDict.contains(CurrentState)) return {8.f, 5.f};
 
-        auto& currAnimManager = AnimManagerDict[CurrentHeroState];
-        auto& currAnimState = currAnimManager.AnimationDict[CurrentAnimState];
-
-        bool facingRight =
+        const bool facingRight =
         (currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
          currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight);
 
         //set flipX accordingly
-        currAnimState.flipX = facingRight ? 1.f : -1.f;
+        HeroPtr->GetScale().x = facingRight ? 1.f : -1.f;
 
         //Scale factor to apply in Y
         float flipFactor = facingRight ? 1.f : -1.f;
 
-        //lambda that applies the scale flip to an object
+        //lambda that applies the scale flip to an object. It'll only flip gun for now. 
         auto flipObjectScale = [flipFactor](auto& obj)
         {
             obj.GetScale().y = flipFactor;
@@ -71,8 +46,10 @@ namespace ETG
         return facingRight ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
     }
 
-    void AnimationComponent::SetAnimations()
+    void HeroAnimComp::SetAnimations()
     {
+        BaseAnimComp::SetAnimations();
+        
         const auto runAnims = std::vector<Animation>{
             Animation::CreateSpriteSheet("Player/Run/Back", "rogue_run_back_hands_001", "PNG", 0.15f),
             Animation::CreateSpriteSheet("Player/Run/BackWard", "rogue_run_backward_001", "PNG", 0.15f),
@@ -119,4 +96,22 @@ namespace ETG
         }
         AnimManagerDict[HeroStateEnum::Dash] = animManagerDash;
     }
+
+    void HeroAnimComp::Update()
+    {
+        CurrentState = HeroPtr->CurrentHeroState;
+        
+        if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
+            CurrentAnimStateKey = InputComponent::GetDashDirectionEnum();
+    
+        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Run)
+            CurrentAnimStateKey = DirectionUtils::GetRunEnum(HeroPtr->CurrentDirection);
+    
+        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
+            CurrentAnimStateKey = DirectionUtils::GetIdleDirectionEnum(HeroPtr->CurrentDirection);
+        
+        BaseAnimComp<HeroStateEnum>::Update(CurrentState,CurrentAnimStateKey);
+    }
+
+    
 }

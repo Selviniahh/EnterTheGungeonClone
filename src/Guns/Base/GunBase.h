@@ -1,15 +1,19 @@
 #pragma once
-#include "GunAnimComp.h"
 #include "../../Animation/Animation.h"
 #include "../../Core/GameObject.h"
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <memory>
 
+#include "../../Core/Components/BaseAnimComp.h"
+#include "../../Managers/StateEnums.h"
+
 class ProjectileBase;
 
 namespace ETG
 {
+    enum class GunStateEnum;
+
     class GunBase : public GameObject
     {
     public:
@@ -53,7 +57,7 @@ namespace ETG
         sf::Vector2f arrowPos;
 
         //Gun Animation
-        std::unique_ptr<GunAnimComp> AnimationComp;
+        std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
         GunStateEnum CurrentGunState{GunStateEnum::Idle};
     };
 }

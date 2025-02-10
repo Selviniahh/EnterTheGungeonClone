@@ -2,9 +2,9 @@
 
 class GameObject;
 
-class HealthComp {
+class BaseHealthComp {
 public:
-    explicit HealthComp(float MaxHealth);
+    explicit BaseHealthComp(float MaxHealth);
     static void Initialize();
 
     bool Damaged;

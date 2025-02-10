@@ -1,13 +1,13 @@
 #pragma once
-#include "../../Core/Components/MoveComp.h"
+#include "../../Core/Components/BaseMoveComp.h"
 
 namespace ETG {
     class Hero;  // Forward-declare the hero.
 
-    class MoveComponent : public MoveComp
+    class HeroMoveComp : public BaseMoveComp
     {
     public:
-        MoveComponent();
+        HeroMoveComp();
 
         // Update movement using input.
         void UpdateMovement();

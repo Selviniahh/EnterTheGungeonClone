@@ -62,7 +62,6 @@ class AnimationManager
 public:
     using AnimationMap = std::unordered_map<AnimationKey, Animation, AnimationKeyHash, AnimationKeyEqual>;
     AnimationMap AnimationDict;
-    std::unordered_map<AnimationKey, sf::Vector2f, AnimationKeyHash, AnimationKeyEqual> GunOrigin;
 
     // For storing whichever key was last used
     AnimationKey LastKey;

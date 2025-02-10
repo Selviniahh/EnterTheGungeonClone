@@ -3,6 +3,7 @@
 ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f)
 {
     AnimationComp = std::make_unique<RogueSpecialAnimComp>();
+    AnimationComp->SetAnimations();
     
     // call the common initialization.
     Initialize();
@@ -23,7 +24,7 @@ void ETG::RogueSpecial::Initialize()
     MuzzleFlashOffset = {17.f, 0.f};
 
     // Load the projectile texture for RogueSpecial.
-    if (!ProjTexture.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Projectile_RogueSpecial.PNG").string()))
+    if (!ProjTexture.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "RogueSpecial" / "Projectile_RogueSpecial.PNG").string()))
         throw std::runtime_error("Failed to load Projectile_RogueSpecial.PNG");
 
     GunBase::Initialize();

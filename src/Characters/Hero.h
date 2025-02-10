@@ -3,9 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include "../Core/GameObject.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
-#include "Components/AnimationComponent.h"
+#include "Components/HeroAnimComp.h"
 #include "../Managers/StateEnums.h"
-#include "Components/MoveComponent.h"
+#include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 
 namespace ETG
@@ -27,10 +27,10 @@ namespace ETG
         bool IsDashing = false;
 
         std::unique_ptr<RogueSpecial> RogueSpecial;
-        MoveComponent MoveComp;
+        HeroMoveComp MoveComp;
 
     private:
-        AnimationComponent AnimationComp;
+        std::unique_ptr<HeroAnimComp> AnimationComp;
         InputComponent InputComp;
 
         sf::Texture HandTex;

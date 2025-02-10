@@ -1,4 +1,5 @@
 #pragma once
+#include "../../Core/Components/BaseAnimComp.h"
 #include "../Base/GunBase.h"
 
 namespace ETG
@@ -12,7 +13,7 @@ namespace ETG
         void Initialize() override;
     };
 
-    class RogueSpecialAnimComp : public GunAnimComp
+    class RogueSpecialAnimComp : public BaseAnimComp<GunStateEnum>
     {
     public:
         RogueSpecialAnimComp();

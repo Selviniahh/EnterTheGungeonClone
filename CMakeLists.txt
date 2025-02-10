@@ -14,16 +14,14 @@ add_executable(ETG main.cpp
         src/Animation/Animation.cpp
         src/Managers/GameManager.cpp
         src/Characters/Hero.cpp
-        src/Characters/Components/AnimationComponent.cpp
+        src/Characters/Components/HeroAnimComp.cpp
         src/Characters/Components/InputComponent.cpp
-        src/Characters/Components/MoveComponent.cpp
+        src/Characters/Components/HeroMoveComp.cpp
         src/Guns/Base/GunBase.cpp
         src/Guns/Base/GunBase.h
         src/Core/GameObject.h
         src/Projectile/ProjectileBase.h
         src/Projectile/ProjectileBase.cpp
-        src/Guns/Base/GunAnimComp.cpp
-        src/Guns/Base/GunAnimComp.h
         src/Guns/RogueSpecial/RogueSpecial.cpp
         src/Guns/RogueSpecial/RogueSpecial.h
         src/Managers/GameState.h
@@ -31,12 +29,13 @@ add_executable(ETG main.cpp
         src/Utils/DirectionUtils.h
         src/Enemy/EnemyBase.cpp
         src/Enemy/EnemyBase.h
-        src/Core/Components/HealthComp.cpp
-        src/Core/Components/HealthComp.h
-        src/Core/Components/MoveComp.cpp
-        src/Core/Components/MoveComp.h
+        src/Core/Components/BaseHealthComp.cpp
+        src/Core/Components/BaseHealthComp.h
+        src/Core/Components/BaseMoveComp.cpp
+        src/Core/Components/BaseMoveComp.h
         src/Utils/Math.h
         src/Managers/SpriteBatch.cpp
+        src/Core/Components/BaseAnimComp.h
 )
 
 # Easiest and fastest way is VCPKG 

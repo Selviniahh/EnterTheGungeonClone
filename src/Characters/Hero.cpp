@@ -15,27 +15,19 @@ ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPo
     RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.PNG").string()))
         std::cerr << "Failed to load hand texture" << std::endl;
+
+    AnimationComp = std::make_unique<HeroAnimComp>();
 }
 
 void ETG::Hero::Update()
 {
-    //Hero self animation handling
-    AnimationKey animState = IdleEnum::Idle_Back;
-    
     InputComp.Update(*this);
     MoveComp.Update();
-    
-    if (CurrentHeroState == HeroStateEnum::Dash)
-        animState = InputComponent::GetDashDirectionEnum();
-    
-    else if (CurrentHeroState == HeroStateEnum::Run)
-        animState = DirectionUtils::GetRunEnum(CurrentDirection);
-    
-    else if (CurrentHeroState == HeroStateEnum::Idle)
-        animState = DirectionUtils::GetIdleDirectionEnum(CurrentDirection);
 
-    AnimationComp.Update(CurrentHeroState, animState);
-    RelativeHandLoc = AnimationComp.FlipSprites(CurrentDirection, *RogueSpecial);
+    //Animations
+    AnimationComp->Update();
+    Origin = AnimationComp->AnimManagerDict[CurrentHeroState].AnimationDict[AnimationComp->CurrentAnimStateKey].Origin;
+    RelativeHandLoc = AnimationComp->FlipSprites(CurrentDirection, *RogueSpecial);
     SetHandTexLoc();
 
     //Gun
@@ -50,7 +42,7 @@ void ETG::Hero::Draw()
     RogueSpecial->Draw();
     
     //Hero self animation draw
-    AnimationComp.Draw(Position);
+    AnimationComp->Draw(Position, Origin, Scale, Rotation, 2);
     SpriteBatch::SimpleDraw(HandTex, HandPos);
     Globals::DrawSinglePixelAtLoc(Position);
 
@@ -60,7 +52,7 @@ void ETG::Hero::Draw()
 
 sf::FloatRect ETG::Hero::HeroBounds() const
 {
-    const auto& currTexRect = AnimationComp.CurrTexRect;
+    const auto& currTexRect = AnimationComp->CurrTexRect;
     return {
         Position.x - currTexRect.width / 2.f,
         Position.y - currTexRect.height / 2.f,
