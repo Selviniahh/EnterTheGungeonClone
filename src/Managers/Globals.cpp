@@ -13,6 +13,7 @@ namespace ETG::Globals
     sf::Clock clock;
     sf::Clock tickClock;
     sf::View MainView;
+    sf::Time ElapsedTimeClock;
 
     void Initialize(const std::shared_ptr<sf::RenderWindow>& window)
     {
@@ -41,8 +42,8 @@ namespace ETG::Globals
         //Calculate tick. In 60fps it should be: 0.016
         //It was hard for me to understand. restart sets 0 and returns total elapsed time since the last time.
         //Every loop call this will be called. So in every call it will return the total time passed in seconds.   
-        const sf::Time elapsedTime = tickClock.restart();
-        FrameTick = elapsedTime.asSeconds();
+        ElapsedTimeClock = tickClock.restart();
+        FrameTick = ElapsedTimeClock.asSeconds();
     }
 
     bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, const sf::Vector2i scale, const float rotation)

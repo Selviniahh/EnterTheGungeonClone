@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "sfml",
-    "benchmark"
+    "benchmark",
+    "imgui-sfml"
   ]
 }

@@ -11,6 +11,7 @@ namespace ETG::Globals
     //Elapsed time in seconds. AKA Delta Time
     extern float FrameTick;
     extern float ElapsedTimeSeconds;
+    extern sf::Time ElapsedTimeClock;
 
     //Window and rendering resources
     extern std::shared_ptr<sf::RenderWindow> Window;

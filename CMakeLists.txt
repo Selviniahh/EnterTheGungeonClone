@@ -36,6 +36,8 @@ add_executable(ETG main.cpp
         src/Utils/Math.h
         src/Managers/SpriteBatch.cpp
         src/Core/Components/BaseAnimComp.h
+        src/Engine/UI/EngineUI.cpp
+        src/Engine/UI/EngineUI.h
 )
 
 # Easiest and fastest way is VCPKG 
@@ -43,6 +45,7 @@ find_package(OpenAL CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED system window graphics network audio)
 find_package(benchmark CONFIG REQUIRED)
 find_package(Threads REQUIRED)
+find_package(ImGui-SFML CONFIG REQUIRED)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND "${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
@@ -64,4 +67,5 @@ target_link_libraries(ETG PRIVATE
         sfml-window
         benchmark::benchmark
         OpenAL::OpenAL
+        ImGui-SFML::ImGui-SFML
 )
