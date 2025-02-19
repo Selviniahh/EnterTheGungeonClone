@@ -14,7 +14,7 @@ namespace ETG
     class GameManager
     {
     private:
-        Hero Hero{sf::Vector2f(0, 0)};
+        std::unique_ptr<Hero> Hero;
         EngineUI EngineUI{};
 
         bool HasFocus = true;

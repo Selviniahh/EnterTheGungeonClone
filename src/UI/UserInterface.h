@@ -25,6 +25,8 @@ namespace ETG
         sf::Vector2f FrameOffsetPerc{4,3.5};
         float AmmoBarOffsetPercX = 2.f;
 
+        sf::Vector2f GameScreenSize;
+
     public:
         UserInterface();
         void Initialize() override;

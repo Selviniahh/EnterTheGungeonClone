@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <SFML/System/Vector2.hpp>
 
 class GameObject;
 struct ImFont;
@@ -10,10 +11,11 @@ class EngineUI
 public:
     void LoadFont();
     void Initialize();
-    void Update();
+    void Update() const;
     void Draw();
 
-    void UpdateDetailsPanel(const std::vector<GameObject*>& sceneObjects);
+    static void UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects);
 
-    ImFont* SegoeFont;
+    ImFont* SegoeFont{};
+    sf::Vector2f windowSize;
 };

@@ -10,17 +10,26 @@ bool ETG::Hero::IsShooting{};
 
 ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
 {
+    SetObjectName("Hero");
     this->Position = Position;
     GameState::GetInstance().SetHero(this);
-    RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
-    if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.PNG").string()))
-        std::cerr << "Failed to load hand texture" << std::endl;
 
+    //Set gun
+    RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
+    GameState::GetInstance().GetSceneObj().push_back(RogueSpecial.get());
+
+    //Set animation
     AnimationComp = std::make_unique<HeroAnimComp>();
+
+    if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").string()))
+        std::cerr << "Failed to load hand texture" << std::endl;
 }
 
 void ETG::Hero::Update()
 {
+    //override
+    GameObject::Update();
+    
     InputComp.Update(*this);
     MoveComp.Update();
 

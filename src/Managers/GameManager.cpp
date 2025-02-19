@@ -3,7 +3,6 @@
 #include "InputManager.h"
 #include "SpriteBatch.h"
 #include <imgui-SFML.h>
-#include <imgui.h>
 
 void ETG::GameManager::Initialize()
 {
@@ -13,15 +12,22 @@ void ETG::GameManager::Initialize()
     // Window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getDesktopMode(), "SFML example", sf::Style::Fullscreen);
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
+
+    //Initialize GameState instance before anything and initialize SceneObj vector
+    GameState::GetInstance();
+    GameState::GetInstance().SetSceneObj(SceneObjects);
+    
+    //NOTE: Secondly EngineUI needs to be initialized
+    EngineUI.Initialize();
     
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
-    
-    UI.Initialize();
-    EngineUI.Initialize();
 
-    GameState::GetInstance().SetSceneObj(SceneObjects);
-    SceneObjects.push_back(&Hero);
+    UI.Initialize();
+    Hero = std::make_unique<class Hero>(sf::Vector2f{10,10});
+    
+    
+    SceneObjects.push_back(Hero.get());
     SceneObjects.push_back(&UI);
 }
 
@@ -31,7 +37,7 @@ void ETG::GameManager::Update()
     {
         Globals::Update();
         InputManager::Update();
-        Hero.Update();
+        Hero->Update();
     }
 
     EngineUI.Update();
@@ -45,7 +51,7 @@ void ETG::GameManager::Draw()
     Window->setView(Globals::MainView);
 
     ETG::GlobSpriteBatch.begin();
-    Hero.Draw();
+    Hero->Draw();
     ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.

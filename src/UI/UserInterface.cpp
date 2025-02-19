@@ -1,5 +1,8 @@
 #include "UserInterface.h"
 #include <filesystem>
+
+#include "../Engine/UI/EngineUI.h"
+#include "../Managers/GameState.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
 
@@ -11,26 +14,30 @@ namespace ETG
 
     void UserInterface::Initialize()
     {
+        SetObjectName("UserInterface");
         const std::string ResPath = RESOURCE_PATH;
         Frame.loadFromFile(ResPath + "/UI/Frame.png");
         Gun.loadFromFile(ResPath + "/Guns/RogueSpecial/RogueSpecial_Idle.png");
         AmmoBar.loadFromFile(ResPath + "/UI/AmmoBarUI.png");
         AmmoDisplay.loadFromFile(ResPath + "/UI/AmmoDisplay.png");
 
+        //NOTE: GameScreenSize is subtracting GameScreenSize with the area that designated as Engine UI. So that Gun UI and Engine UI wouldn't overlap.
+        GameScreenSize = {(float)Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize().x,(float)Globals::ScreenSize.y};
+
         const sf::Vector2u frameSize = Frame.getSize();
 
-        const float FrameOffsetX = Globals::ScreenSize.x * (FrameOffsetPerc.x / 100);
-        const float FrameOffsetY = Globals::ScreenSize.y * (FrameOffsetPerc.y / 100);
+        const float FrameOffsetX = GameScreenSize.x * (FrameOffsetPerc.x / 100);
+        const float FrameOffsetY = GameScreenSize.y * (FrameOffsetPerc.y / 100);
 
         FramePosition = {
-            (Globals::ScreenSize.x - FrameOffsetX - frameSize.x / 2),
-            (Globals::ScreenSize.y - FrameOffsetY - frameSize.y / 2)
+            (GameScreenSize.x - FrameOffsetX - frameSize.x / 2),
+            (GameScreenSize.y - FrameOffsetY - frameSize.y / 2)
         };
 
         GunPosition = {FramePosition.x, FramePosition.y};
 
         AmmoBarPosition = {
-            (FramePosition.x + (Frame.getSize().x / 2) + (Globals::ScreenSize.x * AmmoBarOffsetPercX / 100)),
+            (FramePosition.x + (Frame.getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100)),
             FramePosition.y
         };
     }

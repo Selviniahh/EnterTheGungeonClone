@@ -56,6 +56,7 @@ target_compile_options(ETG PRIVATE
         $<$<CXX_COMPILER_ID:Clang>:-ftemplate-backtrace-limit=0 -ferror-limit=0>
 )
 
+#Because in different builds the final path of the build directory differs, detecting Resources path from Cmake is better option.
 target_compile_definitions(ETG PRIVATE RESOURCE_PATH="${CMAKE_SOURCE_DIR}/Resources")
 
 target_link_libraries(ETG PRIVATE
