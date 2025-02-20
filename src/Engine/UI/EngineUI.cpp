@@ -60,7 +60,11 @@ void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
     {
         if (selected >= 0 && selected < SceneObjects.size())
         {
-            SceneObjects[selected]->ImGuiSetDefaultValues();
+            if(ImGui::TreeNode("Relative Orientation"))
+            {
+                SceneObjects[selected]->ImGuiSetDefaultValues();
+                ImGui::TreePop();   
+            }
         }
     }
 }
@@ -70,8 +74,8 @@ void EngineUI::LoadFont()
     const ImGuiIO io = ImGui::GetIO();
     io.Fonts->Clear();
 
-    const auto FontPath = std::filesystem::path(RESOURCE_PATH) / "Fonts" / "SegoeUI.ttf";
-    SegoeFont = io.Fonts->AddFontFromFileTTF(FontPath.c_str(), 18.f);
-    if (SegoeFont == nullptr) throw std::runtime_error("Failed to load font from " + FontPath.string());
+    const std::filesystem::path FontPath = std::filesystem::path(RESOURCE_PATH) / "Fonts" / "SegoeUI.ttf";
+    SegoeFont = io.Fonts->AddFontFromFileTTF(FontPath.generic_string().data(), 18.f);
+    if (SegoeFont == nullptr) throw std::runtime_error("Failed to load font from " + FontPath.generic_string());
     if (!ImGui::SFML::UpdateFontTexture()) throw std::runtime_error("Font cannot be load.");
 }

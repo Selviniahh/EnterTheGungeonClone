@@ -35,12 +35,12 @@ void ETG::GameManager::Update()
 {
     if (HasFocus)
     {
+        EngineUI.Update();
         Globals::Update();
         InputManager::Update();
         Hero->Update();
     }
 
-    EngineUI.Update();
 }
 
 void ETG::GameManager::Draw()

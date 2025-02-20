@@ -4,11 +4,11 @@
 
 ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spawnPos, const sf::Vector2f projVelocity, const float maxProjectileRange, const float rotation)
 {
-    Position = spawnPos;
+    FinalPosition = spawnPos;
     ProjVelocity = projVelocity;
     MaxProjectileRang = maxProjectileRange;
     Texture = texture;
-    Rotation = rotation;
+    BaseRotation = rotation;
 }
 
 void ProjectileBase::Initialize()
@@ -17,7 +17,7 @@ void ProjectileBase::Initialize()
 
 void ProjectileBase::Update()
 {
-    Position += ETG::Globals::FrameTick * ProjVelocity;
+    FinalPosition += ETG::Globals::FrameTick * ProjVelocity;
 }
 
 void ProjectileBase::Draw()
@@ -25,7 +25,7 @@ void ProjectileBase::Draw()
     sf::Sprite frame;
     frame.setTexture(Texture);
     frame.setOrigin(frame.getTexture()->getSize().x /2,frame.getTexture()->getSize().y /2);
-    frame.setPosition(Position);
-    frame.setRotation(Rotation);
+    frame.setPosition(FinalPosition);
+    frame.setRotation(BaseRotation);
     ETG::GlobSpriteBatch.draw(frame,0);
 }

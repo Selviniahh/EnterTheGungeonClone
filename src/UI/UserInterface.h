@@ -15,13 +15,10 @@ namespace ETG
         sf::Vector2f GunPosition;
         sf::Vector2f AmmoBarPosition;
         std::vector<sf::Vector2i> AmmoArr{};
-        sf::Vector2f FramePosition;
         int lastAmmoCount = 8;
         bool IsReloaded = true;
         bool RemoveLast = true;
-
-        float frameOffsetPercX = 4;
-        float frameOffsetPercY = 3.5;
+        
         sf::Vector2f FrameOffsetPerc{4,3.5};
         float AmmoBarOffsetPercX = 2.f;
 

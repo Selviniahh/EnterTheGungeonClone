@@ -23,7 +23,7 @@ namespace ETG::Globals
         
         //Load font
         const std::filesystem::path FullPath = std::filesystem::path(RESOURCE_PATH) / "Fonts" / "SegoeUI.ttf";
-        if (!Font.loadFromFile(FullPath.string()))
+        if (!Font.loadFromFile(FullPath.generic_string()))
         {
             throw std::runtime_error("Failed to load font");
         }
