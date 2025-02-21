@@ -41,7 +41,6 @@ add_executable(ETG main.cpp
 )
 
 # Easiest and fastest way is VCPKG 
-find_package(OpenAL CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED system window graphics network audio)
 find_package(benchmark CONFIG REQUIRED)
 find_package(Threads REQUIRED)
@@ -67,6 +66,5 @@ target_link_libraries(ETG PRIVATE
         sfml-system
         sfml-window
         benchmark::benchmark
-        OpenAL::OpenAL
         ImGui-SFML::ImGui-SFML
 )
