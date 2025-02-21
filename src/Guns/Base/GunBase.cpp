@@ -97,7 +97,9 @@ void GunBase::Draw()
     }
 
     // Draw the muzzle flash.
-    muzzleFlashAnim.Draw(MuzzleFlashPos, 3, DrawProps.Rotation);
+    //NOTE: Muzzle flash did not constructed as drawable object yet. So all the properties are arbitrarily created.
+    
+    muzzleFlashAnim.Draw(muzzleFlashAnim.Texture, MuzzleFlashPos, sf::Color::White, DrawProps.Rotation, muzzleFlashAnim.Origin, {1,1},DrawProps.Depth);
 }
 
 void GunBase::Shoot()

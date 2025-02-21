@@ -17,6 +17,7 @@ ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPo
 
     //Set gun
     RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
+    GameState::GetInstance().GetSceneObj().push_back(this);
     GameState::GetInstance().GetSceneObj().push_back(RogueSpecial.get());
 
     //Set animation

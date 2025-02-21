@@ -27,7 +27,6 @@ void ETG::GameManager::Initialize()
     Hero = std::make_unique<class Hero>(sf::Vector2f{10,10});
     
     
-    SceneObjects.push_back(Hero.get());
     SceneObjects.push_back(&UI);
 }
 

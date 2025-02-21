@@ -60,7 +60,7 @@ void Animation::Draw(const sf::Texture& texture, const sf::Vector2f position, co
     frame.setColor(color);
     frame.rotate(rotation);
     frame.setOrigin(origin);
-    frame.setScale( scale);
+    frame.setScale(scale);
 
     ETG::GlobSpriteBatch.draw(frame,depth);
 }

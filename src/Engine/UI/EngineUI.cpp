@@ -40,6 +40,9 @@ void EngineUI::Draw()
 void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
 {
     static int SelectedIdx = 0;
+
+    //NOTE: Open the Game Objects pane by default
+    ImGui::SetNextItemOpen(true,ImGuiCond_Once);
     
     //List all objects
     if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
@@ -58,9 +61,15 @@ void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
         }
     }
 
+    //NOTE: Open the details pane by default
+    ImGui::SetNextItemOpen(true,ImGuiCond_Once);
+
     //Show details of selected objects
     if (ImGui::CollapsingHeader("Details", ImGuiTreeNodeFlags_None))
     {
+        //Open the pane by default once
+        ImGui::SetNextItemOpen(true,ImGuiCond_Once);
+        
         if (SelectedIdx >= 0 && SelectedIdx < SceneObjects.size())
         {
             if(ImGui::TreeNode("Absolute Orientation"))

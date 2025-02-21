@@ -25,25 +25,22 @@ namespace ETG
         if (!AnimManagerDict.contains(CurrentState)) return {8.f, 5.f};
 
         const bool facingRight =
-        (currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
-            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight);
+            currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
+            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight;
 
-        //set flipX accordingly
+        //set horizontal scale to face the correct direction. Note that if abs not given, it will forever flip other direction in every tick 
         HeroPtr->SetScale({
-            facingRight ? 1.f : -1.f,
+            facingRight ? std::abs(HeroPtr->GetScale().x) : -std::abs(HeroPtr->GetScale().x),
             HeroPtr->GetScale().y
         });
-
-        //Scale factor to apply in Y
-        float flipFactor = facingRight ? 1.f : -1.f;
-
-        //lambda that applies the scale flip to an object. It'll only flip gun for now. 
-        auto flipObjectScale = [flipFactor](auto& obj)
+        
+        //lambda that applies the scale flip to an object. It'll only flip gun on Y axis according to hero's direction for now. 
+        auto flipObjectScale = [facingRight](auto& obj)
         {
             // obj.GetScale().y = flipFactor;
             obj.SetScale({
                 obj.GetScale().x,
-                flipFactor
+                facingRight ? std::abs(obj.GetScale().y) : -std::abs(obj.GetScale().y)
             });
         };
 
