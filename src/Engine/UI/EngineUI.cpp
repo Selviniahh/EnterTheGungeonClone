@@ -63,9 +63,15 @@ void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
     {
         if (SelectedIdx >= 0 && SelectedIdx < SceneObjects.size())
         {
+            if(ImGui::TreeNode("Absolute Orientation"))
+            {
+                SceneObjects[SelectedIdx]->ImGuiSetAbsoluteOrientation();
+                ImGui::TreePop();   
+            }
+
             if(ImGui::TreeNode("Relative Orientation"))
             {
-                SceneObjects[SelectedIdx]->ImGuiSetDefaultValues();
+                SceneObjects[SelectedIdx]->ImGuiSetRelativeOrientation();
                 ImGui::TreePop();   
             }
         }

@@ -78,8 +78,8 @@ public:
         DrawProps.Origin = Origin + RelativeOrigin;
     }
     
-    // When the UI changes, recalc the final position from BasePosition.
-    virtual void ImGuiSetDefaultValues()
+    // When the UI changes, recalculate the final position from BasePosition.
+    void ImGuiSetRelativeOrientation()
     {
         //NOTE: Position
         ImGui::AlignTextToFramePadding();
@@ -109,5 +109,27 @@ public:
         ImGui::Text("Rotation");
         ImGui::SameLine();
         ImGui::SliderFloat("##Rot", &RelativeRotation, 0.0f, 360.0f);
+    }
+
+    // When the UI changes, recalculate the final position from BasePosition.
+    void ImGuiSetAbsoluteOrientation()
+    {
+        //NOTE: Position
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("Position");
+        ImGui::SameLine();
+        if (ImGui::InputFloat2("##PosX", &Position.x, "%.3f")) {}
+
+        //NOTE: Scale
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("Scale");
+        ImGui::SameLine();
+        if (ImGui::InputFloat2("##Scale", &Scale.x, "%.3f")) {}
+
+        //NOTE: Rotation
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("Rotation");
+        ImGui::SameLine();
+        ImGui::SliderFloat("##Rot", &Rotation, 0.0f, 360.0f);
     }
 };
