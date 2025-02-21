@@ -10,17 +10,28 @@ bool ETG::Hero::IsShooting{};
 
 ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
 {
+    SetObjectName("Hero");
+    Depth = 2;
     this->Position = Position;
     GameState::GetInstance().SetHero(this);
-    RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
-    if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.PNG").string()))
-        std::cerr << "Failed to load hand texture" << std::endl;
 
+    //Set gun
+    RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
+    GameState::GetInstance().GetSceneObj().push_back(this);
+    GameState::GetInstance().GetSceneObj().push_back(RogueSpecial.get());
+
+    //Set animation
     AnimationComp = std::make_unique<HeroAnimComp>();
+
+    if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
+        std::cerr << "Failed to load hand texture" << std::endl;
 }
 
 void ETG::Hero::Update()
 {
+    //override
+    GameObject::Update();
+    
     InputComp.Update(*this);
     MoveComp.Update();
 
@@ -31,7 +42,7 @@ void ETG::Hero::Update()
     SetHandTexLoc();
 
     //Gun
-    RogueSpecial->GetPosition() = HandPos + sf::Vector2f{2,2};
+    RogueSpecial->SetPosition(HandPos + sf::Vector2f{2,2});
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();
@@ -40,11 +51,13 @@ void ETG::Hero::Update()
 void ETG::Hero::Draw()
 {
     RogueSpecial->Draw();
+
+    auto& DrawProps = GetDrawProperties();
     
     //Hero self animation draw
-    AnimationComp->Draw(Position, Origin, Scale, Rotation, 2);
+    AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);
     SpriteBatch::SimpleDraw(HandTex, HandPos);
-    Globals::DrawSinglePixelAtLoc(Position);
+    Globals::DrawSinglePixelAtLoc(DrawProps.Position);
 
     // Debug bounds drawing
     DrawHeroBounds();

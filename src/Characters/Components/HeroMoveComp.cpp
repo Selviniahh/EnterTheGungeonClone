@@ -41,6 +41,6 @@ namespace ETG {
         }
 
         // Use the base helper to update velocity and position.
-        BaseMoveComp::UpdateMovement(inputDir, HeroPtr->GetPosition());
+        BaseMoveComp::UpdateMovement(inputDir, const_cast<sf::Vector2f&>(HeroPtr->GetPosition()));
     }
 }

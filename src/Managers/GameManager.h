@@ -5,6 +5,7 @@
 #include "../Animation/AnimationManager.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
+#include "../Engine/UI/EngineUI.h"
 
 namespace ETG
 {
@@ -13,13 +14,16 @@ namespace ETG
     class GameManager
     {
     private:
-        //For now I don't have anything other than hero and UI  
-        //Hero class
-        Hero Hero{sf::Vector2f(0, 0)};
+        std::unique_ptr<Hero> Hero;
+        EngineUI EngineUI{};
+
         bool HasFocus = true;
         DebugText DebugText;
 
     public:
+        //Hold only scene objects. Used for displaying details panel
+        std::vector<GameObject*> SceneObjects;
+
         UserInterface UI;
 
         void Initialize();

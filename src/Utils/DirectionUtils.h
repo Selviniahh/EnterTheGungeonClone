@@ -27,6 +27,9 @@ namespace ETG
         
         // Populates the map with default angle→direction ranges
         static void PopulateDirectionRanges(DirectionMap mapToFill);
+
+        //DirectionMap's key pair represents minimum and maximum degree range. The value is the corresponding Direction for degree range.
+        //In Short, take the map and calculated angle, and return the Found Direction from angle. 
         static Direction GetDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, float angle);
         
         static IdleEnum GetIdleDirectionEnum(Direction currDir);

@@ -78,7 +78,7 @@ public:
     void Update(T key);
 
     // Draw the last key’s animation
-    void Draw(sf::Vector2f position, float layerDepth);
+    // void Draw(sf::Vector2f position, float layerDepth);
 
     // Overloaded draw for more complex parameters
     void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, float depth);
@@ -125,15 +125,15 @@ void AnimationManager::Update(T key)
     }
 }
 
-inline void AnimationManager::Draw(const sf::Vector2f position, const float layerDepth)
-{
-    // Draw the animation for LastKey
-    const auto it = AnimationDict.find(LastKey);
-    if (it != AnimationDict.end())
-    {
-        it->second.Draw(position, layerDepth);
-    }
-}
+// inline void AnimationManager::Draw(const sf::Vector2f position, const float layerDepth)
+// {
+//     // Draw the animation for LastKey
+//     const auto it = AnimationDict.find(LastKey);
+//     if (it != AnimationDict.end())
+//     {
+//         it->second.Draw(position, layerDepth);
+//     }
+// }
 
 inline void AnimationManager::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth)
 {

@@ -66,9 +66,9 @@ Each `HeroStateEnum` maps to a subset of animations via `AnimationKey` enums:
 
 | State (`HeroStateEnum`) | Sub-Animation (`AnimationKey`)         | Example File Path                     |
 |-------------------------|----------------------------------------|---------------------------------------|
-| `Run`                 | `Run_Back`, `Run_BackWard`, etc.        | `rogue_run_back_hands_001.PNG`        |
-| `Idle`                | `Idle_Back`, `Idle_Right`, etc.         | `rogue_idle_back_hand_left_001.PNG`   |
-| `Dash`                | `Dash_Back`, `Dash_Left`, etc.          | `rogue_dodge_back_001.PNG`            |
+| `Run`                 | `Run_Back`, `Run_BackWard`, etc.        | `rogue_run_back_hands_001.png`        |
+| `Idle`                | `Idle_Back`, `Idle_Right`, etc.         | `rogue_idle_back_hand_left_001.png`   |
+| `Dash`                | `Dash_Back`, `Dash_Left`, etc.          | `rogue_dodge_back_001.png`            |
 
 ___
 

@@ -48,7 +48,7 @@ namespace ETG
     {
         if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
 
-        AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, Rotation, RelativeOrigin, Scale, depth);
+        AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, Rotation, RelativeOrigin, Scale, Depth);
     }
 
     template <typename StateEnum>

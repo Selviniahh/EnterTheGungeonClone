@@ -19,25 +19,29 @@ namespace ETG
         HeroAnimComp::SetAnimations();
     }
 
-    template<typename... TObjects>
+    template <typename... TObjects>
     sf::Vector2f HeroAnimComp::FlipSprites(const Direction& currentDirection, TObjects&... objects)
     {
         if (!AnimManagerDict.contains(CurrentState)) return {8.f, 5.f};
 
         const bool facingRight =
-        (currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
-         currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight);
+            currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
+            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight;
 
-        //set flipX accordingly
-        HeroPtr->GetScale().x = facingRight ? 1.f : -1.f;
-
-        //Scale factor to apply in Y
-        float flipFactor = facingRight ? 1.f : -1.f;
-
-        //lambda that applies the scale flip to an object. It'll only flip gun for now. 
-        auto flipObjectScale = [flipFactor](auto& obj)
+        //set horizontal scale to face the correct direction. Note that if abs not given, it will forever flip other direction in every tick 
+        HeroPtr->SetScale({
+            facingRight ? std::abs(HeroPtr->GetScale().x) : -std::abs(HeroPtr->GetScale().x),
+            HeroPtr->GetScale().y
+        });
+        
+        //lambda that applies the scale flip to an object. It'll only flip gun on Y axis according to hero's direction for now. 
+        auto flipObjectScale = [facingRight](auto& obj)
         {
-            obj.GetScale().y = flipFactor;
+            // obj.GetScale().y = flipFactor;
+            obj.SetScale({
+                obj.GetScale().x,
+                facingRight ? std::abs(obj.GetScale().y) : -std::abs(obj.GetScale().y)
+            });
         };
 
         //Apply the flip to all passed objects
@@ -49,12 +53,12 @@ namespace ETG
     void HeroAnimComp::SetAnimations()
     {
         BaseAnimComp::SetAnimations();
-        
+
         const auto runAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/Run/Back", "rogue_run_back_hands_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Run/BackWard", "rogue_run_backward_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Run/Forward", "rogue_run_forward_hands_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Run/Front", "rogue_run_front_hands_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/Back", "rogue_run_back_hands_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/BackWard", "rogue_run_backward_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/Forward", "rogue_run_forward_hands_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Run/Front", "rogue_run_front_hands_001", "png", 0.15f),
         };
 
         auto animManagerRun = AnimationManager{};
@@ -66,10 +70,10 @@ namespace ETG
         AnimManagerDict[HeroStateEnum::Run] = animManagerRun;
 
         const auto idleAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/Idle/Back", "rogue_idle_back_hand_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Idle/BackWard", "rogue_idle_backwards_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Idle/Front", "rogue_idle_front_hand_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Idle/Right", "rogue_idle_hands_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/Back", "rogue_idle_back_hand_left_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/BackWard", "rogue_idle_backwards_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/Front", "rogue_idle_front_hand_left_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Idle/Right", "rogue_idle_hands_001", "png", 0.15f),
         };
 
         auto animManagerIdle = AnimationManager{};
@@ -81,11 +85,11 @@ namespace ETG
         AnimManagerDict[HeroStateEnum::Idle] = animManagerIdle;
 
         const auto dashAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/Left", "rogue_dodge_left_001", "PNG", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "PNG", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Left", "rogue_dodge_left_001", "png", 0.15f),
+            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", 0.15f),
         };
 
         auto animManagerDash = AnimationManager{};
@@ -100,18 +104,16 @@ namespace ETG
     void HeroAnimComp::Update()
     {
         CurrentState = HeroPtr->CurrentHeroState;
-        
+
         if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
             CurrentAnimStateKey = InputComponent::GetDashDirectionEnum();
-    
+
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Run)
             CurrentAnimStateKey = DirectionUtils::GetRunEnum(HeroPtr->CurrentDirection);
-    
+
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
             CurrentAnimStateKey = DirectionUtils::GetIdleDirectionEnum(HeroPtr->CurrentDirection);
-        
-        BaseAnimComp<HeroStateEnum>::Update(CurrentState,CurrentAnimStateKey);
-    }
 
-    
+        BaseAnimComp<HeroStateEnum>::Update(CurrentState, CurrentAnimStateKey);
+    }
 }

@@ -13,19 +13,25 @@ ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spa
 
 void ProjectileBase::Initialize()
 {
+    
 }
 
 void ProjectileBase::Update()
 {
     Position += ETG::Globals::FrameTick * ProjVelocity;
+    GameObject::Update();
 }
 
 void ProjectileBase::Draw()
 {
+    //Calling this is necessary. When the projectiles are spawned, Update Function called After Draw. Somehow Update needs to be called before Draw. Calling this function instead is just a temp solution. 
+    ComputeDrawProperties();
+    
+    auto& DrawableProps = GetDrawProperties();
     sf::Sprite frame;
     frame.setTexture(Texture);
     frame.setOrigin(frame.getTexture()->getSize().x /2,frame.getTexture()->getSize().y /2);
-    frame.setPosition(Position);
-    frame.setRotation(Rotation);
+    frame.setPosition(DrawableProps.Position);
+    frame.setRotation(DrawableProps.Rotation);
     ETG::GlobSpriteBatch.draw(frame,0);
 }

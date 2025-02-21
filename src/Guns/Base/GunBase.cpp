@@ -31,8 +31,8 @@ void GunBase::Initialize()
 
     // Load the arrow texture (common for all guns).
     const std::filesystem::path arrowPath = std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png";
-    if (!ArrowTex.loadFromFile(arrowPath.string()))
-        throw std::runtime_error(arrowPath.string() + " not found");
+    if (!ArrowTex.loadFromFile(arrowPath.generic_string()))
+        throw std::runtime_error(arrowPath.generic_string() + " not found");
 
     
     arrowOrigin = {
@@ -43,10 +43,13 @@ void GunBase::Initialize()
 
     // Muzzle flash animation should be set up by the derived class.
     muzzleFlashAnim.Active = false;
+    Depth = 2;
 }
 
 void GunBase::Update()
 {
+    GameObject::Update();
+    
     timerForVelocity += Globals::FrameTick;
 
     // If the shoot animation finished, revert to idle.
@@ -79,12 +82,13 @@ void GunBase::Update()
 void GunBase::Draw()
 {
     // Draw the gun.
-    AnimationComp->Draw(Position, Origin, Scale, Rotation, 2);
-    Globals::DrawSinglePixelAtLoc(Position, {1, 1}, Rotation);
+    const auto& DrawProps = GetDrawProperties();
+    AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);
+    Globals::DrawSinglePixelAtLoc(DrawProps.Position, {1, 1}, DrawProps.Rotation);
 
     // Draw the arrow representation.
-    SpriteBatch::SimpleDraw(ArrowTex, arrowPos, Rotation, arrowOrigin);
-    Globals::DrawSinglePixelAtLoc(arrowPos, {1, 1}, Rotation);
+    SpriteBatch::SimpleDraw(ArrowTex, arrowPos, DrawProps.Rotation, arrowOrigin);
+    Globals::DrawSinglePixelAtLoc(arrowPos, {1, 1}, DrawProps.Rotation);
 
     // Draw projectiles.
     for (const auto proj : projectiles)
@@ -93,7 +97,9 @@ void GunBase::Draw()
     }
 
     // Draw the muzzle flash.
-    muzzleFlashAnim.Draw(MuzzleFlashPos, 3, Rotation);
+    //NOTE: Muzzle flash did not constructed as drawable object yet. So all the properties are arbitrarily created.
+    
+    muzzleFlashAnim.Draw(muzzleFlashAnim.Texture, MuzzleFlashPos, sf::Color::White, DrawProps.Rotation, muzzleFlashAnim.Origin, {1,1},DrawProps.Depth);
 }
 
 void GunBase::Shoot()
