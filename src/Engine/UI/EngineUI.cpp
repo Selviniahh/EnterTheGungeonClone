@@ -39,7 +39,7 @@ void EngineUI::Draw()
 
 void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
 {
-    static int selected = 0;
+    static int SelectedIdx = 0;
     
     //List all objects
     if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
@@ -47,9 +47,12 @@ void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
         for (int i = 0; i < SceneObjects.size(); ++i)
         {
             ImGui::PushID(i);
-            const bool isSelected = (selected == i);
+
+            //The boolean only for highlighting selection
+            const bool isSelected = (SelectedIdx == i);
+            
             if (ImGui::Selectable(SceneObjects[i]->GetObjectName().c_str(), isSelected))
-                selected = i;
+                SelectedIdx = i;
 
             ImGui::PopID();
         }
@@ -58,11 +61,11 @@ void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
     //Show details of selected objects
     if (ImGui::CollapsingHeader("Details", ImGuiTreeNodeFlags_None))
     {
-        if (selected >= 0 && selected < SceneObjects.size())
+        if (SelectedIdx >= 0 && SelectedIdx < SceneObjects.size())
         {
             if(ImGui::TreeNode("Relative Orientation"))
             {
-                SceneObjects[selected]->ImGuiSetDefaultValues();
+                SceneObjects[SelectedIdx]->ImGuiSetDefaultValues();
                 ImGui::TreePop();   
             }
         }

@@ -24,7 +24,7 @@ namespace ETG
         void Draw() override;
         virtual void Shoot();
         
-        using GameObject::BaseRotation; //Make Rotation public in Gunbase
+        using GameObject::Rotation; //Make Rotation public in Gunbase
     
     protected:
         // Rotates an offset vector according to the gun's current rotation.

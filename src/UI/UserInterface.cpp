@@ -29,32 +29,36 @@ namespace ETG
         const float FrameOffsetX = GameScreenSize.x * (FrameOffsetPerc.x / 100);
         const float FrameOffsetY = GameScreenSize.y * (FrameOffsetPerc.y / 100);
 
-        FinalPosition = {
+        Position = {
             (GameScreenSize.x - FrameOffsetX - frameSize.x / 2),
             (GameScreenSize.y - FrameOffsetY - frameSize.y / 2)
         };
 
-        GunPosition = {FinalPosition.x, FinalPosition.y};
+        GunPosition = {Position.x, Position.y};
 
         AmmoBarPosition = {
-            (FinalPosition.x + (Frame.getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100)),
-            FinalPosition.y
+            (Position.x + (Frame.getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100)),
+            Position.y
         };
     }
 
     void UserInterface::Update()
     {
+        GameObject::Update();
     }
 
     void UserInterface::Draw()
     {
         // Just draw the textures, no reloading!
+        auto& DrawProps = GetDrawProperties();
         sf::Sprite frame;
 
         // Draw the frame
         frame.setTexture(Frame);
-        frame.setPosition(FinalPosition.x, FinalPosition.y);
+        frame.setPosition(DrawProps.Position.x, DrawProps.Position.y);
         frame.setOrigin(Frame.getSize().x / 2, Frame.getSize().y / 2);
+        frame.setRotation(DrawProps.Rotation);
+        frame.setScale(DrawProps.Scale);
         Globals::DrawSinglePixelAtLoc(frame.getPosition(), {5, 5});
         Globals::Window->draw(frame);
 

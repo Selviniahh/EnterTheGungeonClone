@@ -11,7 +11,7 @@ GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float
     : pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity)
 {
     // Initialize common position.
-    this->FinalPosition = Position;
+    this->Position = Position;
 }
 
 GunBase::~GunBase()
@@ -23,11 +23,11 @@ GunBase::~GunBase()
 void GunBase::Initialize()
 {
     // Set the origin based on the current gun texture.
-    BaseOrigin = {
+    Origin = {
         static_cast<float>(AnimationComp->CurrentTex.getSize().x / 2),
         static_cast<float>(AnimationComp->CurrentTex.getSize().y / 2)
     };
-    BaseOrigin += OriginOffset;
+    Origin += OriginOffset;
 
     // Load the arrow texture (common for all guns).
     const std::filesystem::path arrowPath = std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png";
@@ -43,6 +43,7 @@ void GunBase::Initialize()
 
     // Muzzle flash animation should be set up by the derived class.
     muzzleFlashAnim.Active = false;
+    Depth = 2;
 }
 
 void GunBase::Update()
@@ -59,7 +60,7 @@ void GunBase::Update()
     }
 
     // Update arrow position.
-    arrowPos = FinalPosition + RotateVector(arrowOffset);
+    arrowPos = Position + RotateVector(arrowOffset);
 
     // Update gun animation.
     AnimationComp->Update(CurrentGunState, CurrentGunState);
@@ -76,19 +77,18 @@ void GunBase::Update()
     {
         proj->Update();
     }
-
-    std::cout << FinalPosition.x << std::endl;
 }
 
 void GunBase::Draw()
 {
     // Draw the gun.
-    AnimationComp->Draw(FinalPosition, BaseOrigin, BaseScale, BaseRotation, 2);
-    Globals::DrawSinglePixelAtLoc(FinalPosition, {1, 1}, BaseRotation);
+    const auto& DrawProps = GetDrawProperties();
+    AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);
+    Globals::DrawSinglePixelAtLoc(DrawProps.Position, {1, 1}, DrawProps.Rotation);
 
     // Draw the arrow representation.
-    SpriteBatch::SimpleDraw(ArrowTex, arrowPos, BaseRotation, arrowOrigin);
-    Globals::DrawSinglePixelAtLoc(arrowPos, {1, 1}, BaseRotation);
+    SpriteBatch::SimpleDraw(ArrowTex, arrowPos, DrawProps.Rotation, arrowOrigin);
+    Globals::DrawSinglePixelAtLoc(arrowPos, {1, 1}, DrawProps.Rotation);
 
     // Draw projectiles.
     for (const auto proj : projectiles)
@@ -97,7 +97,7 @@ void GunBase::Draw()
     }
 
     // Draw the muzzle flash.
-    muzzleFlashAnim.Draw(MuzzleFlashPos, 3, BaseRotation);
+    muzzleFlashAnim.Draw(MuzzleFlashPos, 3, DrawProps.Rotation);
 }
 
 void GunBase::Shoot()
@@ -116,13 +116,13 @@ void GunBase::Shoot()
 
         // Calculate projectile velocity.
         const sf::Vector2f spawnPos = arrowPos;
-        const float angle = BaseRotation;
+        const float angle = Rotation;
         const float rad = angle * std::numbers::pi / 180.f;
         const sf::Vector2f direction(std::cos(rad), std::sin(rad));
         const sf::Vector2f projVelocity = direction * velocity;
 
         // Spawn projectile.
-        auto* proj = new ProjectileBase(ProjTexture, spawnPos, projVelocity, maxProjectileRange, BaseRotation);
+        auto* proj = new ProjectileBase(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
         projectiles.push_back(proj);
 
         // Restart muzzle flash animation.
@@ -132,8 +132,8 @@ void GunBase::Shoot()
 
 sf::Vector2f GunBase::RotateVector(const sf::Vector2f& offset) const
 {
-    const float angleRad = BaseRotation * (std::numbers::pi / 180.f);
-    sf::Vector2f scaledOffset(offset.x * BaseScale.x, offset.y * BaseScale.y);
+    const float angleRad = Rotation * (std::numbers::pi / 180.f);
+    sf::Vector2f scaledOffset(offset.x * Scale.x, offset.y * Scale.y);
 
     return {
         scaledOffset.x * std::cos(angleRad) - scaledOffset.y * std::sin(angleRad),

@@ -11,7 +11,8 @@ bool ETG::Hero::IsShooting{};
 ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
 {
     SetObjectName("Hero");
-    this->FinalPosition = Position;
+    Depth = 2;
+    this->Position = Position;
     GameState::GetInstance().SetHero(this);
 
     //Set gun
@@ -35,13 +36,13 @@ void ETG::Hero::Update()
 
     //Animations
     AnimationComp->Update();
-    BaseOrigin = AnimationComp->AnimManagerDict[CurrentHeroState].AnimationDict[AnimationComp->CurrentAnimStateKey].Origin;
+    Origin = AnimationComp->AnimManagerDict[CurrentHeroState].AnimationDict[AnimationComp->CurrentAnimStateKey].Origin;
     RelativeHandLoc = AnimationComp->FlipSprites(CurrentDirection, *RogueSpecial);
     SetHandTexLoc();
 
     //Gun
-    RogueSpecial->GetPosition() = HandPos + sf::Vector2f{2,2};
-    RogueSpecial->BaseRotation = MouseAngle;
+    RogueSpecial->SetPosition(HandPos + sf::Vector2f{2,2});
+    RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();
 }
@@ -49,11 +50,13 @@ void ETG::Hero::Update()
 void ETG::Hero::Draw()
 {
     RogueSpecial->Draw();
+
+    auto& DrawProps = GetDrawProperties();
     
     //Hero self animation draw
-    AnimationComp->Draw(FinalPosition, BaseOrigin, BaseScale, BaseRotation, 2);
+    AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);
     SpriteBatch::SimpleDraw(HandTex, HandPos);
-    Globals::DrawSinglePixelAtLoc(FinalPosition);
+    Globals::DrawSinglePixelAtLoc(DrawProps.Position);
 
     // Debug bounds drawing
     DrawHeroBounds();
@@ -63,8 +66,8 @@ sf::FloatRect ETG::Hero::HeroBounds() const
 {
     const auto& currTexRect = AnimationComp->CurrTexRect;
     return {
-        FinalPosition.x - currTexRect.width / 2.f,
-        FinalPosition.y - currTexRect.height / 2.f,
+        Position.x - currTexRect.width / 2.f,
+        Position.y - currTexRect.height / 2.f,
         static_cast<float>(currTexRect.width),
         static_cast<float>(currTexRect.height)
     };
@@ -83,7 +86,7 @@ void ETG::Hero::DrawHeroBounds() const
 
 void ETG::Hero::SetHandTexLoc()
 {
-    HandPos = FinalPosition + RelativeHandLoc;
+    HandPos = Position + RelativeHandLoc;
     HandPos.x -= static_cast<float>(HandTex.getSize().x) / 2;
     HandPos.y -= static_cast<float>(HandTex.getSize().y) / 2;
 }

@@ -39,6 +39,7 @@ void ETG::GameManager::Update()
         Globals::Update();
         InputManager::Update();
         Hero->Update();
+        UI.Update();
     }
 
 }

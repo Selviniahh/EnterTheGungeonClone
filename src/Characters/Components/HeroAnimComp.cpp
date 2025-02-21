@@ -19,17 +19,20 @@ namespace ETG
         HeroAnimComp::SetAnimations();
     }
 
-    template<typename... TObjects>
+    template <typename... TObjects>
     sf::Vector2f HeroAnimComp::FlipSprites(const Direction& currentDirection, TObjects&... objects)
     {
         if (!AnimManagerDict.contains(CurrentState)) return {8.f, 5.f};
 
         const bool facingRight =
         (currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
-         currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight);
+            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight);
 
         //set flipX accordingly
-        HeroPtr->GetScale().x = facingRight ? 1.f : -1.f;
+        HeroPtr->SetScale({
+            facingRight ? 1.f : -1.f,
+            HeroPtr->GetScale().y
+        });
 
         //Scale factor to apply in Y
         float flipFactor = facingRight ? 1.f : -1.f;
@@ -37,7 +40,11 @@ namespace ETG
         //lambda that applies the scale flip to an object. It'll only flip gun for now. 
         auto flipObjectScale = [flipFactor](auto& obj)
         {
-            obj.GetScale().y = flipFactor;
+            // obj.GetScale().y = flipFactor;
+            obj.SetScale({
+                obj.GetScale().x,
+                flipFactor
+            });
         };
 
         //Apply the flip to all passed objects
@@ -49,7 +56,7 @@ namespace ETG
     void HeroAnimComp::SetAnimations()
     {
         BaseAnimComp::SetAnimations();
-        
+
         const auto runAnims = std::vector<Animation>{
             Animation::CreateSpriteSheet("Player/Run/Back", "rogue_run_back_hands_001", "png", 0.15f),
             Animation::CreateSpriteSheet("Player/Run/BackWard", "rogue_run_backward_001", "png", 0.15f),
@@ -100,18 +107,16 @@ namespace ETG
     void HeroAnimComp::Update()
     {
         CurrentState = HeroPtr->CurrentHeroState;
-        
+
         if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
             CurrentAnimStateKey = InputComponent::GetDashDirectionEnum();
-    
+
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Run)
             CurrentAnimStateKey = DirectionUtils::GetRunEnum(HeroPtr->CurrentDirection);
-    
+
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
             CurrentAnimStateKey = DirectionUtils::GetIdleDirectionEnum(HeroPtr->CurrentDirection);
-        
-        BaseAnimComp<HeroStateEnum>::Update(CurrentState,CurrentAnimStateKey);
-    }
 
-    
+        BaseAnimComp<HeroStateEnum>::Update(CurrentState, CurrentAnimStateKey);
+    }
 }
