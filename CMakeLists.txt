@@ -7,6 +7,12 @@ set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_CMAKE}" CACHE STRING "Vcpkg toolchain file"
 project(ETG LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 
+# Make GNU path format to resolve any binary copy paste requirement for SFML
+include(GNUInstallDirs)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+
 # Specify only source files
 add_executable(ETG main.cpp
         src/UI/UserInterface.cpp
@@ -67,4 +73,8 @@ target_link_libraries(ETG PRIVATE
         sfml-window
         benchmark::benchmark
         ImGui-SFML::ImGui-SFML
+)
+
+install(TARGETS ETG
+        RUNTIME DESTINATION bin  # For Windows executables
 )
