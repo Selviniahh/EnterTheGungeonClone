@@ -11,7 +11,6 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 
 void ETG::RogueSpecial::Initialize()
 {
-    SetObjectName("GunHero");
     OriginOffset = {1.f, 10.f};
     MuzzleFlashEachFrameSpeed = 0.10f;
     arrowOriginOffset = {-6.f, 0.f};

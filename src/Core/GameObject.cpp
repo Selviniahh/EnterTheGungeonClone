@@ -1,12 +1,13 @@
 #include "GameObject.h"
 #include "../Managers/GameState.h"
 
-GameObject::GameObject()
+
+GameObjectBase::GameObjectBase()
 {
     ETG::GameState::GetInstance().GetSceneObj().push_back(this);
 }
 
-void GameObject::ComputeDrawProperties()
+void GameObjectBase::ComputeDrawProperties()
 {
     DrawProps.Position = Position + RelativePos;
     DrawProps.Scale = {Scale.x * RelativeScale.x, Scale.y * RelativeScale.y};

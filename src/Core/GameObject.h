@@ -1,12 +1,17 @@
 #pragma once
 
 #include <imgui.h>
+#include <memory>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
+#ifdef __GNUG__  // Check for GCC or Clang compiler
+#include <cxxabi.h>  // Contains abi::__cxa_demangle
+#include <cstdlib>   // For std::free (used to deallocate demangled strings)
+#endif
 
 namespace ETG { class GameState; }
 
-class GameObject
+class GameObjectBase
 {
     struct DrawProperties
     {
@@ -17,11 +22,11 @@ class GameObject
         float Depth{};
     };
 
-public:
+protected:
     //Push back every GameObject to the SceneObj during initialization.  
-    GameObject();
+    GameObjectBase();
     
-    virtual ~GameObject() = default;
+    virtual ~GameObjectBase() = default;
 
 protected:
     virtual void Initialize() {}
@@ -129,5 +134,33 @@ public:
         ImGui::Text("Rotation");
         ImGui::SameLine();
         ImGui::SliderFloat("##Rot", &Rotation, 0.0f, 360.0f);
+    }
+};
+
+inline std::string DemangleTypeName(const char* name) {
+#ifdef __GNUG__
+    int status = -1;
+    std::unique_ptr<char, void(*)(void*)> res{
+        abi::__cxa_demangle(name, nullptr, nullptr, &status),
+        std::free
+    };
+    return (status == 0) ? res.get() : name;
+#else
+    std::string result = name;
+    // Remove MSVC's "class " prefix
+    size_t pos = result.find("class ");
+    if (pos != std::string::npos) result.erase(pos, 6);
+    return result;
+#endif
+}
+
+//CRTP for compile-time polymorphism
+template<typename Derived>
+class GameObject : public GameObjectBase
+{
+public:
+    GameObject()
+    {
+        ObjectName = DemangleTypeName(typeid(Derived).name());
     }
 };

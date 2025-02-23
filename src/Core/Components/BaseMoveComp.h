@@ -2,7 +2,7 @@
 #include "../GameObject.h"
 #include <SFML/System/Vector2.hpp>
 
-class BaseMoveComp : public GameObject
+class BaseMoveComp : public GameObject<BaseMoveComp>
 {
 protected:
     // Protected constructor so only derived classes can create one.

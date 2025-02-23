@@ -21,7 +21,7 @@ namespace ETG
 
     public:
         //Hold only scene objects. Used for displaying details panel
-        std::vector<GameObject*> SceneObjects;
+        std::vector<GameObjectBase*> SceneObjects;
         
         std::unique_ptr<UserInterface> UI;
         static sf::Event GameEvent;

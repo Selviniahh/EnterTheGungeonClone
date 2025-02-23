@@ -8,9 +8,9 @@ float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
 bool ETG::Hero::IsShooting{};
 
-ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
+ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
 {
-    SetObjectName("Hero");
+    // SetObjectName("Hero");
     RelativeGunOffsetPos = sf::Vector2f{2,2};
     Depth = 2;
     this->Position = Position;

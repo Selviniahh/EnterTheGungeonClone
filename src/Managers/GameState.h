@@ -14,8 +14,8 @@ namespace ETG
         void SetHero(Hero* hero) { MainHero = hero; }
         [[nodiscard]] Hero* GetHero() const { return MainHero; }
 
-        [[nodiscard]] std::vector<GameObject*>& GetSceneObj() const { return *SceneObj; }
-        void SetSceneObj(std::vector<GameObject*>& sceneObj) { SceneObj = &sceneObj; }
+        [[nodiscard]] std::vector<GameObjectBase*>& GetSceneObj() const { return *SceneObj; }
+        void SetSceneObj(std::vector<GameObjectBase*>& sceneObj) { SceneObj = &sceneObj; }
 
         void SetEngineUISize(sf::Vector2f& size) { EngineUISize = std::ref(size); }
         [[nodiscard]] sf::Vector2f& GetEngineUISize() const { return EngineUISize.get(); }
@@ -23,7 +23,7 @@ namespace ETG
     private:
         GameState() = default;
         Hero* MainHero = nullptr;
-        std::vector<GameObject*>* SceneObj = nullptr;
+        std::vector<GameObjectBase*>* SceneObj = nullptr;
 
         sf::Vector2f dummyEngineUISize{};
         std::reference_wrapper<sf::Vector2f> EngineUISize{dummyEngineUISize};

@@ -14,7 +14,7 @@ namespace ETG
 {
     enum class GunStateEnum;
 
-    class GunBase : public GameObject
+    class GunBase : public GameObject<GunBase>
     {
     public:
         explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity);

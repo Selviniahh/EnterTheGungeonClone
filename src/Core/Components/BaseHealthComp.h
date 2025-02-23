@@ -1,9 +1,7 @@
 #pragma once
 #include "../GameObject.h"
 
-class GameObject;
-
-class BaseHealthComp : GameObject {
+class BaseHealthComp : GameObject<BaseHealthComp> {
 public:
     explicit BaseHealthComp(float MaxHealth);
     void Initialize() override;

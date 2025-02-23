@@ -69,7 +69,7 @@ void EngineUI::Draw()
     ImGui::SFML::Render(*ETG::Globals::Window);
 }
 
-void EngineUI::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
+void EngineUI::UpdateDetailsPanel(const std::vector<GameObjectBase*>& SceneObjects)
 {
     static int SelectedIdx = 0;
 

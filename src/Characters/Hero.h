@@ -10,7 +10,7 @@
 
 namespace ETG
 {
-    class Hero : public GameObject
+    class Hero : public GameObject<Hero>
     {
     public:
         static float MouseAngle;

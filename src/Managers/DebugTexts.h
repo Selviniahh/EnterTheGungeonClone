@@ -8,7 +8,7 @@ namespace ETG
     {
     public:
         Hero* HeroPtr = nullptr;
-        std::vector<GameObject*>* SceneObjects = nullptr;
+        std::vector<GameObjectBase*>* SceneObjects = nullptr;
         
         void Draw(sf::RenderWindow& window)
         {

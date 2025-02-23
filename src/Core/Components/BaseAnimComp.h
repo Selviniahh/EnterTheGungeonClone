@@ -7,7 +7,7 @@ namespace ETG
     enum class HeroStateEnum;
 
     template<typename StateEnum>
-    class BaseAnimComp : public GameObject
+    class BaseAnimComp : public GameObject<BaseAnimComp<StateEnum>>
     {
     public:
         BaseAnimComp();
@@ -48,7 +48,7 @@ namespace ETG
     {
         if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
 
-        AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, Rotation, RelativeOrigin, Scale, Depth);
+        AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, this->Rotation, RelativeOrigin, this->Scale, this->Depth);
     }
 
     template <typename StateEnum>
