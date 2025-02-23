@@ -2,6 +2,12 @@
 #include "../../Managers/GameManager.h"
 #include <imgui-SFML.h>
 #include <imgui.h>
+#include <iostream>
+
+bool EngineUI::CurrentGameFocus = false;
+bool EngineUI::PreviousGameFocus = false;
+
+using namespace ETG;
 
 void EngineUI::Initialize()
 {
@@ -10,6 +16,7 @@ void EngineUI::Initialize()
 
     ETG::GameState::GetInstance().SetEngineUISize(windowSize);
     windowSize = {300, (float)(ETG::Window->getSize().y)};
+    std::cout << std::unitbuf;
 
     LoadFont();
 }
@@ -26,8 +33,34 @@ void EngineUI::Update() const
     ImGui::Begin("Details Pane", nullptr);
     UpdateDetailsPanel(ETG::GameState::GetInstance().GetSceneObj());
 
+    PreviousGameFocus = CurrentGameFocus;
+    CurrentGameFocus = !(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
+
     //The end
     ImGui::End();
+}
+
+bool EngineUI::IsGameWindowFocused()
+{
+    // Check if the game has focus; if not, ignore input.
+    if (!CurrentGameFocus) return false;
+
+    // Determine if focus was just gained (Current is true, Previous was false)
+    if (CurrentGameFocus && !EngineUI::PreviousGameFocus)
+        InputManager::LeftClickRequired = true;
+
+    // Process events to check for mouse release
+    if (InputManager::LeftClickRequired && GameManager::GameEvent.type == sf::Event::MouseButtonReleased && ETG::GameManager::GameEvent.mouseButton.button == sf::Mouse::Left)
+    {
+        InputManager::LeftClickRequired = false;
+    }
+    
+    // If LeftClickRequired is still true, wait for release before processing input
+    if (InputManager::LeftClickRequired)
+    {
+        return false;
+    }
+    return true;
 }
 
 void EngineUI::Draw()

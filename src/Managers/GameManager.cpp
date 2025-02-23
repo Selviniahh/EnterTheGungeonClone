@@ -3,6 +3,9 @@
 #include "InputManager.h"
 #include "SpriteBatch.h"
 #include <imgui-SFML.h>
+#include <SFML/Window.hpp>
+
+sf::Event ETG::GameManager::GameEvent{};
 
 void ETG::GameManager::Initialize()
 {
@@ -27,8 +30,6 @@ void ETG::GameManager::Initialize()
     UI->Initialize();
     
     Hero = std::make_unique<class Hero>(sf::Vector2f{10,10});
-
-    SceneObjects.push_back(UI.get());
 }
 
 void ETG::GameManager::Update()
@@ -74,22 +75,21 @@ void ETG::GameManager::Draw()
 
 void ETG::GameManager::ProcessEvents()
 {
-    sf::Event event{};
-    while (Window->pollEvent(event))
+    while (Window->pollEvent(GameEvent))
     {
-        if (event.type == sf::Event::Closed) Window->close();
-        if (event.type == sf::Event::LostFocus) HasFocus = false;
-        if (event.type == sf::Event::GainedFocus) HasFocus = true;
+        if (GameEvent.type == sf::Event::Closed) Window->close();
+        if (GameEvent.type == sf::Event::LostFocus) HasFocus = false;
+        if (GameEvent.type == sf::Event::GainedFocus) HasFocus = true;
 
         // Handle window resize
         // Inside GameManager::ProcessEvents
-        if (event.type == sf::Event::Resized)
+        if (GameEvent.type == sf::Event::Resized)
         {
             // Update the global screen size
-            ScreenSize = {event.size.width, event.size.height};
+            ScreenSize = {GameEvent.size.width, GameEvent.size.height};
 
             // Optionally update the default view if you rely on it
-            sf::View defaultView(sf::FloatRect(0.f, 0.f, event.size.width, event.size.height));
+            sf::View defaultView(sf::FloatRect(0.f, 0.f, GameEvent.size.width, GameEvent.size.height));
             Window->setView(defaultView);
 
             // Recalculate UI positions based on the new screen size.
@@ -98,6 +98,6 @@ void ETG::GameManager::ProcessEvents()
         }
 
         //Poll and process events for ImGUI
-        ImGui::SFML::ProcessEvent(*Window, event);
+        ImGui::SFML::ProcessEvent(*Window, GameEvent);
     }
 }

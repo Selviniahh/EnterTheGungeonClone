@@ -36,8 +36,9 @@ namespace ETG
         sf::Texture HandTex;
         sf::Vector2f HandPos;
         sf::Vector2f RelativeHandLoc{8, 4};
+        sf::Vector2f RelativeGunOffsetPos;
 
-        
+
         void SetHandTexLoc();
     };
 }

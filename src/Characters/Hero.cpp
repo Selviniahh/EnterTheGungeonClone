@@ -11,14 +11,13 @@ bool ETG::Hero::IsShooting{};
 ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
 {
     SetObjectName("Hero");
+    RelativeGunOffsetPos = sf::Vector2f{2,2};
     Depth = 2;
     this->Position = Position;
     GameState::GetInstance().SetHero(this);
 
     //Set gun
     RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
-    GameState::GetInstance().GetSceneObj().push_back(this);
-    GameState::GetInstance().GetSceneObj().push_back(RogueSpecial.get());
 
     //Set animation
     AnimationComp = std::make_unique<HeroAnimComp>();
@@ -42,7 +41,7 @@ void ETG::Hero::Update()
     SetHandTexLoc();
 
     //Gun
-    RogueSpecial->SetPosition(HandPos + sf::Vector2f{2,2});
+    RogueSpecial->SetPosition(HandPos + RelativeGunOffsetPos);
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();

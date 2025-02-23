@@ -124,7 +124,7 @@ void GunBase::Shoot()
         const sf::Vector2f projVelocity = direction * velocity;
 
         // Spawn projectile.
-        auto* proj = new ProjectileBase(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
+        auto* proj = new ProjectileBase(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation,"RogueSpecialProjectile");
         projectiles.push_back(proj);
 
         // Restart muzzle flash animation.
