@@ -2,7 +2,6 @@
 #include "../../Managers/GameManager.h"
 #include <imgui-SFML.h>
 #include <imgui.h>
-#include <iostream>
 
 void EngineUI::Initialize()
 {

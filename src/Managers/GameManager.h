@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DebugTexts.h"
-#include "GameState.h"
 #include "../Animation/AnimationManager.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
@@ -24,11 +23,11 @@ namespace ETG
         //Hold only scene objects. Used for displaying details panel
         std::vector<GameObject*> SceneObjects;
 
-        UserInterface UI;
+        std::unique_ptr<UserInterface> UI;
 
         void Initialize();
         void ProcessEvents();
-        bool WindowHasFocus() const { return HasFocus; }
+        [[nodiscard]] bool WindowHasFocus() const { return HasFocus; }
 
         //I might delete this later on 
         static bool IsRunning() { return Window->isOpen(); }

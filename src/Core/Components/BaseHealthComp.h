@@ -1,11 +1,12 @@
 #pragma once
+#include "../GameObject.h"
 
 class GameObject;
 
-class BaseHealthComp {
+class BaseHealthComp : GameObject {
 public:
     explicit BaseHealthComp(float MaxHealth);
-    static void Initialize();
+    void Initialize() override;
 
     bool Damaged;
     float Timer;

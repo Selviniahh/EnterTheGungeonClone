@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "../../Utils/DirectionUtils.h"
+#include "../../Core/GameObject.h"
 
 namespace ETG
 {
@@ -16,7 +17,7 @@ namespace ETG
 
 namespace ETG
 {
-    class InputComponent
+    class InputComponent : GameObject
     {
     public:
         InputComponent();

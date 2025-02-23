@@ -4,6 +4,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
 
+namespace ETG { class GameState; }
+
 class GameObject
 {
     struct DrawProperties
@@ -16,7 +18,9 @@ class GameObject
     };
 
 public:
-    GameObject() = default;
+    //Push back every GameObject to the SceneObj during initialization.  
+    GameObject();
+    
     virtual ~GameObject() = default;
 
 protected:
@@ -70,13 +74,7 @@ public:
     void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
     void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
 
-    void ComputeDrawProperties()
-    {
-        DrawProps.Position = Position + RelativePos;
-        DrawProps.Scale = {Scale.x * RelativeScale.x, Scale.y * RelativeScale.y};
-        DrawProps.Rotation = Rotation + RelativeRotation;
-        DrawProps.Origin = Origin + RelativeOrigin;
-    }
+    void ComputeDrawProperties();
     
     // When the UI changes, recalculate the final position from BasePosition.
     void ImGuiSetRelativeOrientation()

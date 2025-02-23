@@ -1,6 +1,5 @@
 #pragma once
 #include "../Characters/Hero.h"
-
 namespace ETG
 {
     class GameState

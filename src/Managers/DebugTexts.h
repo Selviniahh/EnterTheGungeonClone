@@ -8,15 +8,19 @@ namespace ETG
     {
     public:
         Hero* HeroPtr = nullptr;
-
+        std::vector<GameObject*>* SceneObjects = nullptr;
+        
         void Draw(sf::RenderWindow& window)
         {
             if (!HeroPtr) HeroPtr = GameState::GetInstance().GetHero();
+            if (!SceneObjects) SceneObjects = &GameState::GetInstance().GetSceneObj();
+            
 
             // Reset textPos to starting position each frame
             InputManager::textPos = {0.f, -20.f};
 
             // Draw debug information
+            DrawDebugText("Total Game Objects in scene: " + std::to_string(SceneObjects->size()), window);
             DrawDebugText("Direction: " + std::to_string(InputManager::direction.x) + ", " + std::to_string(InputManager::direction.y), window);
 
             //Mouse position that my monitor's top left point will be (0,0)

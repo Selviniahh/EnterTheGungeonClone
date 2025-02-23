@@ -23,11 +23,12 @@ void ETG::GameManager::Initialize()
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
 
-    UI.Initialize();
+    UI = std::make_unique<UserInterface>();
+    UI->Initialize();
+    
     Hero = std::make_unique<class Hero>(sf::Vector2f{10,10});
-    
-    
-    SceneObjects.push_back(&UI);
+
+    SceneObjects.push_back(UI.get());
 }
 
 void ETG::GameManager::Update()
@@ -38,7 +39,7 @@ void ETG::GameManager::Update()
         Globals::Update();
         InputManager::Update();
         Hero->Update();
-        UI.Update();
+        UI->Update();
     }
 
 }
@@ -59,7 +60,7 @@ void ETG::GameManager::Draw()
     Window->setView(Window->getDefaultView());
 
     ETG::GlobSpriteBatch.begin();
-    UI.Draw();
+    UI->Draw();
     ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: non batch draws here. 
@@ -93,7 +94,7 @@ void ETG::GameManager::ProcessEvents()
 
             // Recalculate UI positions based on the new screen size.
             // This could be done by calling a dedicated update method in your UI.
-            UI.Initialize(); // or UI.UpdatePositions(); if you separate the logic.
+            UI->Initialize(); // or UI.UpdatePositions(); if you separate the logic.
         }
 
         //Poll and process events for ImGUI
