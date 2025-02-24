@@ -8,7 +8,6 @@ namespace ETG
     class RogueSpecial;
 }
 
-template sf::Vector2f ETG::HeroAnimComp::FlipSprites<ETG::GunBase>(const Direction&, ETG::GunBase&);
 template sf::Vector2f ETG::HeroAnimComp::FlipSprites<ETG::RogueSpecial>(const Direction&, RogueSpecial&);
 
 namespace ETG
@@ -114,6 +113,6 @@ namespace ETG
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
             CurrentAnimStateKey = DirectionUtils::GetIdleDirectionEnum(HeroPtr->CurrentDirection);
 
-        BaseAnimComp<HeroStateEnum>::Update(CurrentState, CurrentAnimStateKey);
+        BaseAnimComp<HeroAnimComp,HeroStateEnum>::Update(CurrentState, CurrentAnimStateKey);
     }
 }

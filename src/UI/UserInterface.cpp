@@ -1,7 +1,7 @@
 #include "UserInterface.h"
 #include <filesystem>
 
-#include "../Engine/UI/EngineUI.h"
+#include "../Engine/Engine.h"
 #include "../Managers/GameState.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"

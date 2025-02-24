@@ -2,17 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include "../../Managers/StateEnums.h"
 #include "../../Core/Components/BaseAnimComp.h"
-
-namespace ETG
-{
-    class Hero;
-}
-
 namespace ETG
 {
     enum class HeroStateEnum;
+    class Hero;
 
-    class HeroAnimComp : public BaseAnimComp<HeroStateEnum>
+    class HeroAnimComp : public BaseAnimComp<HeroAnimComp, HeroStateEnum>
     {
     public:
         HeroAnimComp();

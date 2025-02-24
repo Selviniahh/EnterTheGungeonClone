@@ -2,17 +2,17 @@
 
 #include "GameManager.h"
 #include "GameState.h"
-#include "../Engine/UI/EngineUI.h"
+#include "../Engine/Engine.h"
 
 void ETG::InputManager::Update()
 {
     if (!HeroPtr) HeroPtr = GameState::GetInstance().GetHero();
 
-    if (!EngineUI::IsGameWindowFocused()) return;
+    if (!Engine::IsGameWindowFocused()) return;
 
 
     // Update PreviousGameFocus at the end of the frame to track state correctly
-    EngineUI::PreviousGameFocus = EngineUI::CurrentGameFocus;
+    Engine::PreviousGameFocus = Engine::CurrentGameFocus;
 
     ZoomScale = GetZoomScale(Globals::MainView, *Globals::Window);
 

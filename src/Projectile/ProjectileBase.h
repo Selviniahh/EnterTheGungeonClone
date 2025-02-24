@@ -5,7 +5,7 @@ class ProjectileBase : GameObject<ProjectileBase>
 {
 public:
     ProjectileBase() = default;
-    ProjectileBase(const sf::Texture& texture,sf::Vector2f spawnPos, sf::Vector2f projVelocity, float maxProjectileRange, float rotation, std::string objectName);
+    ProjectileBase(const sf::Texture& texture,sf::Vector2f spawnPos, sf::Vector2f projVelocity, float maxProjectileRange, float rotation);
 
     void Initialize() override;
     void Update() override;

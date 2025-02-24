@@ -3,13 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include "../Core/GameObject.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
-#include "Components/HeroAnimComp.h"
 #include "../Managers/StateEnums.h"
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
+#include "../Characters/Components/HeroAnimComp.h"
 
 namespace ETG
 {
+
     class Hero : public GameObject<Hero>
     {
     public:

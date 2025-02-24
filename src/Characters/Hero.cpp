@@ -3,6 +3,7 @@
 #include "../Managers/GameState.h"
 #include "../Managers/InputManager.h"
 #include "../Managers/SpriteBatch.h"
+#include "Components/HeroAnimComp.h"
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};

@@ -4,7 +4,7 @@
 #include "../Animation/AnimationManager.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
-#include "../Engine/UI/EngineUI.h"
+#include "../Engine/Engine.h"
 
 namespace ETG
 {
@@ -14,7 +14,7 @@ namespace ETG
     {
     private:
         std::unique_ptr<Hero> Hero;
-        EngineUI EngineUI{};
+        Engine EngineUI{};
 
         bool HasFocus = true;
         DebugText DebugText;

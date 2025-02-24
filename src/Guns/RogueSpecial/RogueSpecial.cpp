@@ -1,6 +1,6 @@
 #include "RogueSpecial.h"
 
-ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f)
+ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase<RogueSpecial,RogueSpecialAnimComp>(Position, 0.35f, 200.f, 5000.f, 0.f)
 {
     AnimationComp = std::make_unique<RogueSpecialAnimComp>();
     AnimationComp->SetAnimations();
@@ -32,7 +32,7 @@ void ETG::RogueSpecial::Initialize()
 
 ETG::RogueSpecialAnimComp::RogueSpecialAnimComp()
 {
-    SetAnimations();
+    RogueSpecialAnimComp::SetAnimations();
 }
 
 void ETG::RogueSpecialAnimComp::SetAnimations()

@@ -1,13 +1,9 @@
 #pragma once
 
 #include <imgui.h>
-#include <memory>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
-#ifdef __GNUG__  // Check for GCC or Clang compiler
-#include <cxxabi.h>  // Contains abi::__cxa_demangle
-#include <cstdlib>   // For std::free (used to deallocate demangled strings)
-#endif
+#include <boost/type_index.hpp>
 
 namespace ETG { class GameState; }
 
@@ -68,99 +64,41 @@ private:
 public:
     // Only the drawing code (or renderer) is expected to use these values.
     [[nodiscard]] const DrawProperties& GetDrawProperties() const {return DrawProps;}
-    
     virtual std::string& GetObjectName() { return ObjectName; }
+    
+    // void SetObjectName(const std::string& ObjectName) { this->ObjectName = ObjectName; }
+    
     [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
     [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
     [[nodiscard]] const sf::Vector2f& GetOrigin() const { return Origin; }
 
-    void SetObjectName(const std::string& ObjectName) { this->ObjectName = ObjectName; }
     void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
     void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
     void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
 
     void ComputeDrawProperties();
-    
-    // When the UI changes, recalculate the final position from BasePosition.
-    void ImGuiSetRelativeOrientation()
-    {
-        //NOTE: Position
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Position");
-        ImGui::SameLine();
-        if (ImGui::InputFloat2("##PosX", &RelativePos.x, "%.3f"))
-        {
-            //Revert what I've done last time and then apply RelativePos again
-            const sf::Vector2f delta = {RelativePos.x - PrevRelativePos.x, RelativePos.y - PrevRelativePos.y};
-            DrawProps.Position += delta;
-            PrevRelativePos = RelativePos;
-        }
 
-        //NOTE: Scale
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Scale");
-        ImGui::SameLine();
-        if (ImGui::InputFloat2("##Scale", &RelativeScale.x, "%.3f"))
-        {
-            const sf::Vector2f delta{RelativeScale.x - PrevRelativeScale.x, RelativeScale.y - PrevRelativeScale.y};
-            DrawProps.Scale += delta;
-            PrevRelativeScale = RelativeScale;
-        }
+    //Friend classes for Engine UI
+    friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
+    friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
-        //NOTE: Rotation
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Rotation");
-        ImGui::SameLine();
-        ImGui::SliderFloat("##Rot", &RelativeRotation, 0.0f, 360.0f);
-    }
-
-    // When the UI changes, recalculate the final position from BasePosition.
-    void ImGuiSetAbsoluteOrientation()
-    {
-        //NOTE: Position
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Position");
-        ImGui::SameLine();
-        if (ImGui::InputFloat2("##PosX", &Position.x, "%.3f")) {}
-
-        //NOTE: Scale
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Scale");
-        ImGui::SameLine();
-        if (ImGui::InputFloat2("##Scale", &Scale.x, "%.3f")) {}
-
-        //NOTE: Rotation
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("Rotation");
-        ImGui::SameLine();
-        ImGui::SliderFloat("##Rot", &Rotation, 0.0f, 360.0f);
-    }
 };
 
-inline std::string DemangleTypeName(const char* name) {
-#ifdef __GNUG__
-    int status = -1;
-    std::unique_ptr<char, void(*)(void*)> res{
-        abi::__cxa_demangle(name, nullptr, nullptr, &status),
-        std::free
-    };
-    return (status == 0) ? res.get() : name;
-#else
-    std::string result = name;
-    // Remove MSVC's "class " prefix
-    size_t pos = result.find("class ");
-    if (pos != std::string::npos) result.erase(pos, 6);
-    return result;
-#endif
-}
-
-//CRTP for compile-time polymorphism
-template<typename Derived>
+//CRTP for compile-time polymorphism. All the objects will inherit GameObject not GameObjectBase
+//This implementation necessary to automatically get the class' name at compile time and set to ObjectName
+template<typename DerivedName>
 class GameObject : public GameObjectBase
 {
 public:
     GameObject()
     {
-        ObjectName = DemangleTypeName(typeid(Derived).name());
+        ObjectName = boost::typeindex::type_id_with_cvr<DerivedName>().pretty_name();
+
+        //Remove everything up to and including the last ::
+        const size_t LastColon = ObjectName.find_last_of("::");
+        if (LastColon != std::string::npos)
+        {
+            ObjectName = ObjectName.substr(LastColon + 1);
+        }
     }
 };
