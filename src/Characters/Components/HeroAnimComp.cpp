@@ -2,6 +2,7 @@
 #include "../../Guns/Base/GunBase.h"
 #include "../../Guns/RogueSpecial/RogueSpecial.h"
 #include "../../Managers/GameState.h"
+#include "../../Characters/Hero.h"
 
 namespace ETG
 {
@@ -113,6 +114,6 @@ namespace ETG
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
             CurrentAnimStateKey = DirectionUtils::GetIdleDirectionEnum(HeroPtr->CurrentDirection);
 
-        BaseAnimComp<HeroAnimComp,HeroStateEnum>::Update(CurrentState, CurrentAnimStateKey);
+        BaseAnimComp<HeroStateEnum>::Update(CurrentState, CurrentAnimStateKey);
     }
 }

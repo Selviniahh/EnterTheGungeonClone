@@ -25,7 +25,7 @@ void ProjectileBase::Update()
 void ProjectileBase::Draw()
 {
     //Calling this is necessary. When the projectiles are spawned, Update Function called After Draw. Somehow Update needs to be called before Draw. Calling this function instead is just a temp solution. 
-    ComputeDrawProperties();
+    // ComputeDrawProperties();
     
     auto& DrawableProps = GetDrawProperties();
     sf::Sprite frame;

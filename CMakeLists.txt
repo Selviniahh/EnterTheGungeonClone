@@ -48,6 +48,7 @@ add_executable(ETG main.cpp
         src/Managers/InputManager.cpp
         src/Engine/UI/EngineUI.cpp
         src/Engine/UI/EngineUI.h
+        src/Core/Factory.h
 )
 
 # Easiest and fastest way is VCPKG 

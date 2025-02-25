@@ -7,7 +7,7 @@ namespace ETG
     enum class HeroStateEnum;
     class Hero;
 
-    class HeroAnimComp : public BaseAnimComp<HeroAnimComp, HeroStateEnum>
+    class HeroAnimComp : public BaseAnimComp<HeroStateEnum>
     {
     public:
         HeroAnimComp();

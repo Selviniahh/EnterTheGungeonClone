@@ -14,9 +14,9 @@ public:
     friend void ImGuiSetRelativeOrientation();
     void Draw();
 
-    static void UpdateDetailsPanel(const std::vector<GameObjectBase*>& SceneObjects);
-    friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
-    friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
+    static void UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects);
+    friend void ImGuiSetRelativeOrientation(GameObject* obj);
+    friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
     static bool CurrentGameFocus;
     static bool PreviousGameFocus;
 

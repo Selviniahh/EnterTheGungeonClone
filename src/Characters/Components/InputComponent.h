@@ -17,7 +17,7 @@ namespace ETG
 
 namespace ETG
 {
-    class InputComponent : GameObject<InputComponent>
+    class InputComponent : GameObject
     {
     public:
         InputComponent();

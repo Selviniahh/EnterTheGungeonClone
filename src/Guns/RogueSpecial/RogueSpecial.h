@@ -4,14 +4,14 @@
 
 namespace ETG
 {
-    class RogueSpecialAnimComp : public BaseAnimComp<RogueSpecialAnimComp, GunStateEnum>
+    class RogueSpecialAnimComp : public BaseAnimComp<GunStateEnum>
     {
     public:
         RogueSpecialAnimComp();
         void SetAnimations() override;
     };
     
-    class RogueSpecial : public GunBase<RogueSpecial, RogueSpecialAnimComp>
+    class RogueSpecial : public GunBase<RogueSpecialAnimComp>
     {
     public:
         explicit RogueSpecial(const sf::Vector2f& Position);

@@ -6,8 +6,8 @@ namespace ETG
 {
     enum class HeroStateEnum;
 
-    template<typename Derived, typename StateEnum>
-    class BaseAnimComp : public GameObject<Derived>
+    template<typename StateEnum>
+    class BaseAnimComp : public GameObject
     {
     public:
         BaseAnimComp() = default;
@@ -26,8 +26,8 @@ namespace ETG
         AnimationKey CurrentAnimStateKey;
     };
 
-    template <typename DerivedName, typename StateEnum>
-    void BaseAnimComp<DerivedName, StateEnum>::Update(const StateEnum& stateEnum, const AnimationKey& animKey)
+    template <typename StateEnum>
+    void BaseAnimComp<StateEnum>::Update(const StateEnum& stateEnum, const AnimationKey& animKey)
     {
         CurrentState = stateEnum;
         CurrentAnimStateKey = animKey;
@@ -43,24 +43,24 @@ namespace ETG
         RelativeOrigin = animManager.AnimationDict[AnimManagerDict[CurrentState].LastKey].Origin;
     }
 
-    template <typename Derived, typename StateEnum>
-    void BaseAnimComp<Derived, StateEnum>::Draw(const sf::Vector2f& position)
+    template <typename StateEnum>
+    void BaseAnimComp<StateEnum>::Draw(const sf::Vector2f& position)
     {
         if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
 
         AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, this->Rotation, RelativeOrigin, this->Scale, this->Depth);
     }
 
-    template <typename Derived, typename StateEnum>
-    void BaseAnimComp<Derived, StateEnum>::Draw(const sf::Vector2f position, const sf::Vector2f Origin, const sf::Vector2f Scale, const float Rotation, const float depth)
+    template <typename StateEnum>
+    void BaseAnimComp<StateEnum>::Draw(const sf::Vector2f position, const sf::Vector2f Origin, const sf::Vector2f Scale, const float Rotation, const float depth)
     {
         if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
 
         AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, Rotation, Origin, Scale, depth);
     }
 
-    template <typename Derived, typename StateEnum>
-    void BaseAnimComp<Derived, StateEnum>::SetAnimations()
+    template <typename StateEnum>
+    void BaseAnimComp<StateEnum>::SetAnimations()
     {
     }
 }

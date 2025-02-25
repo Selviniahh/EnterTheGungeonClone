@@ -10,6 +10,7 @@ namespace ETG
     InputComponent::InputComponent()
     {
         DirectionUtils::PopulateDirectionRanges(DirectionMap);
+        // SetObjectNameToSelfClassName();
     }
 
     void InputComponent::Update(Hero& hero) const

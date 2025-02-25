@@ -11,7 +11,7 @@
 namespace ETG
 {
 
-    class Hero : public GameObject<Hero>
+    class Hero : public GameObject
     {
     public:
         static float MouseAngle;
@@ -28,7 +28,7 @@ namespace ETG
         bool IsDashing = false;
 
         std::unique_ptr<RogueSpecial> RogueSpecial;
-        HeroMoveComp MoveComp;
+        std::unique_ptr<HeroMoveComp> MoveComp;
 
     private:
         std::unique_ptr<HeroAnimComp> AnimationComp;
@@ -37,7 +37,7 @@ namespace ETG
         sf::Texture HandTex;
         sf::Vector2f HandPos;
         sf::Vector2f RelativeHandLoc{8, 4};
-        sf::Vector2f RelativeGunOffsetPos;
+        sf::Vector2f RelativeGunOffsetPos{2,2};
 
 
         void SetHandTexLoc();

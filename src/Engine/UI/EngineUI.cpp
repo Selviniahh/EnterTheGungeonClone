@@ -6,7 +6,7 @@
 #include "../../Core/GameObject.h"
 #include <imgui.h>
 
-void ImGuiSetRelativeOrientation(GameObjectBase* obj)
+void ImGuiSetRelativeOrientation(GameObject* obj)
 {
     
     //NOTE: Position
@@ -40,7 +40,7 @@ void ImGuiSetRelativeOrientation(GameObjectBase* obj)
 }
 
 // When the UI changes, recalculate the final position from BasePosition.
-void ImGuiSetAbsoluteOrientation(GameObjectBase* obj)
+void ImGuiSetAbsoluteOrientation(GameObject* obj)
 {
     //NOTE: Position
     ImGui::AlignTextToFramePadding();

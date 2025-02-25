@@ -1,5 +1,6 @@
 #include "Hero.h"
 #include <iostream>
+
 #include "../Managers/GameState.h"
 #include "../Managers/InputManager.h"
 #include "../Managers/SpriteBatch.h"
@@ -11,17 +12,17 @@ bool ETG::Hero::IsShooting{};
 
 ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
 {
-    // SetObjectName("Hero");
-    RelativeGunOffsetPos = sf::Vector2f{2,2};
-    Depth = 2;
     this->Position = Position;
+    Depth = 2;
     GameState::GetInstance().SetHero(this);
 
     //Set gun
-    RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
+    RogueSpecial = ETG::CreateGameObject<class RogueSpecial>(HandPos);
 
     //Set animation
-    AnimationComp = std::make_unique<HeroAnimComp>();
+    AnimationComp = ETG::CreateGameObject<HeroAnimComp>();
+
+    MoveComp = ETG::CreateGameObject<HeroMoveComp>();
 
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
         std::cerr << "Failed to load hand texture" << std::endl;
@@ -33,7 +34,7 @@ void ETG::Hero::Update()
     GameObject::Update();
     
     InputComp.Update(*this);
-    MoveComp.Update();
+    MoveComp->Update();
 
     //Animations
     AnimationComp->Update();

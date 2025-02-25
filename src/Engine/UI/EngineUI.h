@@ -1,9 +1,9 @@
 #pragma once
 
-class GameObjectBase;
+class GameObject;
 
 class EngineUI
 {
-    friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
-    friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
+    friend void ImGuiSetRelativeOrientation(GameObject* obj);
+    friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
 };

@@ -1,13 +1,18 @@
 #pragma once
 
+//TODO: Removing this useless imgui gives me compile time error. Once you done with your thing come back here to fix the problem. 
 #include <imgui.h>
+#include <memory>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
 #include <boost/type_index.hpp>
 
-namespace ETG { class GameState; }
+namespace ETG
+{
+    class GameState;
+}
 
-class GameObjectBase
+class GameObject
 {
     struct DrawProperties
     {
@@ -20,13 +25,17 @@ class GameObjectBase
 
 protected:
     //Push back every GameObject to the SceneObj during initialization.  
-    GameObjectBase();
-    
-    virtual ~GameObjectBase() = default;
+    GameObject();
 
-protected:
-    virtual void Initialize() {}
-    virtual void Draw() {}
+    virtual ~GameObject() = default;
+
+    virtual void Initialize()
+    {
+    }
+
+    virtual void Draw()
+    {
+    }
 
     virtual void Update()
     {
@@ -62,11 +71,11 @@ private:
     DrawProperties DrawProps;
 
 public:
-    // Only the drawing code (or renderer) is expected to use these values.
-    [[nodiscard]] const DrawProperties& GetDrawProperties() const {return DrawProps;}
-    virtual std::string& GetObjectName() { return ObjectName; }
+    void SetObjectNameToSelfClassName();
     
-    // void SetObjectName(const std::string& ObjectName) { this->ObjectName = ObjectName; }
+    // Only the drawing code (or renderer) is expected to use these values.
+    [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
+    virtual std::string& GetObjectName() { return ObjectName; }
     
     [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
     [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
@@ -79,26 +88,8 @@ public:
     void ComputeDrawProperties();
 
     //Friend classes for Engine UI
-    friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
-    friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
+    friend void ImGuiSetRelativeOrientation(GameObject* obj);
+    friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
 
-};
 
-//CRTP for compile-time polymorphism. All the objects will inherit GameObject not GameObjectBase
-//This implementation necessary to automatically get the class' name at compile time and set to ObjectName
-template<typename DerivedName>
-class GameObject : public GameObjectBase
-{
-public:
-    GameObject()
-    {
-        ObjectName = boost::typeindex::type_id_with_cvr<DerivedName>().pretty_name();
-
-        //Remove everything up to and including the last ::
-        const size_t LastColon = ObjectName.find_last_of("::");
-        if (LastColon != std::string::npos)
-        {
-            ObjectName = ObjectName.substr(LastColon + 1);
-        }
-    }
 };

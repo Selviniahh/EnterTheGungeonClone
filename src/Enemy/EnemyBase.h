@@ -1,7 +1,7 @@
 #pragma once
 #include "../Core/GameObject.h"
 
-class EnemyBase : GameObject<EnemyBase>
+class EnemyBase : GameObject
 {
 protected:
     void Initialize() override;

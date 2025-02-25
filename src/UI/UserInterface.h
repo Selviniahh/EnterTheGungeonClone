@@ -5,7 +5,7 @@
 
 namespace ETG
 {
-    class UserInterface : public GameObject<UserInterface>
+    class UserInterface : public GameObject
     {
     private:
         sf::Texture Frame;

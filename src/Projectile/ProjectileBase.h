@@ -1,7 +1,7 @@
 #pragma once
 #include "../Core/GameObject.h"
 
-class ProjectileBase : GameObject<ProjectileBase>
+class ProjectileBase : public GameObject
 {
 public:
     ProjectileBase() = default;

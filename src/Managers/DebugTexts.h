@@ -8,7 +8,7 @@ namespace ETG
     {
     public:
         Hero* HeroPtr = nullptr;
-        std::vector<GameObjectBase*>* SceneObjects = nullptr;
+        std::vector<GameObject*>* SceneObjects = nullptr;
         
         void Draw(sf::RenderWindow& window)
         {
@@ -52,7 +52,7 @@ namespace ETG
             DrawDebugText("View Size: " + std::to_string(Globals::MainView.getSize().x) + " " + std::to_string(Globals::MainView.getSize().y), window);
             DrawDebugText("CurrentDirection: " + DirectionUtils::StringifyDirection(Hero::CurrentDirection), window);
             DrawDebugText(std::string("Is Shooting: ") + (Hero::IsShooting ? "True" : "False"), window);
-            DrawDebugText("Hero Velocity: " + std::to_string(HeroPtr->MoveComp.Velocity.x) + " " + std::to_string(HeroPtr->MoveComp.Velocity.y), window);
+            DrawDebugText("Hero Velocity: " + std::to_string(HeroPtr->MoveComp->Velocity.x) + " " + std::to_string(HeroPtr->MoveComp->Velocity.y), window);
             
         }
 

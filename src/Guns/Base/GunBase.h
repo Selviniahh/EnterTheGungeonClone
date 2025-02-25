@@ -8,6 +8,7 @@
 #include "GunBase.h"
 #include "../../Projectile/ProjectileBase.h"
 #include "../../Managers/SpriteBatch.h"
+#include "../../Core/Factory.h"
 
 class ProjectileBase;
 
@@ -15,8 +16,8 @@ namespace ETG
 {
     enum class GunStateEnum;
 
-    template <typename DerivedGunName, typename AnimCompType>
-    class GunBase : public GameObject<DerivedGunName>
+    template <typename AnimCompType>
+    class GunBase : public GameObject
     {
     public:
         explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity);
@@ -26,13 +27,13 @@ namespace ETG
         void Draw() override;
         virtual void Shoot();
 
-        using GameObject<DerivedGunName>::Rotation; //Make Rotation public in Gunbase
+        using GameObject::Rotation; //Make Rotation public in Gunbase
 
     protected:
         // Rotates an offset vector according to the gun's current rotation.
         sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
 
-        std::vector<ProjectileBase*> projectiles;
+        std::vector<std::unique_ptr<ProjectileBase>> projectiles;
         sf::Texture GunTexture;
         sf::Texture ProjTexture;
 
@@ -64,8 +65,8 @@ namespace ETG
         GunStateEnum CurrentGunState{GunStateEnum::Idle};
     };
 
-    template <typename DerivedGun, typename AnimCompType>
-    GunBase<DerivedGun, AnimCompType>::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity)
+    template <typename AnimCompType>
+    GunBase<AnimCompType>::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity)
         : pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity)
     {
         // Initialize common position.
@@ -75,15 +76,15 @@ namespace ETG
     using namespace ETG;
 
 
-    template <typename DerivedGun, typename AnimCompType>
-    GunBase<DerivedGun, AnimCompType>::~GunBase()
+    template <typename AnimCompType>
+    GunBase<AnimCompType>::~GunBase()
     {
-        for (const auto proj : projectiles)
-            delete proj;
+        for (auto& proj : projectiles)
+            proj.reset();
     }
 
-    template <typename DerivedGun, typename AnimCompType>
-    void GunBase<DerivedGun, AnimCompType>::Initialize()
+    template <typename AnimCompType>
+    void GunBase<AnimCompType>::Initialize()
     {
         // Set the origin based on the current gun texture.
         this->Origin = {
@@ -109,10 +110,10 @@ namespace ETG
         this->Depth = 2;
     }
 
-    template <typename DerivedGun, typename AnimCompType>
-    void GunBase<DerivedGun, AnimCompType>::Update()
+    template <typename AnimCompType>
+    void GunBase<AnimCompType>::Update()
     {
-        GameObject<DerivedGun>::Update();
+        GameObject::Update();
 
         timerForVelocity += Globals::FrameTick;
 
@@ -137,14 +138,14 @@ namespace ETG
             muzzleFlashAnim.Active = false;
 
         // Update projectiles.
-        for (const auto proj : projectiles)
+        for (const auto& proj : projectiles)
         {
             proj->Update();
         }
     }
 
-    template <typename DerivedGun, typename AnimCompType>
-    void GunBase<DerivedGun, AnimCompType>::Draw()
+    template <typename AnimCompType>
+    void GunBase<AnimCompType>::Draw()
     {
         // Draw the gun.
         const auto& DrawProps = this->GetDrawProperties();
@@ -156,7 +157,7 @@ namespace ETG
         Globals::DrawSinglePixelAtLoc(arrowPos, {1, 1}, DrawProps.Rotation);
 
         // Draw projectiles.
-        for (const auto proj : projectiles)
+        for (const auto& proj : projectiles)
         {
             proj->Draw();
         }
@@ -167,8 +168,8 @@ namespace ETG
         muzzleFlashAnim.Draw(muzzleFlashAnim.Texture, MuzzleFlashPos, sf::Color::White, DrawProps.Rotation, muzzleFlashAnim.Origin, {1, 1}, DrawProps.Depth);
     }
 
-    template <typename DerivedGun, typename AnimCompType>
-    void GunBase<DerivedGun, AnimCompType>::Shoot()
+    template <typename AnimCompType>
+    void GunBase<AnimCompType>::Shoot()
     {
         if (timerForVelocity >= pressTime)
         {
@@ -190,16 +191,17 @@ namespace ETG
             const sf::Vector2f projVelocity = direction * velocity;
 
             // Spawn projectile.
-            auto* proj = new ProjectileBase(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
-            projectiles.push_back(proj);
+            std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObject<ProjectileBase>(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
+            proj.get()->Update(); //Necessary to set initial position
+            projectiles.push_back(std::move(proj));
 
             // Restart muzzle flash animation.
             muzzleFlashAnim.Restart();
         }
     }
 
-    template <typename DerivedGun, typename AnimCompType>
-    sf::Vector2f GunBase<DerivedGun, AnimCompType>::RotateVector(const sf::Vector2f& offset) const
+    template <typename AnimCompType>
+    sf::Vector2f GunBase<AnimCompType>::RotateVector(const sf::Vector2f& offset) const
     {
         const float angleRad = Rotation * (std::numbers::pi / 180.f);
         sf::Vector2f scaledOffset(offset.x * this->Scale.x, offset.y * this->Scale.y);
