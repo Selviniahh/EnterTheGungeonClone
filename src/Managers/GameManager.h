@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "Globals.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
@@ -32,7 +34,7 @@ namespace ETG
 
     public:
         //Hold only scene objects. Used for displaying details panel
-        std::vector<GameObject*> SceneObjects;
+        std::unordered_map<std::string,GameObject*> SceneObjects;
         
         std::unique_ptr<UserInterface> UI;
         static sf::Event GameEvent;

@@ -65,32 +65,32 @@ bool Engine::IsGameWindowFocused()
     return true;
 }
 
-
 void Engine::Draw()
 {
     //Render
     ImGui::SFML::Render(*Window);
 }
 
-void Engine::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
+//Probably the way I am making selection is wrong. Fix it with the convenient way ImGUI handled before 
+void Engine::UpdateDetailsPanel(const std::unordered_map<std::string,GameObject*>& SceneObjects)
 {
-    static int SelectedIdx = 0;
-
+    static GameObject* SelectedObj = nullptr;
+    static bool isSelected = false;
+    
     //NOTE: Open the Game Objects pane by default
     ImGui::SetNextItemOpen(true,ImGuiCond_Once);
     
-    //List all objects
+    //List all objects and determine the Selected Object
     if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
     {
-        for (int i = 0; i < SceneObjects.size(); ++i)
+        for (const auto& pair : SceneObjects)
         {
-            ImGui::PushID(i);
+            ImGui::PushID(pair.first.c_str());
 
-            //The boolean only for highlighting selection
-            const bool isSelected = (SelectedIdx == i);
-            
-            if (ImGui::Selectable(SceneObjects[i]->GetObjectName().c_str(), isSelected))
-                SelectedIdx = i;
+            if (ImGui::Selectable(pair.second->GetObjectName().c_str(), isSelected)) //If the name selected through GUI, isSelected will be set to true 
+            {
+                SelectedObj = pair.second;
+            }
 
             ImGui::PopID();
         }
@@ -105,18 +105,17 @@ void Engine::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)
         //Open the pane by default once
         ImGui::SetNextItemOpen(true,ImGuiCond_Once);
         
-        if (SelectedIdx >= 0 && SelectedIdx < SceneObjects.size())
+        if (SelectedObj != nullptr)
         {
             if(ImGui::TreeNode("Absolute Orientation"))
             {
-                // SceneObjects[SelectedIdx]->ImGuiSetAbsoluteOrientation();
-                ImGuiSetAbsoluteOrientation(SceneObjects[SelectedIdx]);
+                ImGuiSetAbsoluteOrientation(SelectedObj);
                 ImGui::TreePop();   
             }
 
             if(ImGui::TreeNode("Relative Orientation"))
             {
-                ImGuiSetRelativeOrientation(SceneObjects[SelectedIdx]);
+                ImGuiSetRelativeOrientation(SelectedObj);
                 ImGui::TreePop();   
             }
         }

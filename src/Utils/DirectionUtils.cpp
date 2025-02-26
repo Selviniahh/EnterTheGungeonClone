@@ -17,7 +17,8 @@ void ETG::DirectionUtils::PopulateDirectionRanges(DirectionMap mapToFill)
 
 ETG::Direction ETG::DirectionUtils::GetDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, const float angle)
 {
-    for (auto& entry : DirectionMap)
+    //The first std::pair is key and element. Second std::pair is the key's type itself  
+    for (const std::pair<const std::pair<int, int>, Direction>& entry : DirectionMap)
     {
         //Check if angle within any defined range
         if (angle >= entry.first.first && angle <= entry.first.second)

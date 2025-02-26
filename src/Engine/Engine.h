@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include <vector>
 #include "../Core/GameObject.h"
 
@@ -14,7 +15,7 @@ public:
     friend void ImGuiSetRelativeOrientation();
     void Draw();
 
-    static void UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects);
+    static void UpdateDetailsPanel(const std::unordered_map<std::string,GameObject*>& SceneObjects);
     friend void ImGuiSetRelativeOrientation(GameObject* obj);
     friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
     static bool CurrentGameFocus;

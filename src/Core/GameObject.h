@@ -66,7 +66,7 @@ private:
     DrawProperties DrawProps;
 
 public:
-    void SetObjectNameToSelfClassName();
+    std::string SetObjectNameToSelfClassName();
     
     // Only the drawing code (or renderer) is expected to use these values.
     [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
@@ -81,6 +81,10 @@ public:
     void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
 
     void ComputeDrawProperties();
+
+    //If same named object constructed before, differentiate it with appending a number end of the name
+    //ex: BaseProjectile BaseProjectile2 BaseProjectile3 
+    void IncrementName();
 
     //Friend classes for Engine UI
     friend void ImGuiSetRelativeOrientation(GameObject* obj);
