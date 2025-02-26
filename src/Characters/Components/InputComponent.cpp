@@ -1,5 +1,4 @@
 #include "InputComponent.h"
-
 #include "../Hero.h"
 #include "../../Managers/InputManager.h"
 #include "../../Utils/DirectionUtils.h"

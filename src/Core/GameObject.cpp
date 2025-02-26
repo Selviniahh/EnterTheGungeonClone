@@ -1,6 +1,8 @@
 #include "GameObject.h"
 #include "../Managers/GameState.h"
-#include "../Core/Factory.h"
+#include <boost/type_index.hpp>
+#include <imgui.h>
+
 
 GameObject::GameObject()
 {

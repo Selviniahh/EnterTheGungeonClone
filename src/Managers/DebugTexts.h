@@ -1,6 +1,10 @@
 #pragma once
 #include "InputManager.h"
 #include "GameState.h"
+#include "Globals.h"
+#include "../Utils/DirectionUtils.h"
+#include "../Characters/Components/HeroMoveComp.h"
+#include "../Characters/Hero.h"
 
 namespace ETG
 {

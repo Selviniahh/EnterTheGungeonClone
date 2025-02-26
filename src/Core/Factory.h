@@ -1,6 +1,6 @@
+#pragma once
 #include <memory>
 #include "../Managers/GameState.h"
-#include "../Core/GameObject.h"
 
 //Factory global functions: 
 namespace ETG

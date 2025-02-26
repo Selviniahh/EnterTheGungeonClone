@@ -1,4 +1,5 @@
 #include "HeroAnimComp.h"
+#include "InputComponent.h"
 #include "../../Guns/Base/GunBase.h"
 #include "../../Guns/RogueSpecial/RogueSpecial.h"
 #include "../../Managers/GameState.h"

@@ -2,6 +2,7 @@
 #include "../../Core/Components/BaseAnimComp.h"
 #include "../Base/GunBase.h"
 
+
 namespace ETG
 {
     class RogueSpecialAnimComp : public BaseAnimComp<GunStateEnum>
@@ -11,7 +12,7 @@ namespace ETG
         void SetAnimations() override;
     };
     
-    class RogueSpecial : public GunBase<RogueSpecialAnimComp>
+    class RogueSpecial : public GunBase
     {
     public:
         explicit RogueSpecial(const sf::Vector2f& Position);

@@ -1,6 +1,6 @@
 #pragma once
-#include "../GameObject.h"
 #include <SFML/System/Vector2.hpp>
+#include "../GameObject.h"
 
 class BaseMoveComp : public GameObject
 {

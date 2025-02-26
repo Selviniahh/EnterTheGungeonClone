@@ -2,22 +2,14 @@
 #include <unordered_map>
 #include "../../Utils/DirectionUtils.h"
 #include "../../Core/GameObject.h"
-
 namespace ETG
 {
     struct PairHash;
     enum class Direction;
     enum class DashEnum;
-}
-
-namespace ETG
-{
     class Hero;
-}
-
-namespace ETG
-{
-    class InputComponent : GameObject
+    
+    class InputComponent : public GameObject
     {
     public:
         InputComponent();

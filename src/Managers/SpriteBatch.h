@@ -2,7 +2,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include "Globals.h"
 
 namespace ETG
 {

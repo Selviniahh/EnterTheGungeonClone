@@ -1,11 +1,20 @@
+#include <imgui-SFML.h>
+#include <SFML/Window.hpp>
 #include "GameManager.h"
 #include "DebugTexts.h"
 #include "InputManager.h"
 #include "SpriteBatch.h"
-#include <imgui-SFML.h>
-#include <SFML/Window.hpp>
+#include "Globals.h"
 
 sf::Event ETG::GameManager::GameEvent{};
+using namespace ETG::Globals;
+
+ETG::GameManager::~GameManager() = default;
+
+ETG::GameManager::GameManager()
+{
+    Initialize();
+}
 
 void ETG::GameManager::Initialize()
 {
@@ -31,6 +40,8 @@ void ETG::GameManager::Initialize()
     
     Hero = ETG::CreateGameObject<class Hero>(sf::Vector2f{10,10});
 
+    DebugText = std::make_unique<class DebugText>();
+    
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
     // DestroyGameObject(Hero);
 
@@ -70,7 +81,7 @@ void ETG::GameManager::Draw()
     ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: non batch draws here. 
-    DebugText.Draw(*Window);
+    DebugText->Draw(*Window);
 
     EngineUI.Draw();
 

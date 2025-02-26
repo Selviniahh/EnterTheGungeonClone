@@ -1,22 +1,23 @@
-#include "Engine.h"
-
-#include <imgui-SFML.h>
-
-#include "../Managers/GameManager.h"
 #include <iostream>
+#include <imgui-SFML.h>
+#include <imgui.h>
+#include "Engine.h"
+#include "../Managers/GameManager.h"
+#include "../Managers/InputManager.h"
 
 bool Engine::CurrentGameFocus = false;
 bool Engine::PreviousGameFocus = false;
 
+using namespace ETG::Globals;
 using namespace ETG;
 
 void Engine::Initialize()
 {
     //Initialize Imgui-SFML after creating the window
-    if (!ImGui::SFML::Init(*ETG::Window)) throw std::runtime_error("Cannot initialize ImGUI with the given Window");
+    if (!ImGui::SFML::Init(*Window)) throw std::runtime_error("Cannot initialize ImGUI with the given Window");
 
-    ETG::GameState::GetInstance().SetEngineUISize(windowSize);
-    windowSize = {300, (float)(ETG::Window->getSize().y)};
+    GameState::GetInstance().SetEngineUISize(windowSize);
+    windowSize = {300, (float)(Window->getSize().y)};
     std::cout << std::unitbuf;
 
     LoadFont();
@@ -25,10 +26,10 @@ void Engine::Initialize()
 void Engine::Update() const
 {
     //Update ImGUI-SFML with the frame delta time
-    ImGui::SFML::Update(*ETG::Window, ETG::ElapsedTimeClock);
+    ImGui::SFML::Update(*Window, ElapsedTimeClock);
 
     // Begin a new ImGui window docked to the right
-    ImGui::SetNextWindowPos(ImVec2((float)ETG::Window->getSize().x - windowSize.x, 0));
+    ImGui::SetNextWindowPos(ImVec2((float)Window->getSize().x - windowSize.x, 0));
     ImGui::SetNextWindowSize(ImVec2(windowSize));
 
     ImGui::Begin("Details Pane", nullptr);
@@ -68,7 +69,7 @@ bool Engine::IsGameWindowFocused()
 void Engine::Draw()
 {
     //Render
-    ImGui::SFML::Render(*ETG::Globals::Window);
+    ImGui::SFML::Render(*Window);
 }
 
 void Engine::UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects)

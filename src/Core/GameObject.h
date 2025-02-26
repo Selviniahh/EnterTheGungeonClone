@@ -1,11 +1,6 @@
 #pragma once
-
-//TODO: Removing this useless imgui gives me compile time error. Once you done with your thing come back here to fix the problem. 
-#include <imgui.h>
-#include <memory>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
-#include <boost/type_index.hpp>
 
 namespace ETG
 {

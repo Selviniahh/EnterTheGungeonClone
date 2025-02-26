@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "../Characters/Hero.h"
 
 namespace ETG
 {
+    class Hero;
     class InputManager
     {
     private:

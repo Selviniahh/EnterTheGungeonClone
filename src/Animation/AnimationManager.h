@@ -1,13 +1,11 @@
 #pragma once
 
 #include <any>
-#include <complex.h>
+#include <complex>
 #include <unordered_map>
 #include <variant>
 #include <string>
 #include "Animation.h"
-#include "AnimationManager.h"
-#include "../Managers/Globals.h" // If you need to reference SFML window, etc.
 #include "../Managers/StateEnums.h"
 
 template <typename>

@@ -1,10 +1,15 @@
 #include "Hero.h"
 #include <iostream>
-
+#include <filesystem>
 #include "../Managers/GameState.h"
 #include "../Managers/InputManager.h"
 #include "../Managers/SpriteBatch.h"
+#include "../Guns/RogueSpecial/RogueSpecial.h"
 #include "Components/HeroAnimComp.h"
+#include "Components/HeroMoveComp.h"
+#include "Components/InputComponent.h"
+#include "../Managers/Globals.h"
+
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -15,25 +20,24 @@ ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
     this->Position = Position;
     Depth = 2;
     GameState::GetInstance().SetHero(this);
-
-    //Set gun
+    
     RogueSpecial = ETG::CreateGameObject<class RogueSpecial>(HandPos);
-
-    //Set animation
     AnimationComp = ETG::CreateGameObject<HeroAnimComp>();
-
     MoveComp = ETG::CreateGameObject<HeroMoveComp>();
-
+    InputComp = ETG::CreateGameObject<InputComponent>();
+    
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
         std::cerr << "Failed to load hand texture" << std::endl;
 }
+
+ETG::Hero::~Hero() = default;
 
 void ETG::Hero::Update()
 {
     //override
     GameObject::Update();
     
-    InputComp.Update(*this);
+    InputComp->Update(*this);
     MoveComp->Update();
 
     //Animations
