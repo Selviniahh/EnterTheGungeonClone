@@ -130,7 +130,7 @@ namespace ETG
             const sf::Vector2f projVelocity = direction * velocity;
 
             // Spawn projectile.
-            std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObject<ProjectileBase>(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
+            std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObjectDefault<ProjectileBase>(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
             proj.get()->Update(); //Necessary to set initial position
             projectiles.push_back(std::move(proj));
 

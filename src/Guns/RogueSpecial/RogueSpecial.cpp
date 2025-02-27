@@ -5,7 +5,7 @@
 
 ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f)
 {
-    AnimationComp = CreateGameObject<RogueSpecialAnimComp>();
+    AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
     AnimationComp->SetAnimations();
     
     // call the common initialization.

@@ -2,6 +2,7 @@
 #include <complex>
 #include "GameManager.h"
 #include "GameState.h"
+#include "../Characters/Hero.h"
 #include "../Engine/Engine.h"
 
 void ETG::InputManager::Update()

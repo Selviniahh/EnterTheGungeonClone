@@ -1,9 +1,14 @@
 #pragma once
 
-class GameObject;
-
-class EngineUI
+namespace ETG
 {
-    friend void ImGuiSetRelativeOrientation(GameObject* obj);
-    friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
-};
+    class GameObject;
+
+    class EngineUI
+    {
+        friend void ImGuiSetRelativeOrientation(GameObject* obj);
+        friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
+    };
+}
+
+

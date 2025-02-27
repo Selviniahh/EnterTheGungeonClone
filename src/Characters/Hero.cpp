@@ -21,10 +21,10 @@ ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
     Depth = 2;
     GameState::GetInstance().SetHero(this);
     
-    RogueSpecial = ETG::CreateGameObject<class RogueSpecial>(HandPos);
-    AnimationComp = ETG::CreateGameObject<HeroAnimComp>();
-    MoveComp = ETG::CreateGameObject<HeroMoveComp>();
-    InputComp = ETG::CreateGameObject<InputComponent>();
+    RogueSpecial = ETG::CreateGameObjectAttached<class RogueSpecial>(this,HandPos);
+    AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
+    MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
+    InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
     
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
         std::cerr << "Failed to load hand texture" << std::endl;

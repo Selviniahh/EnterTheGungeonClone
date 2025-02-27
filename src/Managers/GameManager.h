@@ -1,16 +1,16 @@
 #pragma once
 
 #include <unordered_map>
-
 #include "Globals.h"
-#include "../Characters/Hero.h"
-#include "../UI/UserInterface.h"
 #include "../Engine/Engine.h"
+
 
 namespace ETG
 {
     class DebugText;
-
+    class Scene;
+    class Hero;
+    class UserInterface;
     class GameManager
     {
     public:
@@ -27,6 +27,9 @@ namespace ETG
 
     private:
         std::unique_ptr<Hero> Hero;
+        std::unique_ptr<UserInterface> UI;
+        std::unique_ptr<Scene> Scene;
+        
         Engine EngineUI{};
 
         bool HasFocus = true;
@@ -36,7 +39,6 @@ namespace ETG
         //Hold only scene objects. Used for displaying details panel
         std::unordered_map<std::string,GameObject*> SceneObjects;
         
-        std::unique_ptr<UserInterface> UI;
         static sf::Event GameEvent;
     };
 }

@@ -5,11 +5,11 @@
 #include <iostream>
 
 
-GameObject::GameObject()
+ETG::GameObject::GameObject()
 {
 }
 
-void GameObject::ComputeDrawProperties()
+void ETG::GameObject::ComputeDrawProperties()
 {
     DrawProps.Position = Position + RelativePos;
     DrawProps.Scale = {Scale.x * RelativeScale.x, Scale.y * RelativeScale.y};
@@ -17,7 +17,7 @@ void GameObject::ComputeDrawProperties()
     DrawProps.Origin = Origin + RelativeOrigin;
 }
 
-std::string GameObject::SetObjectNameToSelfClassName()
+std::string ETG::GameObject::SetObjectNameToSelfClassName()
 {
     ObjectName = boost::typeindex::type_id_runtime(*this).pretty_name();
 
@@ -35,9 +35,9 @@ std::string GameObject::SetObjectNameToSelfClassName()
 }
 
 //It feels good to write everything myself 
-void GameObject::IncrementName()
+void ETG::GameObject::IncrementName()
 {
-    const auto& SceneObjs = ETG::GameState::GetInstance().GetSceneObj();
+    const auto& SceneObjs = ETG::GameState::GetInstance().GetSceneObjs();
     const std::string BaseName = ObjectName;
 
     if (SceneObjs.contains(BaseName))

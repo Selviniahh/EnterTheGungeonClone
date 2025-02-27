@@ -5,6 +5,9 @@
 #include "InputManager.h"
 #include "SpriteBatch.h"
 #include "Globals.h"
+#include "../Core/Scene/Scene.h"
+#include "../Characters/Hero.h"
+#include "../UI/UserInterface.h"
 
 sf::Event ETG::GameManager::GameEvent{};
 using namespace ETG::Globals;
@@ -27,18 +30,24 @@ void ETG::GameManager::Initialize()
 
     //Initialize GameState instance before anything and initialize SceneObj vector
     GameState::GetInstance();
-    GameState::GetInstance().SetSceneObj(SceneObjects);
-    
+    GameState::GetInstance().SetSceneObjs(SceneObjects);
+
+    //What's going on at here is only applicable for Scene object. 
+    Scene = std::make_unique<class Scene>();
+    Scene->SetObjectNameToSelfClassName();
+    GameState::GetInstance().SetSceneObj(Scene.get());
+
+
     //NOTE: Secondly EngineUI needs to be initialized
     EngineUI.Initialize();
     
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
 
-    UI = ETG::CreateGameObject<UserInterface>();
+    UI = ETG::CreateGameObjectDefault<UserInterface>();
     UI->Initialize();
     
-    Hero = ETG::CreateGameObject<class Hero>(sf::Vector2f{10,10});
+    Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10,10});
 
     DebugText = std::make_unique<class DebugText>();
     

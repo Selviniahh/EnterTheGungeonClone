@@ -2,6 +2,7 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 #include "Engine.h"
+#include "../Characters/Hero.h"
 #include "../Managers/GameManager.h"
 #include "../Managers/InputManager.h"
 
@@ -23,7 +24,7 @@ void Engine::Initialize()
     LoadFont();
 }
 
-void Engine::Update() const
+void Engine::Update()
 {
     //Update ImGUI-SFML with the frame delta time
     ImGui::SFML::Update(*Window, ElapsedTimeClock);
@@ -33,7 +34,7 @@ void Engine::Update() const
     ImGui::SetNextWindowSize(ImVec2(windowSize));
 
     ImGui::Begin("Details Pane", nullptr);
-    UpdateDetailsPanel(ETG::GameState::GetInstance().GetSceneObj());
+    UpdateDetailsPanel(GameState::GetInstance().GetSceneObjs());
 
     PreviousGameFocus = CurrentGameFocus;
     CurrentGameFocus = !(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
@@ -56,7 +57,7 @@ bool Engine::IsGameWindowFocused()
     {
         InputManager::LeftClickRequired = false;
     }
-    
+
     // If LeftClickRequired is still true, wait for release before processing input
     if (InputManager::LeftClickRequired)
     {
@@ -72,54 +73,122 @@ void Engine::Draw()
 }
 
 //Probably the way I am making selection is wrong. Fix it with the convenient way ImGUI handled before 
-void Engine::UpdateDetailsPanel(const std::unordered_map<std::string,GameObject*>& SceneObjects)
+void Engine::UpdateDetailsPanel(std::unordered_map<std::string, GameObject*>& SceneObjects)
 {
-    static GameObject* SelectedObj = nullptr;
-    static bool isSelected = false;
-    
     //NOTE: Open the Game Objects pane by default
-    ImGui::SetNextItemOpen(true,ImGuiCond_Once);
-    
-    //List all objects and determine the Selected Object
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+    // In your ImGui window:
     if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
     {
-        for (const auto& pair : SceneObjects)
-        {
-            ImGui::PushID(pair.first.c_str());
-
-            if (ImGui::Selectable(pair.second->GetObjectName().c_str(), isSelected)) //If the name selected through GUI, isSelected will be set to true 
-            {
-                SelectedObj = pair.second;
-            }
-
-            ImGui::PopID();
-        }
+        // Assuming Scene is the root object.
+        GameObject* sceneObj = GameState::GetInstance().GetSceneObj();
+        DrawGameObject(sceneObj);
     }
 
     //NOTE: Open the details pane by default
-    ImGui::SetNextItemOpen(true,ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
     //Show details of selected objects
     if (ImGui::CollapsingHeader("Details", ImGuiTreeNodeFlags_None))
     {
         //Open the pane by default once
-        ImGui::SetNextItemOpen(true,ImGuiCond_Once);
-        
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
         if (SelectedObj != nullptr)
         {
-            if(ImGui::TreeNode("Absolute Orientation"))
+            if (ImGui::TreeNode("Absolute Orientation"))
             {
                 ImGuiSetAbsoluteOrientation(SelectedObj);
-                ImGui::TreePop();   
+                ImGui::TreePop();
             }
 
-            if(ImGui::TreeNode("Relative Orientation"))
+            if (ImGui::TreeNode("Relative Orientation"))
             {
                 ImGuiSetRelativeOrientation(SelectedObj);
-                ImGui::TreePop();   
+                ImGui::TreePop();
             }
         }
     }
+}
+
+void Engine::RenderGameObject(GameObject* obj)
+{
+    ImGui::PushID(obj);
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
+        | ImGuiTreeNodeFlags_OpenOnDoubleClick
+        | ImGuiTreeNodeFlags_SpanAvailWidth
+        | ImGuiTreeNodeFlags_AllowItemOverlap;
+    if (SelectedObj == obj)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    bool nodeOpen = ImGui::TreeNodeEx(obj->GetObjectName().c_str(), flags);
+
+    // Always allow selection, even if the node is expanded.
+    if (ImGui::IsItemClicked())
+        SelectedObj = obj;
+
+    if (nodeOpen)
+    {
+        // Recursively render children.
+        for (const auto& [childName, childObj] : GameState::GetInstance().GetSceneObjs())
+        {
+            if (childObj->Owner == obj)
+                RenderGameObject(childObj);
+        }
+        ImGui::TreePop();
+    }
+
+    ImGui::PopID();
+}
+
+
+void Engine::DrawGameObject(GameObject* object)
+{
+    ImGui::PushID(object);
+
+    // Determine if this object has children
+    bool currObjHasChildren = false;
+    for (const auto& [name, child] : GameState::GetInstance().GetSceneObjs())
+    {
+        if (child->Owner == object)
+        {
+            currObjHasChildren = true;
+            break;
+        }
+    }
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    if (object == GameState::GetInstance().GetSceneObj()) flags |= ImGuiTreeNodeFlags_DefaultOpen; //Default expand the Scene object. 
+    if (SelectedObj == object) flags |= ImGuiTreeNodeFlags_Selected;
+
+    // Always create tree node - makes entire row interactable
+    bool isOpen;
+    currObjHasChildren
+        ? isOpen = ImGui::TreeNodeEx(object->GetObjectName().c_str(), flags)
+        : isOpen = ImGui::Selectable(object->GetObjectName().c_str());
+
+    // Handle selection regardless of expand/collapse state
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    {
+        SelectedObj = object;
+    }
+
+    // Render children if expanded
+    if (isOpen)
+    {
+        for (const auto& [name, child] : GameState::GetInstance().GetSceneObjs())
+        {
+            if (child->Owner == object)
+            {
+                DrawGameObject(child);
+            }
+        }
+        if (currObjHasChildren) ImGui::TreePop();
+    }
+
+    ImGui::PopID();
 }
 
 void Engine::LoadFont()

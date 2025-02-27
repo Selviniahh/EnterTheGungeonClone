@@ -1,12 +1,8 @@
-//
-// Created by selviniah on 23/02/25.
-//
-
 #include "EngineUI.h"
 #include "../../Core/GameObject.h"
 #include <imgui.h>
 
-void ImGuiSetRelativeOrientation(GameObject* obj)
+void ETG::ImGuiSetRelativeOrientation(GameObject* obj)
 {
     
     //NOTE: Position
@@ -40,7 +36,7 @@ void ImGuiSetRelativeOrientation(GameObject* obj)
 }
 
 // When the UI changes, recalculate the final position from BasePosition.
-void ImGuiSetAbsoluteOrientation(GameObject* obj)
+void ETG::ImGuiSetAbsoluteOrientation(GameObject* obj)
 {
     //NOTE: Position
     ImGui::AlignTextToFramePadding();

@@ -1,9 +1,13 @@
 #pragma once
 #include <unordered_map>
 
+#include "../Core/Scene/Scene.h"
+
+
 namespace ETG
 {
     class Hero;
+    class Scene;
 
     class GameState
     {
@@ -21,11 +25,15 @@ namespace ETG
         void SetHero(Hero* hero) { MainHero = hero; }
         [[nodiscard]] Hero* GetHero() const { return MainHero; }
 
-        [[nodiscard]] std::unordered_map<std::string,GameObject*>& GetSceneObj() const { return *SceneObj; }
-        void SetSceneObj(std::unordered_map<std::string,GameObject*>& sceneObj) { SceneObj = &sceneObj; }
+        [[nodiscard]] std::unordered_map<std::string,GameObject*>& GetSceneObjs() { return *SceneObjs; }
+        void SetSceneObjs(std::unordered_map<std::string,GameObject*>& sceneObj) { SceneObjs = &sceneObj; }
 
         void SetEngineUISize(sf::Vector2f& size) { EngineUISize = std::ref(size); }
         [[nodiscard]] sf::Vector2f& GetEngineUISize() const { return EngineUISize.get(); }
+
+        void SetSceneObj(Scene* sceneObj) {SceneObj = sceneObj;}
+        [[nodiscard]] Scene* GetSceneObj() const {return SceneObj;}
+        
 
     private:
         GameState() = default;
@@ -33,7 +41,8 @@ namespace ETG
 
         //The object itself is at GameManager with the name SceneObjects
         //I am so sure this is extremely bad practice. Somehow I have to dictate singleton pattern that automatically initializes for the first time calling probably with static. Implement this later on. 
-        std::unordered_map<std::string,GameObject*>* SceneObj = nullptr;
+        std::unordered_map<std::string,GameObject*>* SceneObjs = nullptr;
+        Scene* SceneObj = nullptr;
 
         sf::Vector2f dummyEngineUISize{};
         std::reference_wrapper<sf::Vector2f> EngineUISize{dummyEngineUISize};
