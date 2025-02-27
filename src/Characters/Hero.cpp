@@ -1,39 +1,44 @@
 #include "Hero.h"
 #include <iostream>
+#include <filesystem>
 #include "../Managers/GameState.h"
 #include "../Managers/InputManager.h"
 #include "../Managers/SpriteBatch.h"
+#include "../Guns/RogueSpecial/RogueSpecial.h"
+#include "Components/HeroAnimComp.h"
+#include "Components/HeroMoveComp.h"
+#include "Components/InputComponent.h"
+#include "../Managers/Globals.h"
+
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
 bool ETG::Hero::IsShooting{};
 
-ETG::Hero::Hero(const sf::Vector2f Position) : GameObject(), HandTex({}), HandPos({})
+ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
 {
-    SetObjectName("Hero");
-    Depth = 2;
     this->Position = Position;
+    Depth = 2;
     GameState::GetInstance().SetHero(this);
-
-    //Set gun
-    RogueSpecial = std::make_unique<class RogueSpecial>(HandPos);
-    GameState::GetInstance().GetSceneObj().push_back(this);
-    GameState::GetInstance().GetSceneObj().push_back(RogueSpecial.get());
-
-    //Set animation
-    AnimationComp = std::make_unique<HeroAnimComp>();
-
+    
+    RogueSpecial = ETG::CreateGameObjectAttached<class RogueSpecial>(this,HandPos);
+    AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
+    MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
+    InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
+    
     if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
         std::cerr << "Failed to load hand texture" << std::endl;
 }
+
+ETG::Hero::~Hero() = default;
 
 void ETG::Hero::Update()
 {
     //override
     GameObject::Update();
     
-    InputComp.Update(*this);
-    MoveComp.Update();
+    InputComp->Update(*this);
+    MoveComp->Update();
 
     //Animations
     AnimationComp->Update();
@@ -42,7 +47,7 @@ void ETG::Hero::Update()
     SetHandTexLoc();
 
     //Gun
-    RogueSpecial->SetPosition(HandPos + sf::Vector2f{2,2});
+    RogueSpecial->SetPosition(HandPos + RelativeGunOffsetPos);
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();

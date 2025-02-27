@@ -1,8 +1,23 @@
+#include <imgui-SFML.h>
+#include <SFML/Window.hpp>
 #include "GameManager.h"
 #include "DebugTexts.h"
 #include "InputManager.h"
 #include "SpriteBatch.h"
-#include <imgui-SFML.h>
+#include "Globals.h"
+#include "../Core/Scene/Scene.h"
+#include "../Characters/Hero.h"
+#include "../UI/UserInterface.h"
+
+sf::Event ETG::GameManager::GameEvent{};
+using namespace ETG::Globals;
+
+ETG::GameManager::~GameManager() = default;
+
+ETG::GameManager::GameManager()
+{
+    Initialize();
+}
 
 void ETG::GameManager::Initialize()
 {
@@ -15,19 +30,31 @@ void ETG::GameManager::Initialize()
 
     //Initialize GameState instance before anything and initialize SceneObj vector
     GameState::GetInstance();
-    GameState::GetInstance().SetSceneObj(SceneObjects);
-    
+    GameState::GetInstance().SetSceneObjs(SceneObjects);
+
+    //What's going on at here is only applicable for Scene object. 
+    Scene = std::make_unique<class Scene>();
+    Scene->SetObjectNameToSelfClassName();
+    GameState::GetInstance().SetSceneObj(Scene.get());
+
+
     //NOTE: Secondly EngineUI needs to be initialized
     EngineUI.Initialize();
     
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
 
-    UI.Initialize();
-    Hero = std::make_unique<class Hero>(sf::Vector2f{10,10});
+    UI = ETG::CreateGameObjectDefault<UserInterface>();
+    UI->Initialize();
     
+    Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10,10});
+
+    DebugText = std::make_unique<class DebugText>();
     
-    SceneObjects.push_back(&UI);
+    //TODO: Work on safely destroying and error resolution for accessing destroyed object
+    // DestroyGameObject(Hero);
+
+    
 }
 
 void ETG::GameManager::Update()
@@ -38,7 +65,7 @@ void ETG::GameManager::Update()
         Globals::Update();
         InputManager::Update();
         Hero->Update();
-        UI.Update();
+        UI->Update();
     }
 
 }
@@ -59,11 +86,11 @@ void ETG::GameManager::Draw()
     Window->setView(Window->getDefaultView());
 
     ETG::GlobSpriteBatch.begin();
-    UI.Draw();
+    UI->Draw();
     ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: non batch draws here. 
-    DebugText.Draw(*Window);
+    DebugText->Draw(*Window);
 
     EngineUI.Draw();
 
@@ -73,30 +100,29 @@ void ETG::GameManager::Draw()
 
 void ETG::GameManager::ProcessEvents()
 {
-    sf::Event event{};
-    while (Window->pollEvent(event))
+    while (Window->pollEvent(GameEvent))
     {
-        if (event.type == sf::Event::Closed) Window->close();
-        if (event.type == sf::Event::LostFocus) HasFocus = false;
-        if (event.type == sf::Event::GainedFocus) HasFocus = true;
+        if (GameEvent.type == sf::Event::Closed) Window->close();
+        if (GameEvent.type == sf::Event::LostFocus) HasFocus = false;
+        if (GameEvent.type == sf::Event::GainedFocus) HasFocus = true;
 
         // Handle window resize
         // Inside GameManager::ProcessEvents
-        if (event.type == sf::Event::Resized)
+        if (GameEvent.type == sf::Event::Resized)
         {
             // Update the global screen size
-            ScreenSize = {event.size.width, event.size.height};
+            ScreenSize = {GameEvent.size.width, GameEvent.size.height};
 
             // Optionally update the default view if you rely on it
-            sf::View defaultView(sf::FloatRect(0.f, 0.f, event.size.width, event.size.height));
+            sf::View defaultView(sf::FloatRect(0.f, 0.f, GameEvent.size.width, GameEvent.size.height));
             Window->setView(defaultView);
 
             // Recalculate UI positions based on the new screen size.
             // This could be done by calling a dedicated update method in your UI.
-            UI.Initialize(); // or UI.UpdatePositions(); if you separate the logic.
+            UI->Initialize(); // or UI.UpdatePositions(); if you separate the logic.
         }
 
         //Poll and process events for ImGUI
-        ImGui::SFML::ProcessEvent(*Window, event);
+        ImGui::SFML::ProcessEvent(*Window, GameEvent);
     }
 }

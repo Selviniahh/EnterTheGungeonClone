@@ -1,21 +1,14 @@
 #pragma once
-#include <vector>
-#include <SFML/System/Vector2.hpp>
 
-class GameObject;
-struct ImFont;
-
-
-class EngineUI
+namespace ETG
 {
-public:
-    void LoadFont();
-    void Initialize();
-    void Update() const;
-    void Draw();
+    class GameObject;
 
-    static void UpdateDetailsPanel(const std::vector<GameObject*>& SceneObjects);
+    class EngineUI
+    {
+        friend void ImGuiSetRelativeOrientation(GameObject* obj);
+        friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
+    };
+}
 
-    ImFont* SegoeFont{};
-    sf::Vector2f windowSize;
-};
+

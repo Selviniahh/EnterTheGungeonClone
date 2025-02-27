@@ -1,6 +1,10 @@
 #pragma once
 #include "InputManager.h"
 #include "GameState.h"
+#include "Globals.h"
+#include "../Utils/DirectionUtils.h"
+#include "../Characters/Components/HeroMoveComp.h"
+#include "../Characters/Hero.h"
 
 namespace ETG
 {
@@ -8,15 +12,19 @@ namespace ETG
     {
     public:
         Hero* HeroPtr = nullptr;
-
+        // std::unordered_map<std::string,GameObject*> SceneObjects = nullptr;
+        
         void Draw(sf::RenderWindow& window)
         {
             if (!HeroPtr) HeroPtr = GameState::GetInstance().GetHero();
+            // if (!SceneObjects) SceneObjects = &GameState::GetInstance().GetSceneObj();
+            const auto& SceneObjects = GameState::GetInstance().GetSceneObjs();
 
             // Reset textPos to starting position each frame
             InputManager::textPos = {0.f, -20.f};
 
             // Draw debug information
+            DrawDebugText("Total Game Objects in scene: " + std::to_string(SceneObjects.size()), window);
             DrawDebugText("Direction: " + std::to_string(InputManager::direction.x) + ", " + std::to_string(InputManager::direction.y), window);
 
             //Mouse position that my monitor's top left point will be (0,0)
@@ -48,7 +56,7 @@ namespace ETG
             DrawDebugText("View Size: " + std::to_string(Globals::MainView.getSize().x) + " " + std::to_string(Globals::MainView.getSize().y), window);
             DrawDebugText("CurrentDirection: " + DirectionUtils::StringifyDirection(Hero::CurrentDirection), window);
             DrawDebugText(std::string("Is Shooting: ") + (Hero::IsShooting ? "True" : "False"), window);
-            DrawDebugText("Hero Velocity: " + std::to_string(HeroPtr->MoveComp.Velocity.x) + " " + std::to_string(HeroPtr->MoveComp.Velocity.y), window);
+            DrawDebugText("Hero Velocity: " + std::to_string(HeroPtr->MoveComp->Velocity.x) + " " + std::to_string(HeroPtr->MoveComp->Velocity.y), window);
             
         }
 

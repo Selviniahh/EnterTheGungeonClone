@@ -1,7 +1,7 @@
 #pragma once
 #include "../Core/GameObject.h"
 
-class EnemyBase : GameObject
+class EnemyBase : ETG::GameObject
 {
 protected:
     void Initialize() override;

@@ -1,7 +1,7 @@
 #include "UserInterface.h"
 #include <filesystem>
 
-#include "../Engine/UI/EngineUI.h"
+#include "../Engine/Engine.h"
 #include "../Managers/GameState.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
@@ -14,7 +14,6 @@ namespace ETG
 
     void UserInterface::Initialize()
     {
-        SetObjectName("UserInterface");
         const std::string ResPath = RESOURCE_PATH;
         Frame.loadFromFile(ResPath + "/UI/Frame.png");
         Gun.loadFromFile(ResPath + "/Guns/RogueSpecial/RogueSpecial_Idle.png");

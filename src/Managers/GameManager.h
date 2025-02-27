@@ -1,38 +1,44 @@
 #pragma once
 
-#include "DebugTexts.h"
-#include "GameState.h"
-#include "../Animation/AnimationManager.h"
-#include "../Characters/Hero.h"
-#include "../UI/UserInterface.h"
-#include "../Engine/UI/EngineUI.h"
+#include <unordered_map>
+#include "Globals.h"
+#include "../Engine/Engine.h"
+
 
 namespace ETG
 {
-    using namespace Globals;
-
+    class DebugText;
+    class Scene;
+    class Hero;
+    class UserInterface;
     class GameManager
     {
+    public:
+        GameManager();
+        ~GameManager();
+        void Initialize();
+        void ProcessEvents();
+        [[nodiscard]] bool WindowHasFocus() const { return HasFocus; }
+
+        //I might delete this later on 
+        static bool IsRunning() { return Globals::Window->isOpen(); }
+        void Update();
+        void Draw();
+
     private:
         std::unique_ptr<Hero> Hero;
-        EngineUI EngineUI{};
+        std::unique_ptr<UserInterface> UI;
+        std::unique_ptr<Scene> Scene;
+        
+        Engine EngineUI{};
 
         bool HasFocus = true;
-        DebugText DebugText;
+        std::unique_ptr<DebugText> DebugText;
 
     public:
         //Hold only scene objects. Used for displaying details panel
-        std::vector<GameObject*> SceneObjects;
-
-        UserInterface UI;
-
-        void Initialize();
-        void ProcessEvents();
-        bool WindowHasFocus() const { return HasFocus; }
-
-        //I might delete this later on 
-        static bool IsRunning() { return Window->isOpen(); }
-        void Update();
-        void Draw();
+        std::unordered_map<std::string,GameObject*> SceneObjects;
+        
+        static sf::Event GameEvent;
     };
 }

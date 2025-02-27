@@ -1,5 +1,4 @@
 #include "InputComponent.h"
-
 #include "../Hero.h"
 #include "../../Managers/InputManager.h"
 #include "../../Utils/DirectionUtils.h"
@@ -10,6 +9,7 @@ namespace ETG
     InputComponent::InputComponent()
     {
         DirectionUtils::PopulateDirectionRanges(DirectionMap);
+        // SetObjectNameToSelfClassName();
     }
 
     void InputComponent::Update(Hero& hero) const

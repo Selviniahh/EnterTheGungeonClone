@@ -1,8 +1,11 @@
 #include "RogueSpecial.h"
+#include "../../Core/Factory.h"
+
+#include <filesystem>
 
 ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f)
 {
-    AnimationComp = std::make_unique<RogueSpecialAnimComp>();
+    AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
     AnimationComp->SetAnimations();
     
     // call the common initialization.
@@ -11,7 +14,6 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 
 void ETG::RogueSpecial::Initialize()
 {
-    SetObjectName("GunHero");
     OriginOffset = {1.f, 10.f};
     MuzzleFlashEachFrameSpeed = 0.10f;
     arrowOriginOffset = {-6.f, 0.f};
@@ -33,7 +35,7 @@ void ETG::RogueSpecial::Initialize()
 
 ETG::RogueSpecialAnimComp::RogueSpecialAnimComp()
 {
-    SetAnimations();
+    RogueSpecialAnimComp::SetAnimations();
 }
 
 void ETG::RogueSpecialAnimComp::SetAnimations()

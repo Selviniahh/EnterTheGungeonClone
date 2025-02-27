@@ -1,7 +1,6 @@
 #pragma once
 #include <functional>
 #include <string>
-
 #include "../../src/Managers/StateEnums.h"
 
 namespace ETG

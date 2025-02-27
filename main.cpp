@@ -2,8 +2,7 @@
 
 int main()
 {
-    ETG::GameManager GM;
-    GM.Initialize();
+    ETG::GameManager GM{};
 
     while (ETG::GameManager::IsRunning())
     {

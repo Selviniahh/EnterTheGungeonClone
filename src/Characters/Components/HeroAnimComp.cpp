@@ -1,14 +1,15 @@
 #include "HeroAnimComp.h"
+#include "InputComponent.h"
 #include "../../Guns/Base/GunBase.h"
 #include "../../Guns/RogueSpecial/RogueSpecial.h"
 #include "../../Managers/GameState.h"
+#include "../../Characters/Hero.h"
 
 namespace ETG
 {
     class RogueSpecial;
 }
 
-template sf::Vector2f ETG::HeroAnimComp::FlipSprites<ETG::GunBase>(const Direction&, ETG::GunBase&);
 template sf::Vector2f ETG::HeroAnimComp::FlipSprites<ETG::RogueSpecial>(const Direction&, RogueSpecial&);
 
 namespace ETG
