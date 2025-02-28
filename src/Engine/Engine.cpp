@@ -34,7 +34,7 @@ void Engine::Update()
     ImGui::SetNextWindowSize(ImVec2(windowSize));
 
     ImGui::Begin("Details Pane", nullptr);
-    UpdateDetailsPanel(GameState::GetInstance().GetSceneObjs());
+    UpdateDetailsPanel();
 
     PreviousGameFocus = CurrentGameFocus;
     CurrentGameFocus = !(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
@@ -48,7 +48,7 @@ bool Engine::IsGameWindowFocused()
     // Check if the game has focus; if not, ignore input.
     if (!CurrentGameFocus) return false;
 
-    // Determine if focus was just gained (Current is true, Previous was false)
+    // Determine if focus was just gained. The if block will return true when the game screen clicked but not released (Current is true, Previous was false)
     if (CurrentGameFocus && !Engine::PreviousGameFocus)
         InputManager::LeftClickRequired = true;
 
@@ -73,12 +73,13 @@ void Engine::Draw()
 }
 
 //Probably the way I am making selection is wrong. Fix it with the convenient way ImGUI handled before 
-void Engine::UpdateDetailsPanel(std::unordered_map<std::string, GameObject*>& SceneObjects)
+
+void Engine::UpdateDetailsPanel()
 {
     //NOTE: Open the Game Objects pane by default
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
-    // In your ImGui window:
+    //Game object pane
     if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
     {
         // Assuming Scene is the root object.
@@ -95,52 +96,8 @@ void Engine::UpdateDetailsPanel(std::unordered_map<std::string, GameObject*>& Sc
         //Open the pane by default once
         ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
-        if (SelectedObj != nullptr)
-        {
-            if (ImGui::TreeNode("Absolute Orientation"))
-            {
-                ImGuiSetAbsoluteOrientation(SelectedObj);
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Relative Orientation"))
-            {
-                ImGuiSetRelativeOrientation(SelectedObj);
-                ImGui::TreePop();
-            }
-        }
+        DisplayProperties();
     }
-}
-
-void Engine::RenderGameObject(GameObject* obj)
-{
-    ImGui::PushID(obj);
-
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
-        | ImGuiTreeNodeFlags_OpenOnDoubleClick
-        | ImGuiTreeNodeFlags_SpanAvailWidth
-        | ImGuiTreeNodeFlags_AllowItemOverlap;
-    if (SelectedObj == obj)
-        flags |= ImGuiTreeNodeFlags_Selected;
-
-    bool nodeOpen = ImGui::TreeNodeEx(obj->GetObjectName().c_str(), flags);
-
-    // Always allow selection, even if the node is expanded.
-    if (ImGui::IsItemClicked())
-        SelectedObj = obj;
-
-    if (nodeOpen)
-    {
-        // Recursively render children.
-        for (const auto& [childName, childObj] : GameState::GetInstance().GetSceneObjs())
-        {
-            if (childObj->Owner == obj)
-                RenderGameObject(childObj);
-        }
-        ImGui::TreePop();
-    }
-
-    ImGui::PopID();
 }
 
 
@@ -148,11 +105,11 @@ void Engine::DrawGameObject(GameObject* object)
 {
     ImGui::PushID(object);
 
-    // Determine if this object has children
+    //Is current object has any children
     bool currObjHasChildren = false;
-    for (const auto& [name, child] : GameState::GetInstance().GetSceneObjs())
+    for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs())
     {
-        if (child->Owner == object)
+        if (sceneObj->Owner == object)
         {
             currObjHasChildren = true;
             break;
@@ -160,35 +117,54 @@ void Engine::DrawGameObject(GameObject* object)
     }
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-    if (object == GameState::GetInstance().GetSceneObj()) flags |= ImGuiTreeNodeFlags_DefaultOpen; //Default expand the Scene object. 
+    if (object == GameState::GetInstance().GetSceneObj()) flags |= ImGuiTreeNodeFlags_DefaultOpen; //Default expand the scene objects
     if (SelectedObj == object) flags |= ImGuiTreeNodeFlags_Selected;
 
-    // Always create tree node - makes entire row interactable
+    //Create tree node if the object has children. If not create single selectable widget 
     bool isOpen;
     currObjHasChildren
         ? isOpen = ImGui::TreeNodeEx(object->GetObjectName().c_str(), flags)
-        : isOpen = ImGui::Selectable(object->GetObjectName().c_str());
+        : isOpen = ImGui::Selectable(object->GetObjectName().c_str(), object == SelectedObj);
 
-    // Handle selection regardless of expand/collapse state
+    //Handle selection
     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
         SelectedObj = object;
     }
 
-    // Render children if expanded
+    //Find all the children of current object and Draw all of them
     if (isOpen)
     {
-        for (const auto& [name, child] : GameState::GetInstance().GetSceneObjs())
+        for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs())
         {
-            if (child->Owner == object)
+            if (sceneObj->Owner == object)
             {
-                DrawGameObject(child);
+                DrawGameObject(sceneObj);
             }
         }
+
         if (currObjHasChildren) ImGui::TreePop();
     }
 
     ImGui::PopID();
+}
+
+void Engine::DisplayProperties()
+{
+    if (SelectedObj != nullptr)
+    {
+        if (ImGui::TreeNode("Absolute Orientation"))
+        {
+            ImGuiSetAbsoluteOrientation(SelectedObj);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Relative Orientation"))
+        {
+            ImGuiSetRelativeOrientation(SelectedObj);
+            ImGui::TreePop();
+        }
+    }
 }
 
 void Engine::LoadFont()

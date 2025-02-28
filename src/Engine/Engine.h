@@ -13,17 +13,20 @@ public:
     void Initialize();
     void Update();
     void Draw();
+    void DisplayProperties();
     static bool IsGameWindowFocused();
 
     static bool CurrentGameFocus;
     static bool PreviousGameFocus;
 
 private:
-    void UpdateDetailsPanel(std::unordered_map<std::string, ETG::GameObject*>& SceneObjects);
-    void RenderGameObject(ETG::GameObject* obj);
+    void UpdateDetailsPanel();
     friend void ImGuiSetRelativeOrientation(ETG::GameObject* obj);
     friend void ImGuiSetAbsoluteOrientation(ETG::GameObject* obj);
     friend void ImGuiSetRelativeOrientation();
+
+    //By default first time the argument will be scene. After that other objects that has been attached stuffs will be passed.
+    //Used recursive depth-first (pre-order) tree traversal
     void DrawGameObject(ETG::GameObject* object);
 
     ImFont* SegoeFont{};
