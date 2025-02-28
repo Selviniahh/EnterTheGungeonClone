@@ -1,11 +1,11 @@
+#include <complex>
+#include <filesystem>
 #include "GunBase.h"
+#include <numbers>
 #include "../../Projectile/ProjectileBase.h"
 #include "../../Managers/Globals.h"
 #include "../../Managers/SpriteBatch.h"
 #include "../../Core/Factory.h"
-
-#include <complex>
-#include <filesystem>
 
 namespace ETG
 {
