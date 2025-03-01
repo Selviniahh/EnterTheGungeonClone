@@ -102,9 +102,14 @@ void ETG::GameManager::ProcessEvents()
 {
     while (Window->pollEvent(GameEvent))
     {
-        if (GameEvent.type == sf::Event::Closed) Window->close();
         if (GameEvent.type == sf::Event::LostFocus) HasFocus = false;
         if (GameEvent.type == sf::Event::GainedFocus) HasFocus = true;
+        if (GameEvent.type == sf::Event::Closed)
+        {
+            Font.reset();
+            Window->close();
+            return;
+        }
 
         // Handle window resize
         // Inside GameManager::ProcessEvents

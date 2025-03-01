@@ -15,7 +15,7 @@ namespace ETG::Globals
 
     //Window and rendering resources
     extern std::shared_ptr<sf::RenderWindow> Window;
-    extern sf::Font Font;
+    extern std::unique_ptr<sf::Font> Font;
     extern sf::Vector2u ScreenSize;
     extern float DefaultScale;
     static int FPS = 170;

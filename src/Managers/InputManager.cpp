@@ -46,7 +46,7 @@ void ETG::InputManager::Update()
 
 void ETG::InputManager::InitializeDebugText()
 {
-    debugText.setFont(Globals::Font);
+    debugText.setFont(*Globals::Font);
     debugText.setCharacterSize(16);
     debugText.setFillColor(sf::Color::Yellow);
 }

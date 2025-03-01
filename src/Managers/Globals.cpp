@@ -8,7 +8,7 @@ namespace ETG::Globals
     float ElapsedTimeSeconds = 0.0f;
     float DefaultScale = 1;
     std::shared_ptr<sf::RenderWindow> Window = nullptr;
-    sf::Font Font;
+    std::unique_ptr<sf::Font> Font;
     sf::Vector2u ScreenSize;
     sf::Clock clock;
     sf::Clock tickClock;
@@ -23,7 +23,9 @@ namespace ETG::Globals
         
         //Load font
         const std::filesystem::path FullPath = std::filesystem::path(RESOURCE_PATH) / "Fonts" / "SegoeUI.ttf";
-        if (!Font.loadFromFile(FullPath.generic_string()))
+
+        Font = std::make_unique<sf::Font>();
+        if (!Font->loadFromFile(FullPath.generic_string()))
         {
             throw std::runtime_error("Failed to load font");
         }
