@@ -84,10 +84,10 @@ void ETG::SpriteBatch::end(sf::RenderWindow& window)
     // sprites.clear();  // Remove this line (already cleared in begin())
 }
 
-void ETG::SpriteBatch::SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos, float Rotation, sf::Vector2f origin, float Scale, float depth)
+void ETG::SpriteBatch::SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const sf::Vector2f& pos, float Rotation, sf::Vector2f origin, float Scale, float depth)
 {
     sf::Sprite frame;
-    frame.setTexture(tex);
+    frame.setTexture(*tex);
     frame.setScale(Scale, Scale);
     frame.setPosition(pos); // Position it at the specified location
     frame.setRotation(Rotation);

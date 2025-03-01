@@ -31,8 +31,8 @@ namespace ETG
         sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
 
         std::vector<std::unique_ptr<ProjectileBase>> projectiles;
-        sf::Texture GunTexture;
-        sf::Texture ProjTexture;
+        std::shared_ptr<sf::Texture> GunTexture;
+        std::shared_ptr<sf::Texture> ProjTexture;
 
         // Muzzle flash variables (instance sets up its own animation).
         Animation muzzleFlashAnim;
@@ -50,7 +50,7 @@ namespace ETG
         sf::Vector2f OriginOffset;
 
         // Arrow variables (common to all guns). Arrow will be disabled in Release
-        sf::Texture ArrowTex;
+        std::shared_ptr<sf::Texture> ArrowTex;
         sf::Vector2f arrowOffset;
         sf::Vector2f arrowOrigin;
         sf::Vector2f arrowOriginOffset;

@@ -1,6 +1,7 @@
 #pragma once 
 #include "../GameObject.h"
 #include "../../Animation/AnimationManager.h"
+#include <memory>
 
 namespace ETG
 {
@@ -18,7 +19,7 @@ namespace ETG
         
         sf::IntRect CurrTexRect;
         sf::Vector2f RelativeOrigin{0.f, 0.f};
-        sf::Texture CurrentTex;
+        std::shared_ptr<sf::Texture> CurrentTex;
 
         //Animation properties
         std::unordered_map<StateEnum, AnimationManager> AnimManagerDict{};

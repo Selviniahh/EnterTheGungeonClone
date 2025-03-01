@@ -1,12 +1,12 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 namespace ETG
 {
     class GameObject
     {
-
         struct DrawProperties
         {
             sf::Vector2f Position{0, 0};
@@ -37,7 +37,7 @@ namespace ETG
         }
 
         std::string ObjectName{"Default"};
-        sf::Texture Texture;
+        std::shared_ptr<sf::Texture> Texture;
 
         //Base position of GameObjects
         //Inherited Objects such as Gun's position will be attached to hand pos in tick. After the object manipulations are completed, the relative offsets needs given in UI needs to be applied
@@ -63,10 +63,7 @@ namespace ETG
         //Contains the final drawing properties. 
         DrawProperties DrawProps;
 
-        
-
     public:
-
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObject* Owner = nullptr;
         

@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics/Texture.hpp>
+#include <memory>
 
 class Animation
 {
@@ -9,11 +10,11 @@ private:
     int CurrentFrame = 0;
     int FrameX;
     int FrameY;
-    mutable std::vector<sf::Texture> textureCache; 
+    mutable std::vector<std::shared_ptr<sf::Texture>> textureCache; 
 
 public:
     sf::IntRect CurrRect;
-    sf::Texture Texture;
+    std::shared_ptr<sf::Texture> Texture;
     sf::Vector2f Origin;
     std::vector<sf::Rect<int>> FrameRects;
     bool IsValid = true;
@@ -21,7 +22,7 @@ public:
     bool Active = true;
 
     //NOTE: Rule of Five: Destructor, Copy Constructor, Copy Assignment, Move Constructor, Move Assignment
-    Animation(const sf::Texture& texture, float eachFrameSpeed, int frameX, int frameY, int row = 1);
+    Animation(const std::shared_ptr<sf::Texture>& texture, float eachFrameSpeed, int frameX, int frameY, int row = 1);
     ~Animation() = default;
     Animation(const Animation& other) = default; // Copy constructor
     Animation(Animation&& other) = default; // Move constructor
@@ -34,11 +35,11 @@ public:
     /// \brief decrement `AnimTimeLeft` If AnimTimeLeft is 0, increment CurrentFrame, restart CurrentFrame counter
     void Update();
     void Draw(sf::Vector2f position, float layerDepth, float rotation = 0) const;
-    void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, const float depth) const;
+    void Draw(const std::shared_ptr<sf::Texture>& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, const float depth) const;
 
     /// Restart the animation. Set `CurrentFrame` = 0, `AnimTimeLeft` = `EachFrameSpeed`
     void Restart();
-    const sf::Texture& GetCurrentFrameAsTexture() const;
+    std::shared_ptr<sf::Texture> GetCurrentFrameAsTexture() const;
     bool IsAnimationFinished() const;
 
     //Omit FileName's last number. If file's name is "SpriteSheet_001" Give "SpriteSheet_00"

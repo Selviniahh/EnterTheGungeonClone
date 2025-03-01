@@ -36,7 +36,7 @@ namespace ETG
         std::unique_ptr<HeroAnimComp> AnimationComp;
         std::unique_ptr<InputComponent> InputComp;
 
-        sf::Texture HandTex;
+        std::shared_ptr<sf::Texture> HandTex;
         sf::Vector2f HandPos;
         sf::Vector2f RelativeHandLoc{8, 4};
         sf::Vector2f RelativeGunOffsetPos{2,2};

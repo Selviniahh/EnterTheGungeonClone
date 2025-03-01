@@ -1,5 +1,6 @@
 // Managers/SpriteBatch.h
 #pragma once
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -17,7 +18,7 @@ namespace ETG
 
         void end(sf::RenderWindow& window);
 
-        static void SimpleDraw(const sf::Texture& tex, const sf::Vector2f& pos, float Rotation = 0, sf::Vector2f origin = {1, 1}, float Scale = 1, float depth = 1);
+        static void SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const sf::Vector2f& pos, float Rotation = 0, sf::Vector2f origin = {1, 1}, float Scale = 1, float depth = 1);
 
     private:
         struct SpriteQuad

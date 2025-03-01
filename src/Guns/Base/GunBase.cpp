@@ -12,8 +12,13 @@ namespace ETG
     ETG::GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity)
         : pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity)
     {
-        // Initialize common position.
+        // Initialize common position and textures
         this->Position = Position;
+        
+        if (!GunTexture) GunTexture = std::make_shared<sf::Texture>();
+        if (!ProjTexture) ProjTexture = std::make_shared<sf::Texture>();
+        if (!Texture) Texture = std::make_shared<sf::Texture>();
+        if (!ArrowTex) ArrowTex = std::make_shared<sf::Texture>();
     }
 
     GunBase::~GunBase()
@@ -22,25 +27,23 @@ namespace ETG
             proj.reset();
     }
 
-
     void GunBase::Initialize()
     {
         // Set the origin based on the current gun texture.
         this->Origin = {
-            static_cast<float>(AnimationComp->CurrentTex.getSize().x / 2),
-            static_cast<float>(AnimationComp->CurrentTex.getSize().y / 2)
+            static_cast<float>(Texture->getSize().x / 2),
+            static_cast<float>(Texture->getSize().y / 2)
         };
         this->Origin += OriginOffset;
 
         // Load the arrow texture (common for all guns).
         const std::filesystem::path arrowPath = std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png";
-        if (!ArrowTex.loadFromFile(arrowPath.generic_string()))
+        if (!ArrowTex->loadFromFile(arrowPath.generic_string()))
             throw std::runtime_error(arrowPath.generic_string() + " not found");
 
-
         arrowOrigin = {
-            static_cast<float>(ArrowTex.getSize().x / 2),
-            static_cast<float>(ArrowTex.getSize().y / 2)
+            static_cast<float>(ArrowTex->getSize().x / 2),
+            static_cast<float>(ArrowTex->getSize().y / 2)
         };
         arrowOrigin += arrowOriginOffset;
 
@@ -48,7 +51,6 @@ namespace ETG
         muzzleFlashAnim.Active = false;
         this->Depth = 2;
     }
-
 
     void GunBase::Update()
     {
@@ -83,7 +85,6 @@ namespace ETG
         }
     }
 
-
     void GunBase::Draw()
     {
         // Draw the gun.
@@ -103,10 +104,8 @@ namespace ETG
 
         // Draw the muzzle flash.
         //NOTE: Muzzle flash did not constructed as drawable object yet. So all the properties are arbitrarily created.
-
         muzzleFlashAnim.Draw(muzzleFlashAnim.Texture, MuzzleFlashPos, sf::Color::White, DrawProps.Rotation, muzzleFlashAnim.Origin, {1, 1}, DrawProps.Depth);
     }
-
 
     void GunBase::Shoot()
     {
@@ -130,7 +129,8 @@ namespace ETG
             const sf::Vector2f projVelocity = direction * velocity;
 
             // Spawn projectile.
-            std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObjectDefault<ProjectileBase>(ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
+            // Fixed: Pass the texture directly if CreateGameObjectDefault expects sf::Texture
+            std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObjectDefault<ProjectileBase>(*ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
             proj.get()->Update(); //Necessary to set initial position
             projectiles.push_back(std::move(proj));
 
@@ -138,7 +138,6 @@ namespace ETG
             muzzleFlashAnim.Restart();
         }
     }
-
 
     sf::Vector2f GunBase::RotateVector(const sf::Vector2f& offset) const
     {

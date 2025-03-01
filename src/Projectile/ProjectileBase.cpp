@@ -7,7 +7,7 @@ ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spa
     Position = spawnPos;
     ProjVelocity = projVelocity;
     MaxProjectileRang = maxProjectileRange;
-    Texture = texture;
+    Texture = std::make_shared<sf::Texture>(texture);
     Rotation = rotation;
 }
 
@@ -29,7 +29,7 @@ void ProjectileBase::Draw()
     
     auto& DrawableProps = GetDrawProperties();
     sf::Sprite frame;
-    frame.setTexture(Texture);
+    frame.setTexture(*Texture);
     frame.setOrigin(frame.getTexture()->getSize().x /2,frame.getTexture()->getSize().y /2);
     frame.setPosition(DrawableProps.Position);
     frame.setRotation(DrawableProps.Rotation);

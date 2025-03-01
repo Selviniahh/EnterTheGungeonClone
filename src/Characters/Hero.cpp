@@ -15,7 +15,7 @@ float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
 bool ETG::Hero::IsShooting{};
 
-ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
+ETG::Hero::Hero(const sf::Vector2f Position) : HandPos({})
 {
     this->Position = Position;
     Depth = 2;
@@ -25,8 +25,10 @@ ETG::Hero::Hero(const sf::Vector2f Position) : HandTex({}), HandPos({})
     AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
+
+    HandTex = std::make_shared<sf::Texture>();
     
-    if (!HandTex.loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
+    if (!HandTex->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
         std::cerr << "Failed to load hand texture" << std::endl;
 }
 
@@ -93,6 +95,6 @@ void ETG::Hero::DrawHeroBounds() const
 void ETG::Hero::SetHandTexLoc()
 {
     HandPos = Position + RelativeHandLoc;
-    HandPos.x -= static_cast<float>(HandTex.getSize().x) / 2;
-    HandPos.y -= static_cast<float>(HandTex.getSize().y) / 2;
+    HandPos.x -= static_cast<float>(HandTex->getSize().x) / 2;
+    HandPos.y -= static_cast<float>(HandTex->getSize().y) / 2;
 }

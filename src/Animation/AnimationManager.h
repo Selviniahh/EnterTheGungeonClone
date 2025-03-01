@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <variant>
 #include <string>
+#include <memory>
 #include "Animation.h"
 #include "../Managers/StateEnums.h"
 
@@ -64,7 +65,7 @@ public:
     // For storing whichever key was last used
     AnimationKey LastKey;
 
-    sf::Texture LastTexture;
+    std::shared_ptr<sf::Texture> LastTexture;
 
 public:
     // Add an animation to the dictionary
@@ -75,18 +76,18 @@ public:
     template <typename T>
     void Update(T key);
 
-    // Draw the last key’s animation
+    // Draw the last key's animation
     // void Draw(sf::Vector2f position, float layerDepth);
 
     // Overloaded draw for more complex parameters
-    void Draw(const sf::Texture& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, float depth);
+    void Draw(const std::shared_ptr<sf::Texture>& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, float depth);
 
     // Optionally set origin
     template <typename T>
     void SetOrigin(T key, sf::Vector2f origin);
 
     // Return the current frame as a texture for the last key
-    const sf::Texture& GetCurrentFrameAsTexture();
+    std::shared_ptr<sf::Texture> GetCurrentFrameAsTexture();
 
     // Check if the current animation has finished
     bool IsAnimationFinished();
@@ -123,17 +124,7 @@ void AnimationManager::Update(T key)
     }
 }
 
-// inline void AnimationManager::Draw(const sf::Vector2f position, const float layerDepth)
-// {
-//     // Draw the animation for LastKey
-//     const auto it = AnimationDict.find(LastKey);
-//     if (it != AnimationDict.end())
-//     {
-//         it->second.Draw(position, layerDepth);
-//     }
-// }
-
-inline void AnimationManager::Draw(const sf::Texture& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth)
+inline void AnimationManager::Draw(const std::shared_ptr<sf::Texture>& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth)
 {
     auto it = AnimationDict.find(LastKey);
     if (it != AnimationDict.end())
@@ -153,7 +144,7 @@ void AnimationManager::SetOrigin(T key, const sf::Vector2f origin)
     }
 }
 
-const inline sf::Texture& AnimationManager::GetCurrentFrameAsTexture()
+inline std::shared_ptr<sf::Texture> AnimationManager::GetCurrentFrameAsTexture()
 {
     const auto it = AnimationDict.find(LastKey);
     if (it != AnimationDict.end())
