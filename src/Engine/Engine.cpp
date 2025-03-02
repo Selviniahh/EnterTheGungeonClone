@@ -83,7 +83,7 @@ void Engine::UpdateDetailsPanel()
     if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
     {
         // Assuming Scene is the root object.
-        GameObject* sceneObj = GameState::GetInstance().GetSceneObj();
+        GameObjectBase* sceneObj = GameState::GetInstance().GetSceneObj();
         DrawGameObject(sceneObj);
     }
 
@@ -101,7 +101,7 @@ void Engine::UpdateDetailsPanel()
 }
 
 
-void Engine::DrawGameObject(GameObject* object)
+void Engine::DrawGameObject(GameObjectBase* object)
 {
     ImGui::PushID(object);
 
@@ -151,7 +151,7 @@ void Engine::DrawGameObject(GameObject* object)
 
 void Engine::DisplayProperties()
 {
-    if (SelectedObj != nullptr)
+    if (SelectedObj != nullptr && SelectedObj->IsDrawable)
     {
         if (ImGui::TreeNode("Absolute Orientation"))
         {

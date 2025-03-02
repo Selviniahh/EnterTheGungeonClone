@@ -1,10 +1,10 @@
 #pragma once
 #include <SFML/Graphics/Texture.hpp>
-#include "../Core/GameObject.h"
+#include "../Core/GameObjectBase.h"
 
 namespace ETG
 {
-    class UserInterface : public GameObject
+    class UserInterface : public GameObjectBase
     {
     private:
         sf::Texture Frame;

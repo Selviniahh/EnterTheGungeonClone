@@ -19,7 +19,7 @@ void ProjectileBase::Initialize()
 void ProjectileBase::Update()
 {
     Position += ETG::Globals::FrameTick * ProjVelocity;
-    GameObject::Update();
+    GameObjectBase::Update();
 }
 
 void ProjectileBase::Draw()

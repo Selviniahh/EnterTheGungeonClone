@@ -1,21 +1,38 @@
 #pragma once 
-#include "../GameObject.h"
+#include "../ComponentBase.h"
 #include "../../Animation/AnimationManager.h"
+#include "../../Utils/Interface/IAnimationComponent.h"
 #include <memory>
+
 
 namespace ETG
 {
     enum class HeroStateEnum;
 
     template<typename StateEnum>
-    class BaseAnimComp : public GameObject
+    class BaseAnimComp : public ComponentBase, public IAnimationComponent
     {
     public:
-        BaseAnimComp() = default;
+
+        // Override the base class Initialize method to register with owner
+        void Initialize() override
+        { 
+            GameObjectBase::Initialize();
+            
+            // Register with owner if we have one
+            if (Owner) {
+                Owner->SetAnimationInterface(this);
+            }
+        }
+        
         virtual void SetAnimations();
         void Update(const StateEnum& stateEnum, const AnimationKey& animKey);
         virtual void Draw(const sf::Vector2f& position);
         virtual void Draw(sf::Vector2f position, sf::Vector2f Origin, sf::Vector2f Scale, float Rotation, float depth);
+        
+        // Implement IAnimationComponent interface
+        [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
+        [[nodiscard]] sf::Vector2f GetOrigin() const override { return RelativeOrigin; }
         
         sf::IntRect CurrTexRect;
         sf::Vector2f RelativeOrigin{0.f, 0.f};
@@ -32,8 +49,6 @@ namespace ETG
     {
         CurrentState = stateEnum;
         CurrentAnimStateKey = animKey;
-
-        // if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("The state: " + CurrentState + " Is not found.");
 
         auto& animManager = AnimManagerDict[CurrentState];
         animManager.Update(CurrentAnimStateKey);

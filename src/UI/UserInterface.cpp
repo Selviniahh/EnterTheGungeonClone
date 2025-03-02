@@ -43,7 +43,7 @@ namespace ETG
 
     void UserInterface::Update()
     {
-        GameObject::Update();
+        GameObjectBase::Update();
     }
 
     void UserInterface::Draw()

@@ -1,9 +1,9 @@
 #pragma once
-#include "../GameObject.h"
+#include "../GameObjectBase.h"
 
 namespace ETG
 {
-    class Scene : public GameObject
+    class Scene : public GameObjectBase
     {
     public:
         Scene();

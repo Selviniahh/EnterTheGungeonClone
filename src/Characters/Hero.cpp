@@ -2,13 +2,13 @@
 #include <iostream>
 #include <filesystem>
 #include "../Managers/GameState.h"
-#include "../Managers/InputManager.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
 #include "Components/HeroAnimComp.h"
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "../Managers/Globals.h"
+#include "../Utils/TextureUtils.h"
 
 
 float ETG::Hero::MouseAngle = 0;
@@ -23,6 +23,7 @@ ETG::Hero::Hero(const sf::Vector2f Position) : HandPos({})
     
     RogueSpecial = ETG::CreateGameObjectAttached<class RogueSpecial>(this,HandPos);
     AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
+    AnimationComp->Initialize();
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
 
@@ -36,15 +37,19 @@ ETG::Hero::~Hero() = default;
 
 void ETG::Hero::Update()
 {
-    //override
-    GameObject::Update();
+    // Call the base class update
+    GameObjectBase::Update();
     
     InputComp->Update(*this);
     MoveComp->Update();
 
-    //Animations
+    // Animations - still need direct access to HeroAnimComp for specialized functionality
     AnimationComp->Update();
+    
+    // We need the AnimComp directly here to access AnimManagerDict
     Origin = AnimationComp->AnimManagerDict[CurrentHeroState].AnimationDict[AnimationComp->CurrentAnimStateKey].Origin;
+    
+    // FlipSprites is a specialized method in HeroAnimComp
     RelativeHandLoc = AnimationComp->FlipSprites(CurrentDirection, *RogueSpecial);
     SetHandTexLoc();
 
@@ -53,6 +58,9 @@ void ETG::Hero::Update()
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();
+
+    // Use AnimComp's current texture
+    Texture = AnimationComp->CurrentTex; 
 }
 
 void ETG::Hero::Draw()
@@ -61,35 +69,13 @@ void ETG::Hero::Draw()
 
     auto& DrawProps = GetDrawProperties();
     
-    //Hero self animation draw
+    // Hero self animation draw - using specialized Draw method from HeroAnimComp
     AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);
     SpriteBatch::SimpleDraw(HandTex, HandPos);
     Globals::DrawSinglePixelAtLoc(DrawProps.Position);
 
-    // Debug bounds drawing
-    DrawHeroBounds();
-}
-
-sf::FloatRect ETG::Hero::HeroBounds() const
-{
-    const auto& currTexRect = AnimationComp->CurrTexRect;
-    return {
-        Position.x - currTexRect.width / 2.f,
-        Position.y - currTexRect.height / 2.f,
-        static_cast<float>(currTexRect.width),
-        static_cast<float>(currTexRect.height)
-    };
-}
-
-void ETG::Hero::DrawHeroBounds() const
-{
-    const sf::FloatRect bounds = HeroBounds();
-    sf::RectangleShape boundsBox(sf::Vector2f(bounds.width, bounds.height));
-    boundsBox.setPosition(bounds.left, bounds.top);
-    boundsBox.setOutlineColor(sf::Color::Red);
-    boundsBox.setOutlineThickness(1.f);
-    boundsBox.setFillColor(sf::Color::Transparent);
-    Globals::Window->draw(boundsBox);
+    // Debug bounds drawing - now using base class method
+    DrawBounds();
 }
 
 void ETG::Hero::SetHandTexLoc()

@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "GunBase.h"
 #include "../../Animation/Animation.h"
-#include "../../Core/GameObject.h"
+#include "../../Core/GameObjectBase.h"
 #include "../../Managers/StateEnums.h"
 #include "../../Core/Components/BaseAnimComp.h"
 
@@ -14,7 +14,7 @@ namespace ETG
 {
     enum class GunStateEnum;
     
-    class GunBase : public GameObject
+    class GunBase : public GameObjectBase
     {
     public:
         explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity);
@@ -24,7 +24,7 @@ namespace ETG
         void Draw() override;
         virtual void Shoot();
 
-        using GameObject::Rotation; //Make Rotation public in Gunbase
+        using GameObjectBase::Rotation; //Make Rotation public in Gunbase
 
     protected:
         // Rotates an offset vector according to the gun's current rotation.

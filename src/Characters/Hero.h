@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
-#include "../Core/GameObject.h"
+#include "../Core/GameObjectBase.h"
 #include "../Managers/StateEnums.h"
 #include "../Core/Factory.h"
 
@@ -12,7 +12,7 @@ namespace ETG
     class InputComponent;
     class HeroMoveComp;
     
-    class Hero : public GameObject
+    class Hero : public GameObjectBase
     {
     public:
         static float MouseAngle;
@@ -23,8 +23,6 @@ namespace ETG
         ~Hero() override;
         void Update() override;
         void Draw() override;
-        void DrawHeroBounds() const;
-        sf::FloatRect HeroBounds() const;
 
         HeroStateEnum CurrentHeroState{HeroStateEnum::Idle};
         bool IsDashing = false;

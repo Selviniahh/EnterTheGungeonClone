@@ -25,8 +25,8 @@ namespace ETG
         void SetHero(Hero* hero) { MainHero = hero; }
         [[nodiscard]] Hero* GetHero() const { return MainHero; }
 
-        [[nodiscard]] std::unordered_map<std::string,GameObject*>& GetSceneObjs() { return *SceneObjs; }
-        void SetSceneObjs(std::unordered_map<std::string,GameObject*>& sceneObj) { SceneObjs = &sceneObj; }
+        [[nodiscard]] std::unordered_map<std::string,GameObjectBase*>& GetSceneObjs() { return *SceneObjs; }
+        void SetSceneObjs(std::unordered_map<std::string,GameObjectBase*>& sceneObj) { SceneObjs = &sceneObj; }
 
         void SetEngineUISize(sf::Vector2f& size) { EngineUISize = std::ref(size); }
         [[nodiscard]] sf::Vector2f& GetEngineUISize() const { return EngineUISize.get(); }
@@ -41,7 +41,7 @@ namespace ETG
 
         //The object itself is at GameManager with the name SceneObjects
         //I am so sure this is extremely bad practice. Somehow I have to dictate singleton pattern that automatically initializes for the first time calling probably with static. Implement this later on. 
-        std::unordered_map<std::string,GameObject*>* SceneObjs = nullptr;
+        std::unordered_map<std::string,GameObjectBase*>* SceneObjs = nullptr;
         Scene* SceneObj = nullptr;
 
         sf::Vector2f dummyEngineUISize{};

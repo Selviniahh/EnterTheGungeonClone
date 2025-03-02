@@ -54,7 +54,7 @@ namespace ETG
 
     void GunBase::Update()
     {
-        GameObject::Update();
+        GameObjectBase::Update();
 
         timerForVelocity += Globals::FrameTick;
 

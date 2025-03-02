@@ -2,11 +2,13 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include "../Utils/Interface/IAnimationComponent.h"
 
 namespace ETG
 {
-    class GameObject
+    class GameObjectBase
     {
+    protected:
         struct DrawProperties
         {
             sf::Vector2f Position{0, 0};
@@ -16,11 +18,10 @@ namespace ETG
             float Depth{};
         };
 
-    protected:
         //Push back every GameObject to the SceneObj during initialization.  
-        GameObject();
+        GameObjectBase();
 
-        virtual ~GameObject() = default;
+        virtual ~GameObjectBase();
 
         virtual void Initialize()
         {
@@ -30,11 +31,7 @@ namespace ETG
         {
         }
 
-        virtual void Update()
-        {
-            //Calculate the final drawing properties. The Base position modified from the source and relative pos given in the UI will be summed to form the final value before being drawn
-            ComputeDrawProperties();
-        }
+        virtual void Update();
 
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;
@@ -47,6 +44,11 @@ namespace ETG
         float Rotation{};
         sf::Vector2f Origin{0.f, 0.f};
         float Depth{};
+
+        //This will be true for drawable game objects. False for components
+
+        //NOTE: Pointer to animation component interface. This is my first time using interface logic
+        IAnimationComponent* AnimInterface = nullptr;
 
     private:
         //Relative Offsets for GameObjects.
@@ -63,17 +65,19 @@ namespace ETG
         //Contains the final drawing properties. 
         DrawProperties DrawProps;
 
+        void ComputeDrawProperties();
+        void IncrementName();
+
     public:
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
-        GameObject* Owner = nullptr;
-        
-        std::string SetObjectNameToSelfClassName();
+        GameObjectBase* Owner = nullptr;
+        bool IsDrawable = true;
 
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
         virtual std::string& GetObjectName() { return ObjectName; }
 
-        const GameObject* GetOwner() const { return Owner; }
+        [[nodiscard]] const GameObjectBase* GetOwner() const { return Owner; }
 
         [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
         [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
@@ -82,15 +86,21 @@ namespace ETG
         void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
-
-        void ComputeDrawProperties();
-
+        
+        // Animation component management
+        void SetAnimationInterface(IAnimationComponent* animComp) { AnimInterface = animComp; }
+        IAnimationComponent* GetAnimationInterface() { return AnimInterface; } //Never used yet
+        
+        // Bounds methods
+        [[nodiscard]] virtual sf::FloatRect GetBounds() const;
+        virtual void DrawBounds(sf::Color color = sf::Color::Red) const;
+        
         //If same named object constructed before, differentiate it with appending a number end of the name
         //ex: BaseProjectile BaseProjectile2 BaseProjectile3 
-        void IncrementName();
+        std::string SetObjectNameToSelfClassName();
 
         //Friend classes for Engine UI
-        friend void ImGuiSetRelativeOrientation(GameObject* obj);
-        friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
+        friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
+        friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
     };
 }

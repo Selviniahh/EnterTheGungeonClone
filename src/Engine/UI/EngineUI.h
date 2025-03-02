@@ -2,12 +2,12 @@
 
 namespace ETG
 {
-    class GameObject;
+    class GameObjectBase;
 
     class EngineUI
     {
-        friend void ImGuiSetRelativeOrientation(GameObject* obj);
-        friend void ImGuiSetAbsoluteOrientation(GameObject* obj);
+        friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
+        friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
     };
 }
 

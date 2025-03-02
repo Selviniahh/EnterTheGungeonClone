@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "../Core/GameObject.h"
+#include "../Core/GameObjectBase.h"
 
 struct ImFont;
 
@@ -21,17 +21,17 @@ public:
 
 private:
     void UpdateDetailsPanel();
-    friend void ImGuiSetRelativeOrientation(ETG::GameObject* obj);
-    friend void ImGuiSetAbsoluteOrientation(ETG::GameObject* obj);
+    friend void ImGuiSetRelativeOrientation(ETG::GameObjectBase* obj);
+    friend void ImGuiSetAbsoluteOrientation(ETG::GameObjectBase* obj);
     friend void ImGuiSetRelativeOrientation();
 
     //By default first time the argument will be scene. After that other objects that has been attached stuffs will be passed.
     //Used recursive depth-first (pre-order) tree traversal
-    void DrawGameObject(ETG::GameObject* object);
+    void DrawGameObject(ETG::GameObjectBase* object);
 
     ImFont* SegoeFont{};
     sf::Vector2f windowSize;
-    ETG::GameObject* SelectedObj = nullptr;
+    ETG::GameObjectBase* SelectedObj = nullptr;
 
-    std::unordered_set<ETG::GameObject*> OwnerObjects;
+    std::unordered_set<ETG::GameObjectBase*> OwnerObjects;
 };

@@ -1,7 +1,8 @@
 #pragma once
 #include <unordered_map>
+#include "../../Core/ComponentBase.h"
 #include "../../Utils/DirectionUtils.h"
-#include "../../Core/GameObject.h"
+#include "../../Core/GameObjectBase.h"
 namespace ETG
 {
     struct PairHash;
@@ -9,7 +10,7 @@ namespace ETG
     enum class DashEnum;
     class Hero;
     
-    class InputComponent : public GameObject
+    class InputComponent : public ComponentBase
     {
     public:
         InputComponent();

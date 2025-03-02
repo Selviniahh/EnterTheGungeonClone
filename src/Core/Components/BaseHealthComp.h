@@ -1,7 +1,7 @@
 #pragma once
-#include "../GameObject.h"
+#include "../ComponentBase.h"
 
-class BaseHealthComp : ETG::GameObject {
+class BaseHealthComp : ETG::ComponentBase {
 public:
     explicit BaseHealthComp(float MaxHealth);
     void Initialize() override;
@@ -12,7 +12,7 @@ public:
     float Health;
 
 private:
-    static void DamageTaken(GameObject* DamagedActor, float Damage);
+    static void DamageTaken(GameObjectBase* DamagedActor, float Damage);
 
     float MaxHealth;
 };

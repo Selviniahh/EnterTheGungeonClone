@@ -1,8 +1,8 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
-#include "../GameObject.h"
+#include "../ComponentBase.h"
 
-class BaseMoveComp : public ETG::GameObject
+class BaseMoveComp : public ETG::ComponentBase
 {
 protected:
     // Protected constructor so only derived classes can create one.

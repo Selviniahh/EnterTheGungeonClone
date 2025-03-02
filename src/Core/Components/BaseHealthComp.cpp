@@ -12,6 +12,6 @@ void BaseHealthComp::Initialize()
 {
 }
 
-void BaseHealthComp::DamageTaken(GameObject* DamagedActor, float Damage)
+void BaseHealthComp::DamageTaken(GameObjectBase* DamagedActor, float Damage)
 {
 }

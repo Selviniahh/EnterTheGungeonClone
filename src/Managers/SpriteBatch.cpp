@@ -1,4 +1,5 @@
 #include "SpriteBatch.h"
+#include "../Utils/TextureUtils.h"
 
 //A forward declaration I've never seen before
 namespace ETG
@@ -12,54 +13,18 @@ void ETG::SpriteBatch::begin()
     sprites.clear();
 }
 
-void ETG::SpriteBatch::draw(const sf::Sprite& sprite, float depth)
-{
-    const sf::Texture* texture = sprite.getTexture();
-    if (!texture) return;
-
-    const sf::Transform& transform = sprite.getTransform();
-    const sf::IntRect& texRect = sprite.getTextureRect();
-    const sf::Color color = sprite.getColor();
-
-    sf::Vertex vertices[4];
-
-    // Positions
-    vertices[0].position = transform.transformPoint(0.f, 0.f);
-    vertices[1].position = transform.transformPoint(static_cast<float>(texRect.width), 0.f);
-    vertices[2].position = transform.transformPoint(static_cast<float>(texRect.width), static_cast<float>(texRect.height));
-    vertices[3].position = transform.transformPoint(0.f, static_cast<float>(texRect.height));
-
-    // Texture coordinates
-    float left = static_cast<float>(texRect.left);
-    float right = left + static_cast<float>(texRect.width);
-    float top = static_cast<float>(texRect.top);
-    float bottom = top + static_cast<float>(texRect.height);
-
-    vertices[0].texCoords = sf::Vector2f(left, top);
-    vertices[1].texCoords = sf::Vector2f(right, top);
-    vertices[2].texCoords = sf::Vector2f(right, bottom);
-    vertices[3].texCoords = sf::Vector2f(left, bottom);
-
-    // Color
-    for (auto& vertice : vertices)
-        vertice.color = color;
-
-    // Add to the list
-    sprites.emplace_back(vertices[0], vertices[1], vertices[2], vertices[3], texture, depth, drawCounter++);
-}
-
 void ETG::SpriteBatch::end(sf::RenderWindow& window)
 {
     if (sprites.empty()) return;
 
     // Sort sprites by draw order. If draw order same, draw the one has higher order. 
-    std::sort(sprites.begin(), sprites.end(),
-              [](const SpriteQuad& a, const SpriteQuad& b)
-              {
-                  if (a.depth == b.depth)
-                      return a.drawOrder < b.drawOrder;
-                  return a.depth > b.depth;
-              });
+    std::ranges::sort(sprites,
+                      [](const SpriteQuad& a, const SpriteQuad& b)
+                      {
+                          if (a.depth == b.depth)
+                              return a.drawOrder < b.drawOrder;
+                          return a.depth > b.depth;
+                      });
 
     const sf::Texture* currentTexture = sprites[0].texture;
     sf::VertexArray va(sf::Quads);
@@ -81,7 +46,6 @@ void ETG::SpriteBatch::end(sf::RenderWindow& window)
     }
 
     window.draw(va, currentTexture);
-    // sprites.clear();  // Remove this line (already cleared in begin())
 }
 
 void ETG::SpriteBatch::SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const sf::Vector2f& pos, float Rotation, sf::Vector2f origin, float Scale, float depth)
@@ -94,5 +58,43 @@ void ETG::SpriteBatch::SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const
     frame.setOrigin(origin);
     frame.setColor(sf::Color::White);
 
-    ETG::GlobSpriteBatch.draw(frame, depth);
+    GlobSpriteBatch.draw(frame, depth);
+}
+
+void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Color& color, float thickness, float depth)
+{
+    // Get a shared pixel texture
+    static std::shared_ptr<sf::Texture> pixelTex = GetPixelTexture();
+    
+    // Top edge
+    sf::Sprite topEdge;
+    topEdge.setTexture(*pixelTex);
+    topEdge.setPosition(rect.left, rect.top);
+    topEdge.setScale(rect.width, thickness);
+    topEdge.setColor(color);
+    draw(topEdge, depth);
+    
+    // Bottom edge
+    sf::Sprite bottomEdge;
+    bottomEdge.setTexture(*pixelTex);
+    bottomEdge.setPosition(rect.left, rect.top + rect.height - thickness);
+    bottomEdge.setScale(rect.width, thickness);
+    bottomEdge.setColor(color);
+    draw(bottomEdge, depth);
+    
+    // Left edge
+    sf::Sprite leftEdge;
+    leftEdge.setTexture(*pixelTex);
+    leftEdge.setPosition(rect.left, rect.top);
+    leftEdge.setScale(thickness, rect.height);
+    leftEdge.setColor(color);
+    draw(leftEdge, depth);
+    
+    // Right edge
+    sf::Sprite rightEdge;
+    rightEdge.setTexture(*pixelTex);
+    rightEdge.setPosition(rect.left + rect.width - thickness, rect.top);
+    rightEdge.setScale(thickness, rect.height);
+    rightEdge.setColor(color);
+    draw(rightEdge, depth);
 }

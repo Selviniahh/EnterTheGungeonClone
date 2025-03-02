@@ -6,15 +6,15 @@
 
 void EnemyBase::Initialize()
 {
-    GameObject::Initialize();
+    GameObjectBase::Initialize();
 }
 
 void EnemyBase::Update()
 {
-    GameObject::Update();
+    GameObjectBase::Update();
 }
 
 void EnemyBase::Draw()
 {
-    GameObject::Draw();
+    GameObjectBase::Draw();
 }

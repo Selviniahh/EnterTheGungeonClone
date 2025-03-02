@@ -37,7 +37,7 @@ namespace ETG
 
     public:
         //Hold only scene objects. Used for displaying details panel
-        std::unordered_map<std::string,GameObject*> SceneObjects;
+        std::unordered_map<std::string,GameObjectBase*> SceneObjects;
         
         static sf::Event GameEvent;
     };

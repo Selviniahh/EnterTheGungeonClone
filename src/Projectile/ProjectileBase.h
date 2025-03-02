@@ -1,7 +1,7 @@
 #pragma once
-#include "../Core/GameObject.h"
+#include "../Core/GameObjectBase.h"
 
-class ProjectileBase : public ETG::GameObject
+class ProjectileBase : public ETG::GameObjectBase
 {
 public:
     ProjectileBase() = default;

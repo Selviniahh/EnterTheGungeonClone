@@ -22,7 +22,7 @@ namespace ETG
     }
 
     template <typename T, typename... Args>
-    std::unique_ptr<T> CreateGameObjectAttached(GameObject* OwnerObj, Args&&... args)
+    std::unique_ptr<T> CreateGameObjectAttached(GameObjectBase* OwnerObj, Args&&... args)
     {
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         obj->Owner = OwnerObj;
