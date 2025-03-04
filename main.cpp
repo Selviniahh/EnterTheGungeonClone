@@ -14,8 +14,6 @@ int main()
         {
             sf::sleep(sf::milliseconds(10));
         }
-
-        if (ETG::GameManager::GameEvent.type == sf::Event::Closed) break;
             
         GM.Update();
         GM.Draw();
