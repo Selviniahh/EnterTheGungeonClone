@@ -72,6 +72,7 @@ void ETG::GameManager::Update()
 
 void ETG::GameManager::Draw()
 {
+    if (!HasFocus) return;
     Window->clear(sf::Color::Black);
 
     //NOTE: Draw the main game scene with Custom view. These draws will be drawn zoomed

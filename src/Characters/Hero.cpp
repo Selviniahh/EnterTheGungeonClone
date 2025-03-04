@@ -10,7 +10,6 @@
 #include "../Managers/Globals.h"
 #include "../Utils/TextureUtils.h"
 
-
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
 bool ETG::Hero::IsShooting{};
