@@ -2,6 +2,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <boost/describe.hpp>
+#include <boost/mp11/algorithm.hpp>
 #include "../Utils/Interface/IAnimationComponent.h"
 
 namespace ETG
@@ -65,6 +67,9 @@ namespace ETG
         //Contains the final drawing properties. 
         DrawProperties DrawProps;
 
+        //The typename without any increment
+        std::string TypeName{};
+
         void ComputeDrawProperties();
         void IncrementName();
 
@@ -82,6 +87,7 @@ namespace ETG
         [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
         [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
         [[nodiscard]] const sf::Vector2f& GetOrigin() const { return Origin; }
+        [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
 
         void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
@@ -94,7 +100,7 @@ namespace ETG
         // Bounds methods
         [[nodiscard]] virtual sf::FloatRect GetBounds() const;
         virtual void DrawBounds(sf::Color color = sf::Color::Red) const;
-        
+
         //If same named object constructed before, differentiate it with appending a number end of the name
         //ex: BaseProjectile BaseProjectile2 BaseProjectile3 
         std::string SetObjectNameToSelfClassName();
@@ -102,5 +108,10 @@ namespace ETG
         //Friend classes for Engine UI
         friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
+
+        BOOST_DESCRIBE_CLASS(GameObjectBase,(),
+            (Owner,IsDrawable),
+            (ObjectName, Texture, Position, Origin, Depth),
+            ())
     };
 }

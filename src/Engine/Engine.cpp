@@ -5,6 +5,7 @@
 #include "../Characters/Hero.h"
 #include "../Managers/GameManager.h"
 #include "../Managers/InputManager.h"
+#include "UI/EngineUI.h"
 
 bool Engine::CurrentGameFocus = false;
 bool Engine::PreviousGameFocus = false;
@@ -80,11 +81,11 @@ void Engine::UpdateDetailsPanel()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
     //Game object pane
-    if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
+    if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_None))
     {
         // Assuming Scene is the root object.
         GameObjectBase* sceneObj = GameState::GetInstance().GetSceneObj();
-        DrawGameObject(sceneObj);
+        DisplayHierarchy(sceneObj);
     }
 
     //NOTE: Open the details pane by default
@@ -101,7 +102,7 @@ void Engine::UpdateDetailsPanel()
 }
 
 
-void Engine::DrawGameObject(GameObjectBase* object)
+void Engine::DisplayHierarchy(GameObjectBase* object)
 {
     ImGui::PushID(object);
 
@@ -139,7 +140,7 @@ void Engine::DrawGameObject(GameObjectBase* object)
         {
             if (sceneObj->Owner == object)
             {
-                DrawGameObject(sceneObj);
+                DisplayHierarchy(sceneObj);
             }
         }
 
@@ -149,9 +150,9 @@ void Engine::DrawGameObject(GameObjectBase* object)
     ImGui::PopID();
 }
 
-void Engine::DisplayProperties()
+void Engine::DisplayProperties() const
 {
-    if (SelectedObj != nullptr && SelectedObj->IsDrawable)
+    if (SelectedObj != nullptr)
     {
         if (ImGui::TreeNode("Absolute Orientation"))
         {
@@ -162,6 +163,12 @@ void Engine::DisplayProperties()
         if (ImGui::TreeNode("Relative Orientation"))
         {
             ImGuiSetRelativeOrientation(SelectedObj);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Base Properties"))
+        {
+            EngineUI::PopulateParentReflection<GameObjectBase>(*SelectedObj); //TODO: The base objects cannot be recognized because based on the given type, the type name needs to be known at compile time. 
             ImGui::TreePop();
         }
     }

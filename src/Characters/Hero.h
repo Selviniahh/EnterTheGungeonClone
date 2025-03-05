@@ -41,5 +41,10 @@ namespace ETG
 
 
         void SetHandTexLoc();
+
+        BOOST_DESCRIBE_CLASS(Hero,(GameObjectBase),
+            (IsDashing),
+            (),
+            ())
     };
 }

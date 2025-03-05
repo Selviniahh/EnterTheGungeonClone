@@ -62,6 +62,7 @@ namespace ETG
 
         static void DrawDebugText(const std::string& str, sf::RenderWindow& window)
         {
+            if (!window.isOpen()) return; //For no reason, suddenly I had to write this otherwise, the game starts crashing when I close the game
             InputManager::debugText.setString(str);
             InputManager::debugText.setPosition(SetDebugTextPos(InputManager::textPos));
             window.draw(InputManager::debugText);
