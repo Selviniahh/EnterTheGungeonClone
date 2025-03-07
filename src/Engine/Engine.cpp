@@ -5,6 +5,7 @@
 #include "../Characters/Hero.h"
 #include "../Managers/GameManager.h"
 #include "../Managers/InputManager.h"
+#include "../Managers/TypeRegistry.h"
 #include "UI/EngineUI.h"
 
 bool Engine::CurrentGameFocus = false;
@@ -23,6 +24,7 @@ void Engine::Initialize()
     std::cout << std::unitbuf;
 
     LoadFont();
+    TypeRegistry::InitializeTypeRegistry();
 }
 
 void Engine::Update()
@@ -168,7 +170,7 @@ void Engine::DisplayProperties() const
 
         if (ImGui::TreeNode("Base Properties"))
         {
-            EngineUI::PopulateParentReflection<GameObjectBase>(*SelectedObj); //TODO: The base objects cannot be recognized because based on the given type, the type name needs to be known at compile time. 
+            TypeRegistry::ProcessObject(SelectedObj);
             ImGui::TreePop();
         }
     }

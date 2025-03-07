@@ -54,6 +54,7 @@ add_executable(ETG main.cpp
         src/Core/ComponentBase.h
         src/Utils/Interface/IAnimationComponent.h
         src/Utils/StrManipulateUtil.h
+        src/Managers/TypeRegistry.h
 )
 
 # Easiest and fastest way is VCPKG 
@@ -63,6 +64,8 @@ find_package(Threads REQUIRED)
 find_package(ImGui-SFML CONFIG REQUIRED)
 find_package(boost_type_index CONFIG REQUIRED)
 find_package(boost_describe CONFIG REQUIRED)
+find_package(boost_mpl REQUIRED CONFIG)
+
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND "${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
@@ -87,6 +90,7 @@ target_link_libraries(ETG PRIVATE
         ImGui-SFML::ImGui-SFML
         Boost::type_index
         Boost::describe
+        Boost::mpl
 )
 
 install(TARGETS ETG

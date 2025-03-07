@@ -3,6 +3,8 @@
 #include <boost/type_index.hpp>
 #include <imgui.h>
 #include <iostream>
+
+#include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Utils/StrManipulateUtil.h"
 
@@ -17,6 +19,24 @@ ETG::GameObjectBase::~GameObjectBase()
     AnimInterface = nullptr;
 }
 
+void ETG::GameObjectBase::Initialize()
+{
+}
+
+void ETG::GameObjectBase::VisualizeOrigin() const
+{
+    if (DrawOriginPoint)
+    {
+        Globals::DrawSinglePixelAtLoc(DrawProps.Position, sf::Vector2i(1,1), Rotation);
+    }
+}
+
+void ETG::GameObjectBase::Draw()
+{
+    VisualizeOrigin();
+    DrawBounds();
+}
+
 void ETG::GameObjectBase::Update()
 {
     //Calculate the final drawing properties. The Base position modified from the source and relative pos given in the UI will be summed to form the final value before being drawn
@@ -29,6 +49,7 @@ void ETG::GameObjectBase::ComputeDrawProperties()
     DrawProps.Scale = {Scale.x * RelativeScale.x, Scale.y * RelativeScale.y};
     DrawProps.Rotation = Rotation + RelativeRotation;
     DrawProps.Origin = Origin + RelativeOrigin;
+    DrawProps.Depth = Depth;
 }
 
 sf::FloatRect ETG::GameObjectBase::GetBounds() const
@@ -66,6 +87,7 @@ sf::FloatRect ETG::GameObjectBase::GetBounds() const
 
 void ETG::GameObjectBase::DrawBounds(sf::Color color) const
 {
+    if (!DrawBound) return;
     GlobSpriteBatch.drawRectOutline(GetBounds(), color, 1.0f, 0);
 }
 

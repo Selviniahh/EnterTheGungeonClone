@@ -28,5 +28,12 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
+
+        BOOST_DESCRIBE_CLASS(UserInterface,(GameObjectBase),
+            (IsReloaded),
+            (),
+            ()
+            )
     };
+
 }

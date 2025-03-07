@@ -8,6 +8,12 @@ namespace ETG
     public:
         Scene();
         ~Scene() override = default;
+
+    private:
+        BOOST_DESCRIBE_CLASS(Scene,(GameObjectBase),
+            (),
+            (),
+            ())
     };
 
     inline Scene::Scene()

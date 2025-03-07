@@ -22,7 +22,7 @@ namespace ETG
 
     //GameObjectBase*
     template <>
-    void ShowImGuiWidget<GameObjectBase*>(const char* label, GameObjectBase*& value);
+    void ShowImGuiWidget<GameObjectBase*>(const char* label, GameObjectBase*& obj);
 
     //Bool
     template <>
@@ -50,11 +50,12 @@ namespace ETG
         //TODO: I need to do something with this two function later I done with reflection
         void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
-        template <class T, class Bd, class Md>
-        static void PopulateParentReflection(const T& t);
 
-        template <class T, class Md>
-        static void PopulateMemberReflectionProps(const T& t);
+        void BeginProperty(const char* label);
+        void EndProperty();
+        
+        template <class T, class Bd, class Md>
+        static void PopulateReflection(const T& t);
         
     };
 
@@ -63,13 +64,13 @@ namespace ETG
     template <class T,
     class Bd = boost::describe::describe_bases<T, boost::describe::mod_any_access>,
     class Md = boost::describe::describe_members<T, boost::describe::mod_any_access>>
-    void EngineUI::PopulateParentReflection(const T& t)
+    void EngineUI::PopulateReflection(const T& t)
     {
         boost::mp11::mp_for_each<Bd>([&]<typename T0>(T0)
         {
             using BTN = typename T0::type;
             auto parentType = boost::typeindex::type_id<BTN>().pretty_name(); //just for test
-            PopulateMemberReflectionProps((BTN const&)t);
+            PopulateReflection((BTN const&)t);
         });
 
         //Members
@@ -77,7 +78,7 @@ namespace ETG
         {
             using member_type = std::decay_t<decltype(t.*D.pointer)>;
             auto TypeName = boost::typeindex::type_id<member_type>().pretty_name();
-            //GameObjectBase* //TODO: Even though before I planned the Engine related stuffs separate from ETG namespace, they tighlty coupled. I have to one day create separate library named Engine and ETG then link Engine to ETG
+            //GameObjectBase* //TODO: Even though before I planned the Engine related stuffs separate from ETG namespace, they tightly coupled. I have to one day create separate library named Engine and ETG then link Engine to ETG
 
             auto VariableName = D.name; //"Owner"
             auto* ValuePtr = &(t.*D.pointer); //This is pointer-to-member type of pointer. It doesn't point to any memory
@@ -94,4 +95,10 @@ namespace ETG
         const std::string ErrorMessage = boost::typeindex::type_id<T>().pretty_name() + "and " + label + " not found";
         std::cerr << ErrorMessage;
     }
+
+    void BeginProperty(const char* label);
+    void EndProperty();
+
 }
+
+

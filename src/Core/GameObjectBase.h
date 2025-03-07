@@ -22,17 +22,9 @@ namespace ETG
 
         //Push back every GameObject to the SceneObj during initialization.  
         GameObjectBase();
-
         virtual ~GameObjectBase();
-
-        virtual void Initialize()
-        {
-        }
-
-        virtual void Draw()
-        {
-        }
-
+        virtual void Initialize();
+        virtual void Draw();
         virtual void Update();
 
         std::string ObjectName{"Default"};
@@ -71,13 +63,16 @@ namespace ETG
         std::string TypeName{};
 
         void ComputeDrawProperties();
+        void VisualizeOrigin() const;
         void IncrementName();
 
     public:
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
         bool IsDrawable = true;
-
+        bool DrawBound = true;
+        bool DrawOriginPoint = true; 
+        
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
         virtual std::string& GetObjectName() { return ObjectName; }
@@ -98,20 +93,21 @@ namespace ETG
         IAnimationComponent* GetAnimationInterface() { return AnimInterface; } //Never used yet
         
         // Bounds methods
-        [[nodiscard]] virtual sf::FloatRect GetBounds() const;
-        virtual void DrawBounds(sf::Color color = sf::Color::Red) const;
+        [[nodiscard]] sf::FloatRect GetBounds() const;
+        void DrawBounds(sf::Color color = sf::Color::Red) const;
 
         //If same named object constructed before, differentiate it with appending a number end of the name
         //ex: BaseProjectile BaseProjectile2 BaseProjectile3 
         std::string SetObjectNameToSelfClassName();
+        
 
         //Friend classes for Engine UI
         friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
         BOOST_DESCRIBE_CLASS(GameObjectBase,(),
-            (Owner,IsDrawable),
-            (ObjectName, Texture, Position, Origin, Depth),
+            (Owner,IsDrawable, DrawOriginPoint, DrawBound),
+            (ObjectName, Texture, Origin, Depth),
             ())
     };
 }
