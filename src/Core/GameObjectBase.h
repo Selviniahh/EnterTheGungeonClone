@@ -69,7 +69,6 @@ namespace ETG
     public:
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
-        bool IsDrawable = true;
         bool DrawBound = true;
         bool DrawOriginPoint = true; 
         
@@ -106,7 +105,7 @@ namespace ETG
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
         BOOST_DESCRIBE_CLASS(GameObjectBase,(),
-            (Owner,IsDrawable, DrawOriginPoint, DrawBound),
+            (Owner, DrawOriginPoint, DrawBound),
             (ObjectName, Texture, Origin, Depth),
             ())
     };

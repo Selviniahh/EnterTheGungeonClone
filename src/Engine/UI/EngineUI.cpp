@@ -65,7 +65,13 @@ void ETG::ImGuiSetAbsoluteOrientation(GameObjectBase* obj)
 template <>
 void ETG::ShowImGuiWidget<ETG::GameObjectBase*>(const char* label, GameObjectBase*& obj)
 {
-    // TypeRegistry::ProcessObject(obj);
+    if (!obj) return;
+
+    if (ImGui::TreeNode("Owner"))
+    {
+        TypeRegistry::ProcessObject(obj);
+        ImGui::TreePop();
+    }
 }
 
 template <>
