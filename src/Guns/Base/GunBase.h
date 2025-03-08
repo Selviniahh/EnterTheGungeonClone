@@ -31,7 +31,6 @@ namespace ETG
         sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
 
         std::vector<std::unique_ptr<ProjectileBase>> projectiles;
-        std::shared_ptr<sf::Texture> GunTexture;
         std::shared_ptr<sf::Texture> ProjTexture;
 
         // Muzzle flash variables (instance sets up its own animation).

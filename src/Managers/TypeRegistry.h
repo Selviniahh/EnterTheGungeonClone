@@ -3,13 +3,13 @@
 #include <unordered_map>
 #include <typeindex>
 #include <type_traits>
-#include <string>
 #include <utility>
 #include "../Core/GameObjectBase.h"
-#include "../Engine/UI/EngineUI.h"
 #include "../UI/UserInterface.h"
 #include "../Characters/Hero.h"
 #include "../Core/Scene/Scene.h"
+#include "../Characters/Components/InputComponent.h"
+#include "../Engine/Reflection.h"
 
 namespace ETG
 {
@@ -30,7 +30,7 @@ namespace ETG
                     // Convert obj to be the type of T. I know T is child of GameObjectBase
                     if (auto* Child = dynamic_cast<T*>(obj))
                     {
-                        EngineUI::PopulateReflection<T>(*Child);
+                        Reflection::PopulateReflection<T>(*Child);
                         return true;
                     }
 
@@ -44,8 +44,6 @@ namespace ETG
         {
             if (!obj)
                 return false; // Changed from throwing exception to returning false
-                // throw std::runtime_error("Error the object: " + obj->GetObjectName() + "not found");
-            
 
             // Try direct match first (fastest)
             const auto exactType = std::type_index(typeid(*obj));
@@ -58,7 +56,7 @@ namespace ETG
             }
 
             //Default to base class if no match
-            EngineUI::PopulateReflection<GameObjectBase>(*obj);
+            Reflection::PopulateReflection<GameObjectBase>(*obj);
             return true;
         }
 
@@ -82,10 +80,9 @@ namespace ETG
             RegisterType<Hero>();
             RegisterType<GameObjectBase>();
             RegisterType<UserInterface>();
+            RegisterType<InputComponent>();
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;
-
-    private:
     };
 }

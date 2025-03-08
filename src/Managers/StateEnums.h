@@ -1,4 +1,6 @@
 #pragma once
+#include <boost/describe.hpp>
+
 namespace ETG
 {
     enum class RunEnum
@@ -8,6 +10,7 @@ namespace ETG
         Run_Forward,
         Run_Front
     };
+    BOOST_DESCRIBE_ENUM(RunEnum, Run_Back, Run_BackWard, Run_Forward, Run_Front)
 
     enum class IdleEnum
     {
@@ -16,6 +19,7 @@ namespace ETG
         Idle_Front,
         Idle_Right
     };
+    BOOST_DESCRIBE_ENUM(IdleEnum,Idle_Back, Idle_BackWard, Idle_Front, Idle_Right)
 
     enum class DashEnum
     {
@@ -26,6 +30,7 @@ namespace ETG
         Dash_Right,
         Unknown
     };
+    BOOST_DESCRIBE_ENUM(DashEnum, Dash_Back, Dash_BackWard, Dash_Front, Dash_Left, Dash_Right, Unknown)
 
     enum class HeroStateEnum
     {
@@ -34,13 +39,15 @@ namespace ETG
         Dash,
         Die
     };
-
+    BOOST_DESCRIBE_ENUM(HeroStateEnum, Idle, Run, Dash, Die)
+    
     enum class GunStateEnum
     {
         Idle,
         Shoot,
         Reload
     };
+    BOOST_DESCRIBE_ENUM(GunStateEnum, Idle, Shoot, Reload)
 
     enum class Direction
     {
@@ -53,6 +60,7 @@ namespace ETG
         BackHandRight,
         BackDiagonalRight
     };
+    BOOST_DESCRIBE_ENUM(Direction, Right, FrontHandRight, FrontHandLeft, Left, BackDiagonalLeft, BackHandLeft, BackHandRight, BackDiagonalRight)
 
     static std::vector<ETG::RunEnum> RunEnumValues = {
         RunEnum::Run_Back,

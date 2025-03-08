@@ -104,6 +104,11 @@ std::string ETG::GameObjectBase::SetObjectNameToSelfClassName()
     return ObjectName;
 }
 
+void ETG::GameObjectBase::PopulateSpecificWidgets()
+{
+    
+}
+
 //It feels good to write everything myself 
 void ETG::GameObjectBase::IncrementName()
 {

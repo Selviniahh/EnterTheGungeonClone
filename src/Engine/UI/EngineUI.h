@@ -1,11 +1,11 @@
 #pragma once
+#include <imgui-SFML.h>
+#include <imgui.h>
 #include <iostream>
 #include <memory>
-#include <boost/describe.hpp>
 #include <boost/type_index.hpp>
 #include <SFML/System/Vector2.hpp>
 #include "../../Utils/StrManipulateUtil.h"
-
 
 namespace sf
 {
@@ -16,7 +16,10 @@ namespace ETG
 {
     class GameObjectBase;
 
-    //Base template
+    void BeginProperty(const char* label);
+    void EndProperty();
+
+    //Base template forwards to the appropriate implementation
     template <typename T>
     void ShowImGuiWidget(const char* label, T& value);
 
@@ -43,62 +46,42 @@ namespace ETG
     //float
     template <>
     void ShowImGuiWidget<float>(const char* label, float& value);
-
+    
     class EngineUI
     {
     public:
         //TODO: I need to do something with this two function later I done with reflection
         void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
-
-        void BeginProperty(const char* label);
-        void EndProperty();
-        
-        template <class T, class Bd, class Md>
-        static void PopulateReflection(const T& t);
-        
     };
 
     //------------------------------IMPLEMENTATION----------------------------------------------------
-    //Bases:
-    template <class T,
-    class Bd = boost::describe::describe_bases<T, boost::describe::mod_any_access>,
-    class Md = boost::describe::describe_members<T, boost::describe::mod_any_access>>
-    void EngineUI::PopulateReflection(const T& t)
-    {
-        boost::mp11::mp_for_each<Bd>([&]<typename T0>(T0)
-        {
-            using BTN = typename T0::type;
-            auto parentType = boost::typeindex::type_id<BTN>().pretty_name(); //just for test
-            PopulateReflection((BTN const&)t);
-        });
-
-        //Members
-        boost::mp11::mp_for_each<Md>([&](auto D)
-        {
-            using member_type = std::decay_t<decltype(t.*D.pointer)>;
-            auto TypeName = boost::typeindex::type_id<member_type>().pretty_name();
-            //GameObjectBase* //TODO: Even though before I planned the Engine related stuffs separate from ETG namespace, they tightly coupled. I have to one day create separate library named Engine and ETG then link Engine to ETG
-
-            auto VariableName = D.name; //"Owner"
-            auto* ValuePtr = &(t.*D.pointer); //This is pointer-to-member type of pointer. It doesn't point to any memory
-            member_type& valueRef = const_cast<member_type&>(*(ValuePtr)); // Cast away constness and return ref.
-            // auto* NonCostValuePtr = const_cast<member_type*>(ValuePtr); //Cast away costness as pointer. Unused for now 
-
-            ShowImGuiWidget<member_type>(VariableName, valueRef);
-        });
-    }
-
+    //This will firstly execute if in above none of declared templates satisfied.  
     template <typename T>
     void ShowImGuiWidget(const char* label, T& value)
     {
-        const std::string ErrorMessage = boost::typeindex::type_id<T>().pretty_name() + "and " + label + " not found";
-        std::cerr << ErrorMessage;
+        ShowImGuiWidgetImpl(label,value, std::is_enum<T>{});
     }
 
-    void BeginProperty(const char* label);
-    void EndProperty();
+    //Implementation for non-enum types. If non defined non enum exposed to UI, this template spceialization will be executed
+    template<typename T>
+    void ShowImGuiWidgetImpl(const char* label, T& value, std::false_type)
+    {
+        const std::string ErrorMessage = "Non enum Typename: " + boost::typeindex::type_id<T>().pretty_name() + " and variable name " + label + " not found. "
+            "Did you define a specialized template in EngineUI.cpp for this typename?";
+        std::cerr << ErrorMessage << std::endl;
+        
+        ImGui::Text(ErrorMessage.c_str());
+    }
 
+    //default implementation for enums
+    template<typename T>
+    void ShowImGuiWidgetImpl(const char* label, T& value, std::true_type)
+    {
+        BeginProperty(label);
+        ImGui::Text(EnumToString(value));
+        EndProperty();
+    }
+
+    
 }
-
-

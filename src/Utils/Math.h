@@ -36,4 +36,10 @@ public:
     {
         return std::sqrt(SizeSquared(vector));
     }
+
+    template<typename T>
+    static bool IsInRange(const T& value, const T& min, const T& max)
+    {
+        return value >= min && value <= max;
+    }
 };

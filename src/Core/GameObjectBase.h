@@ -26,10 +26,7 @@ namespace ETG
         virtual void Initialize();
         virtual void Draw();
         virtual void Update();
-
-        std::string ObjectName{"Default"};
-        std::shared_ptr<sf::Texture> Texture;
-
+        
         //Base position of GameObjects
         //Inherited Objects such as Gun's position will be attached to hand pos in tick. After the object manipulations are completed, the relative offsets needs given in UI needs to be applied
         //and result will be stored in FinalPos, FinalRot etc. Final properties will be drawn.    
@@ -70,7 +67,9 @@ namespace ETG
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
         bool DrawBound = true;
-        bool DrawOriginPoint = true; 
+        bool DrawOriginPoint = true;
+        std::string ObjectName{"Default"};
+        std::shared_ptr<sf::Texture> Texture;
         
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
@@ -98,6 +97,8 @@ namespace ETG
         //If same named object constructed before, differentiate it with appending a number end of the name
         //ex: BaseProjectile BaseProjectile2 BaseProjectile3 
         std::string SetObjectNameToSelfClassName();
+
+        virtual void PopulateSpecificWidgets();
         
 
         //Friend classes for Engine UI
@@ -105,8 +106,8 @@ namespace ETG
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
         BOOST_DESCRIBE_CLASS(GameObjectBase,(),
-            (Owner, DrawOriginPoint, DrawBound),
-            (ObjectName, Texture, Origin, Depth),
+            (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound),
+            (Origin, Depth),
             ())
     };
 }

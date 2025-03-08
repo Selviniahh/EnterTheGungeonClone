@@ -7,6 +7,7 @@
 #include "../Managers/InputManager.h"
 #include "../Managers/TypeRegistry.h"
 #include "UI/EngineUI.h"
+#include "UI/ModalManager.h"
 
 bool Engine::CurrentGameFocus = false;
 bool Engine::PreviousGameFocus = false;
@@ -20,7 +21,7 @@ void Engine::Initialize()
     if (!ImGui::SFML::Init(*Window)) throw std::runtime_error("Cannot initialize ImGUI with the given Window");
 
     GameState::GetInstance().SetEngineUISize(windowSize);
-    windowSize = {300, (float)(Window->getSize().y)};
+    windowSize = {400, (float)(Window->getSize().y)};
     std::cout << std::unitbuf;
 
     LoadFont();
@@ -33,9 +34,11 @@ void Engine::Update()
     ImGui::SFML::Update(*Window, ElapsedTimeClock);
 
     // Begin a new ImGui window docked to the right
-    ImGui::SetNextWindowPos(ImVec2((float)Window->getSize().x - windowSize.x, 0));
-    ImGui::SetNextWindowSize(ImVec2(windowSize));
+    // Only set position and size when first creating the window
+    ImGui::SetNextWindowPos(ImVec2((float)Window->getSize().x - windowSize.x, 0), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(windowSize), ImGuiCond_FirstUseEver);
 
+    // Use no flags to allow all default window behaviors (dragging, resizing)
     ImGui::Begin("Details Pane", nullptr);
     UpdateDetailsPanel();
 
@@ -168,9 +171,10 @@ void Engine::DisplayProperties() const
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Base Properties"))
+        if (ImGui::TreeNode("Properties"))
         {
             TypeRegistry::ProcessObject(SelectedObj);
+            SelectedObj->PopulateSpecificWidgets();
             ImGui::TreePop();
         }
     }

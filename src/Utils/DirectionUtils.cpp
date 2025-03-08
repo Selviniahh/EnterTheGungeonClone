@@ -18,12 +18,12 @@ void ETG::DirectionUtils::PopulateDirectionRanges(DirectionMap mapToFill)
 ETG::Direction ETG::DirectionUtils::GetDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, const float angle)
 {
     //The first std::pair is key and element. Second std::pair is the key's type itself  
-    for (const std::pair<const std::pair<int, int>, Direction>& entry : DirectionMap)
+    for (const auto& [fst, snd] : DirectionMap)
     {
         //Check if angle within any defined range
-        if (angle >= entry.first.first && angle <= entry.first.second)
+        if (angle >= fst.first && angle <= fst.second)
         {
-            return entry.second;
+            return snd;
         }
     }
     throw std::out_of_range("Mouse angle is out of defined ranges. Angle is: " + std::to_string(angle));

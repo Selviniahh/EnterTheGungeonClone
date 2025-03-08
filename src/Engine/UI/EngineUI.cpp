@@ -67,9 +67,10 @@ void ETG::ShowImGuiWidget<ETG::GameObjectBase*>(const char* label, GameObjectBas
 {
     if (!obj) return;
 
-    if (ImGui::TreeNode("Owner"))
+    if (ImGui::TreeNode(label))
     {
         TypeRegistry::ProcessObject(obj);
+        ImGui::Spacing(); //Too much recursive visualization might get easily confusing
         ImGui::TreePop();
     }
 }
@@ -79,17 +80,20 @@ void ETG::ShowImGuiWidget<bool>(const char* label, bool& value)
 {
     BeginProperty(label);
 
-    // Checkbox with custom styling
-    constexpr auto activeColor = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); // Blue when active
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, activeColor);
-    ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+    // Save current style
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
+
+    //make checkbox a bit narrower
+    ImGui::PushItemWidth(5.f);
 
     if (ImGui::Checkbox("##value", &value))
     {
         // Value changed
     }
 
-    ImGui::PopStyleColor(2);
+    // Restore style
+    ImGui::PopItemWidth();
+    ImGui::PopStyleVar();
 
     EndProperty();
 }
@@ -116,11 +120,22 @@ void ETG::ShowImGuiWidget<std::shared_ptr<sf::Texture>>(const char* label, std::
     {
         // Get the native OpenGL texture handle from SFML
         const ImTextureID textId = value->getNativeHandle();
-        float texWidth = static_cast<float>(64);
-        float texHeight = static_cast<float>(64);
 
-        //Display texture size info
+        float texWidth = static_cast<float>(value->getSize().x);
+        float texHeight = static_cast<float>(value->getSize().y);
+
         ImGui::Text("%.0fx%.0f", texWidth, texHeight);
+
+        //Scale the texture
+        constexpr float MIN_DIMENSION = 64.0f;
+        float scale = 1.0f;
+        const float smallestDimension = std::max(texWidth, texHeight);
+        while (smallestDimension * (scale + 1) < MIN_DIMENSION)
+        {
+            scale += 1.0f;
+        }
+        texWidth *= scale;
+        texHeight *= scale;
 
         //Uv min 0,0 UV mac: 1 1 which means display full image
         ImVec2 uvMin(0.0f, 0.0f);
@@ -159,16 +174,27 @@ void ETG::BeginProperty(const char* label)
 {
     ImGui::PushID(label);
     ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() * 0.4f);
+
+    ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() * 0.40f);
+
+    // Reduce vertical spacing
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().ItemSpacing.y * 0.8f));
+
     ImGui::AlignTextToFramePadding();
+
     ImGui::Text("%s", label);
+
     ImGui::NextColumn();
     ImGui::SetNextItemWidth(-1);
 }
 
 void ETG::EndProperty()
 {
+    ImGui::PopStyleVar();
     ImGui::Columns(1);
     ImGui::PopID();
+
+    // Reduce spacing between properties
     ImGui::Spacing();
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2); // Slightly reduce space between items
 }

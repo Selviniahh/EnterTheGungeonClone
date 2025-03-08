@@ -55,6 +55,8 @@ add_executable(ETG main.cpp
         src/Utils/Interface/IAnimationComponent.h
         src/Utils/StrManipulateUtil.h
         src/Managers/TypeRegistry.h
+        src/Engine/UI/ModalManager.h
+        src/Engine/Reflection.h
 )
 
 # Easiest and fastest way is VCPKG 
