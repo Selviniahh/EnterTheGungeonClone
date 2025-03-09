@@ -20,7 +20,7 @@ namespace ETG::Globals
         Window = window;
         ScreenSize = window->getSize();
         GlobSpriteBatch.begin();
-        
+
         //Load font
         const std::filesystem::path FullPath = std::filesystem::path(RESOURCE_PATH) / "Fonts" / "SegoeUI.ttf";
 
@@ -64,45 +64,42 @@ namespace ETG::Globals
         //NOTE: Order of sprite setting should be Texture -> Origin -> Scale -> Position
         sf::Sprite frame;
         frame.setTexture(tex);
-        frame.setOrigin(0.5f, 0.5f);  // Center of 1x1 pixel
+        frame.setOrigin(0.5f, 0.5f); // Center of 1x1 pixel
         frame.setScale(scale.x, scale.y);
         frame.setPosition(Loc); // Position it at the specified location
         frame.setRotation(rotation);
-        
+
         // Draw the sprite
-        GlobSpriteBatch.draw(frame,0);
+        GlobSpriteBatch.draw(frame, 0);
         return false;
     }
 }
 
 //Operator overloads
-namespace ETG
+std::ostream& operator<<(std::ostream& lhs, const sf::Vector2<int>& rhs)
 {
-    std::ostream& operator<<(std::ostream& lhs, const sf::Vector2<int>& rhs)
-    {
-        return lhs << "X: " << rhs.x << " Y: " << rhs.y << std::endl;
-    }
-
-    std::ostream& operator<<(std::ostream& lhs, const sf::IntRect& rhs)
-    {
-        return lhs << "Size: " << rhs.getSize()
-            << "Height: " << rhs.height
-            << " Width: " << rhs.width
-            << " Top: " << rhs.top
-            << " Left:" << rhs.left
-            << std::endl << "Position: " << rhs.getPosition() << std::endl;
-    }
-
-    std::ostream& operator<<(std::ostream& lhs, const sf::FloatRect& rhs)
-    {
-        return lhs << "Left: " << rhs.left
-            << ", Top: " << rhs.top
-            << ", Width: " << rhs.width
-            << ", Height: " << rhs.height << " Size: " << std::endl;
-    }
-
-    std::ostream& operator<<(std::ostream& lhs, const sf::Vector2<float>& rhs)
-    {
-        return lhs << "X: " << rhs.x << " Y: " << rhs.y << std::endl;
-    };
+    return lhs << "X: " << rhs.x << " Y: " << rhs.y << std::endl;
 }
+
+std::ostream& operator<<(std::ostream& lhs, const sf::IntRect& rhs)
+{
+    return lhs << "Size: " << rhs.getSize()
+        << "Height: " << rhs.height
+        << " Width: " << rhs.width
+        << " Top: " << rhs.top
+        << " Left:" << rhs.left
+        << std::endl << "Position: " << rhs.getPosition() << std::endl;
+}
+
+std::ostream& operator<<(std::ostream& lhs, const sf::FloatRect& rhs)
+{
+    return lhs << "Left: " << rhs.left
+        << ", Top: " << rhs.top
+        << ", Width: " << rhs.width
+        << ", Height: " << rhs.height << " Size: " << std::endl;
+}
+
+std::ostream& operator<<(std::ostream& lhs, const sf::Vector2<float>& rhs)
+{
+    return lhs << "X: " << rhs.x << " Y: " << rhs.y << std::endl;
+};

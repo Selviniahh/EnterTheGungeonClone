@@ -15,7 +15,7 @@ namespace ETG
         // Initialize common position and textures
         this->Position = Position;
         
-        if (!GunTexture) GunTexture = std::make_shared<sf::Texture>();
+        if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ProjTexture) ProjTexture = std::make_shared<sf::Texture>();
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ArrowTex) ArrowTex = std::make_shared<sf::Texture>();
@@ -70,7 +70,7 @@ namespace ETG
 
         // Update gun animation.
         AnimationComp->Update(CurrentGunState, CurrentGunState);
-        GunTexture = AnimationComp->CurrentTex;
+        Texture = AnimationComp->CurrentTex;
 
         // Update muzzle flash position and animation.
         MuzzleFlashPos = arrowPos + RotateVector(MuzzleFlashOffset);

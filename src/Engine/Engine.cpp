@@ -5,6 +5,9 @@
 #include "../Characters/Hero.h"
 #include "../Managers/GameManager.h"
 #include "../Managers/InputManager.h"
+#include "../Managers/TypeRegistry.h"
+#include "UI/EngineUI.h"
+#include "UI/ModalManager.h"
 
 bool Engine::CurrentGameFocus = false;
 bool Engine::PreviousGameFocus = false;
@@ -18,10 +21,11 @@ void Engine::Initialize()
     if (!ImGui::SFML::Init(*Window)) throw std::runtime_error("Cannot initialize ImGUI with the given Window");
 
     GameState::GetInstance().SetEngineUISize(windowSize);
-    windowSize = {300, (float)(Window->getSize().y)};
+    windowSize = {400, (float)(Window->getSize().y)};
     std::cout << std::unitbuf;
 
     LoadFont();
+    TypeRegistry::InitializeTypeRegistry();
 }
 
 void Engine::Update()
@@ -30,9 +34,11 @@ void Engine::Update()
     ImGui::SFML::Update(*Window, ElapsedTimeClock);
 
     // Begin a new ImGui window docked to the right
-    ImGui::SetNextWindowPos(ImVec2((float)Window->getSize().x - windowSize.x, 0));
-    ImGui::SetNextWindowSize(ImVec2(windowSize));
+    // Only set position and size when first creating the window
+    ImGui::SetNextWindowPos(ImVec2((float)Window->getSize().x - windowSize.x, 0), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(windowSize), ImGuiCond_FirstUseEver);
 
+    // Use no flags to allow all default window behaviors (dragging, resizing)
     ImGui::Begin("Details Pane", nullptr);
     UpdateDetailsPanel();
 
@@ -80,11 +86,11 @@ void Engine::UpdateDetailsPanel()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
     //Game object pane
-    if (ImGui::CollapsingHeader("Game Objects", ImGuiTreeNodeFlags_None))
+    if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_None))
     {
         // Assuming Scene is the root object.
         GameObjectBase* sceneObj = GameState::GetInstance().GetSceneObj();
-        DrawGameObject(sceneObj);
+        DisplayHierarchy(sceneObj);
     }
 
     //NOTE: Open the details pane by default
@@ -101,7 +107,7 @@ void Engine::UpdateDetailsPanel()
 }
 
 
-void Engine::DrawGameObject(GameObjectBase* object)
+void Engine::DisplayHierarchy(GameObjectBase* object)
 {
     ImGui::PushID(object);
 
@@ -139,7 +145,7 @@ void Engine::DrawGameObject(GameObjectBase* object)
         {
             if (sceneObj->Owner == object)
             {
-                DrawGameObject(sceneObj);
+                DisplayHierarchy(sceneObj);
             }
         }
 
@@ -149,9 +155,9 @@ void Engine::DrawGameObject(GameObjectBase* object)
     ImGui::PopID();
 }
 
-void Engine::DisplayProperties()
+void Engine::DisplayProperties() const
 {
-    if (SelectedObj != nullptr && SelectedObj->IsDrawable)
+    if (SelectedObj != nullptr)
     {
         if (ImGui::TreeNode("Absolute Orientation"))
         {
@@ -162,6 +168,13 @@ void Engine::DisplayProperties()
         if (ImGui::TreeNode("Relative Orientation"))
         {
             ImGuiSetRelativeOrientation(SelectedObj);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Properties"))
+        {
+            TypeRegistry::ProcessObject(SelectedObj);
+            SelectedObj->PopulateSpecificWidgets();
             ImGui::TreePop();
         }
     }

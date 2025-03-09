@@ -1,7 +1,5 @@
 #pragma once
-#include <unordered_map>
 #include <unordered_set>
-
 #include "../Core/GameObjectBase.h"
 
 struct ImFont;
@@ -13,7 +11,7 @@ public:
     void Initialize();
     void Update();
     void Draw();
-    void DisplayProperties();
+    void DisplayProperties() const;
     static bool IsGameWindowFocused();
 
     static bool CurrentGameFocus;
@@ -27,7 +25,7 @@ private:
 
     //By default first time the argument will be scene. After that other objects that has been attached stuffs will be passed.
     //Used recursive depth-first (pre-order) tree traversal
-    void DrawGameObject(ETG::GameObjectBase* object);
+    void DisplayHierarchy(ETG::GameObjectBase* object);
 
     ImFont* SegoeFont{};
     sf::Vector2f windowSize;

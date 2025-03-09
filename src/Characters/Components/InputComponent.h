@@ -3,13 +3,14 @@
 #include "../../Core/ComponentBase.h"
 #include "../../Utils/DirectionUtils.h"
 #include "../../Core/GameObjectBase.h"
+
 namespace ETG
 {
     struct PairHash;
     enum class Direction;
     enum class DashEnum;
     class Hero;
-    
+
     class InputComponent : public ComponentBase
     {
     public:
@@ -19,8 +20,15 @@ namespace ETG
 
         static DashEnum GetDashDirectionEnum();
 
+        void PopulateSpecificWidgets() override;
+
     private:
         std::unordered_map<std::pair<int, int>, Direction, PairHash> DirectionMap{};
         void UpdateDirection(Hero& hero) const;
+
+        BOOST_DESCRIBE_CLASS(InputComponent, (ComponentBase),
+            (),
+            (),
+            ())
     };
 }

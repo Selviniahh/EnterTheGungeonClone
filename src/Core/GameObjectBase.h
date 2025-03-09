@@ -2,6 +2,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <boost/describe.hpp>
+#include <boost/mp11/algorithm.hpp>
 #include "../Utils/Interface/IAnimationComponent.h"
 
 namespace ETG
@@ -20,22 +22,11 @@ namespace ETG
 
         //Push back every GameObject to the SceneObj during initialization.  
         GameObjectBase();
-
         virtual ~GameObjectBase();
-
-        virtual void Initialize()
-        {
-        }
-
-        virtual void Draw()
-        {
-        }
-
+        virtual void Initialize();
+        virtual void Draw();
         virtual void Update();
-
-        std::string ObjectName{"Default"};
-        std::shared_ptr<sf::Texture> Texture;
-
+        
         //Base position of GameObjects
         //Inherited Objects such as Gun's position will be attached to hand pos in tick. After the object manipulations are completed, the relative offsets needs given in UI needs to be applied
         //and result will be stored in FinalPos, FinalRot etc. Final properties will be drawn.    
@@ -65,14 +56,21 @@ namespace ETG
         //Contains the final drawing properties. 
         DrawProperties DrawProps;
 
+        //The typename without any increment
+        std::string TypeName{};
+
         void ComputeDrawProperties();
+        void VisualizeOrigin() const;
         void IncrementName();
 
     public:
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
-        bool IsDrawable = true;
-
+        bool DrawBound = true;
+        bool DrawOriginPoint = true;
+        std::string ObjectName{"Default"};
+        std::shared_ptr<sf::Texture> Texture;
+        
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
         virtual std::string& GetObjectName() { return ObjectName; }
@@ -82,6 +80,7 @@ namespace ETG
         [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
         [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
         [[nodiscard]] const sf::Vector2f& GetOrigin() const { return Origin; }
+        [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
 
         void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
@@ -92,15 +91,23 @@ namespace ETG
         IAnimationComponent* GetAnimationInterface() { return AnimInterface; } //Never used yet
         
         // Bounds methods
-        [[nodiscard]] virtual sf::FloatRect GetBounds() const;
-        virtual void DrawBounds(sf::Color color = sf::Color::Red) const;
-        
+        [[nodiscard]] sf::FloatRect GetBounds() const;
+        void DrawBounds(sf::Color color = sf::Color::Red) const;
+
         //If same named object constructed before, differentiate it with appending a number end of the name
         //ex: BaseProjectile BaseProjectile2 BaseProjectile3 
         std::string SetObjectNameToSelfClassName();
 
+        virtual void PopulateSpecificWidgets();
+        
+
         //Friend classes for Engine UI
         friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
+
+        BOOST_DESCRIBE_CLASS(GameObjectBase,(),
+            (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound),
+            (Origin, Depth),
+            ())
     };
 }

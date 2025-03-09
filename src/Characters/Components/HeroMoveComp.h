@@ -1,8 +1,9 @@
 #pragma once
 #include "../../Core/Components/BaseMoveComp.h"
 
-namespace ETG {
-    class Hero;  // Forward-declare the hero.
+namespace ETG
+{
+    class Hero; // Forward-declare the hero.
 
     class HeroMoveComp : public BaseMoveComp
     {
@@ -17,5 +18,7 @@ namespace ETG {
 
         // Pointer to the associated Hero (set from GameState or elsewhere).
         Hero* HeroPtr = nullptr;
+
+        BOOST_DESCRIBE_CLASS(HeroMoveComp, (BaseMoveComp), (HeroPtr), (), ())
     };
 }

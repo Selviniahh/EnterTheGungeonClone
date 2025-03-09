@@ -9,6 +9,8 @@
 #include "Components/InputComponent.h"
 #include "../Managers/Globals.h"
 #include "../Utils/TextureUtils.h"
+#include "../Utils/StrManipulateUtil.h"
+
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -64,6 +66,7 @@ void ETG::Hero::Update()
 
 void ETG::Hero::Draw()
 {
+    GameObjectBase::Draw();
     RogueSpecial->Draw();
 
     auto& DrawProps = GetDrawProperties();
@@ -71,10 +74,8 @@ void ETG::Hero::Draw()
     // Hero self animation draw - using specialized Draw method from HeroAnimComp
     AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);
     SpriteBatch::SimpleDraw(HandTex, HandPos);
-    Globals::DrawSinglePixelAtLoc(DrawProps.Position);
-
     // Debug bounds drawing - now using base class method
-    DrawBounds();
+    // DrawBounds();
 }
 
 void ETG::Hero::SetHandTexLoc()

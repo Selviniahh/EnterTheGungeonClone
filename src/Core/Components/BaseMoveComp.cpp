@@ -3,7 +3,7 @@
 #include "../../Utils/Math.h"
 
 BaseMoveComp::BaseMoveComp(float maxSpeed, float acceleration, float deceleration)
-    : MaxSpeed(maxSpeed),
+    : ComponentBase(), MaxSpeed(maxSpeed),
       Acceleration(acceleration),
       Deceleration(deceleration),
       Velocity(0.f, 0.f)

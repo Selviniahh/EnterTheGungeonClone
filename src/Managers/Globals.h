@@ -4,7 +4,10 @@
 #include <filesystem>
 
 //A forward declaration I've never seen before
-namespace ETG {class SpriteBatch;}
+namespace ETG
+{
+    class SpriteBatch;
+}
 
 namespace ETG::Globals
 {
@@ -28,16 +31,12 @@ namespace ETG::Globals
 
     //Initialize global variables
     void Initialize(const std::shared_ptr<sf::RenderWindow>& window);
-    
-    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, sf::Vector2i scale = {1,1}, float rotation = 0);
 
+    bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, sf::Vector2i scale = {1, 1}, float rotation = 0);
 }
 
-namespace ETG
-{
-    //Operator overloads
-    std::ostream& operator<<(std::ostream& lhs, const sf::Vector2<int>& rhs);
-    std::ostream& operator<<(std::ostream& lhs, const sf::IntRect& rhs);
-    std::ostream operator<<(const std::ostream& lhs, const sf::Vector2<float>& rhs);
-    std::ostream& operator<<(std::ostream& lhs, const sf::FloatRect& rhs);
-}
+//Operator overloads
+std::ostream& operator<<(std::ostream& lhs, const sf::Vector2<int>& rhs);
+std::ostream& operator<<(std::ostream& lhs, const sf::IntRect& rhs);
+std::ostream& operator<<(const std::ostream& lhs, const sf::Vector2<float>& rhs);
+std::ostream& operator<<(std::ostream& lhs, const sf::FloatRect& rhs);

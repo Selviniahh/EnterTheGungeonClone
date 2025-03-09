@@ -20,5 +20,7 @@ namespace ETG
 
     private:
         Hero* HeroPtr = nullptr;
+
+        BOOST_DESCRIBE_CLASS(HeroAnimComp, (BaseAnimComp), (HeroPtr), (), ())
     };
 }

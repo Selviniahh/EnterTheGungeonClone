@@ -9,9 +9,10 @@ namespace ETG
     public:
         ComponentBase()
         {
-            IsDrawable = false;
         }
 
         ~ComponentBase() override = default;
+
+        BOOST_DESCRIBE_CLASS(ComponentBase,(GameObjectBase),(),(),())
     };
 }
