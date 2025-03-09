@@ -4,7 +4,7 @@
 
 #include "BaseHealthComp.h"
 
-BaseHealthComp::BaseHealthComp(const float MaxHealth) : Damaged(false), Timer(0), IsDead(false), MaxHealth(MaxHealth)
+BaseHealthComp::BaseHealthComp(const float MaxHealth) : ComponentBase(), Damaged(false), Timer(0), IsDead(false), MaxHealth(MaxHealth)
 {
 }
 

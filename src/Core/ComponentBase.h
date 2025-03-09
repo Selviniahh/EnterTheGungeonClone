@@ -12,5 +12,7 @@ namespace ETG
         }
 
         ~ComponentBase() override = default;
+
+        BOOST_DESCRIBE_CLASS(ComponentBase,(GameObjectBase),(),(),())
     };
 }

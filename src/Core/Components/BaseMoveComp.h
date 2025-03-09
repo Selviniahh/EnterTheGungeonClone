@@ -21,4 +21,6 @@ public:
     // inputDir: the desired movement direction (zero vector if none).
     // position: reference to the object's position, which will be updated.
     void UpdateMovement(const sf::Vector2f& inputDir, sf::Vector2f& position);
+
+    BOOST_DESCRIBE_CLASS(BaseMoveComp, (ComponentBase), (MaxSpeed, Acceleration, Deceleration, Velocity), (), ())
 };

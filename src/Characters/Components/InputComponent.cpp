@@ -1,16 +1,14 @@
 #include "InputComponent.h"
 #include <imgui.h>
 #include "../Hero.h"
-#include "../../Engine/UI/ModalManager.h"
 #include "../../Managers/InputManager.h"
 #include "../../Utils/DirectionUtils.h"
 #include "../../Utils/Math.h"
 #include "../../Utils/StrManipulateUtil.h"
 
-
 namespace ETG
 {
-    InputComponent::InputComponent()
+    InputComponent::InputComponent(): ComponentBase()
     {
         DirectionUtils::PopulateDirectionRanges(DirectionMap);
         // SetObjectNameToSelfClassName();

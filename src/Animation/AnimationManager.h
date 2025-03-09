@@ -67,7 +67,6 @@ public:
 
     std::shared_ptr<sf::Texture> LastTexture;
 
-public:
     // Add an animation to the dictionary
     template <typename T>
     void AddAnimation(T key, const Animation& animation);

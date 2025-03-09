@@ -9,7 +9,10 @@
 #include "../Characters/Hero.h"
 #include "../Core/Scene/Scene.h"
 #include "../Characters/Components/InputComponent.h"
+#include "../Core/Components/BaseMoveComp.h"
 #include "../Engine/Reflection.h"
+#include "../Characters/Components/HeroMoveComp.h"
+#include "../Characters/Components/HeroAnimComp.h"
 
 namespace ETG
 {
@@ -76,11 +79,16 @@ namespace ETG
 
         static void InitializeTypeRegistry()
         {
+            //It doesn't matter to add or not the base class if child is added
+            RegisterType<GameObjectBase>(); 
+            RegisterType<ComponentBase>();
             RegisterType<Scene>();
             RegisterType<Hero>();
-            RegisterType<GameObjectBase>();
             RegisterType<UserInterface>();
             RegisterType<InputComponent>();
+            RegisterType<HeroMoveComp>();
+            // RegisterType<BaseAnimComp<HeroStateEnum>>();
+            RegisterType<HeroAnimComp>();
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;

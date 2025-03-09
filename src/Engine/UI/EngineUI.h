@@ -67,6 +67,17 @@ namespace ETG
     template<typename T>
     void ShowImGuiWidgetImpl(const char* label, T& value, std::false_type)
     {
+        //If the value is child of GameObject. Try to downcast and try again. If not there's no other implementation given
+        if constexpr (std::is_convertible_v<T,GameObjectBase*>)
+        {
+            if (auto* child = dynamic_cast<GameObjectBase*>(value))
+            {
+                ShowImGuiWidget<GameObjectBase*>(label, child);
+                return;
+            }    
+        }
+        
+        
         const std::string ErrorMessage = "Non enum Typename: " + boost::typeindex::type_id<T>().pretty_name() + " and variable name " + label + " not found. "
             "Did you define a specialized template in EngineUI.cpp for this typename?";
         std::cerr << ErrorMessage << std::endl;

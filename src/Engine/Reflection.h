@@ -8,6 +8,14 @@
 class Reflection
 {
 public:
+    //does type has any members
+    template<class T,
+    class Md = boost::describe::describe_members<T, boost::describe::mod_any_access>>
+    static constexpr bool HasMembers()
+    {
+        return boost::mp11::mp_size<Md>::value > 0;
+    }
+    
     //Bases:
     template <class T,
               class Bd = boost::describe::describe_bases<T, boost::describe::mod_any_access>,
@@ -16,13 +24,23 @@ public:
     {
         boost::mp11::mp_for_each<Bd>([&]<typename T0>(T0)
         {
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Base Properties"))
+            using BTN = typename T0::type;
+
+            //If the current base has any members, create treenode
+            if constexpr (HasMembers<BTN>())
             {
-                using BTN = typename T0::type;
-                auto parentType = boost::typeindex::type_id<BTN>().pretty_name(); //just for test
+                ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+                if (ImGui::TreeNode("Base Properties"))
+                {
+                    auto parentType = boost::typeindex::type_id<BTN>().pretty_name(); //just for test
+                    PopulateReflection((BTN const&)t);
+                    ImGui::TreePop();
+                }    
+            }
+            //If not simply continue without tree node
+            else
+            {
                 PopulateReflection((BTN const&)t);
-                ImGui::TreePop();
             }
         });
 

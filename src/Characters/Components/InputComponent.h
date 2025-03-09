@@ -26,7 +26,7 @@ namespace ETG
         std::unordered_map<std::pair<int, int>, Direction, PairHash> DirectionMap{};
         void UpdateDirection(Hero& hero) const;
 
-        BOOST_DESCRIBE_CLASS(InputComponent, (GameObjectBase),
+        BOOST_DESCRIBE_CLASS(InputComponent, (ComponentBase),
             (),
             (),
             ())
