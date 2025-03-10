@@ -40,6 +40,7 @@ void ETG::RogueSpecial::Initialize()
 
 ETG::RogueSpecialAnimComp::RogueSpecialAnimComp()
 {
+    IsGameObjectUISpecified = true;
     RogueSpecialAnimComp::SetAnimations();
 }
 
@@ -80,4 +81,9 @@ void ETG::RogueSpecialAnimComp::SetAnimations()
         });
     }
     AnimManagerDict[GunStateEnum::Reload] = ReloadAnimManager;
+}
+
+void ETG::RogueSpecialAnimComp::PopulateSpecificWidgets()
+{
+    BaseAnimComp<GunStateEnum>::PopulateSpecificWidgets();
 }

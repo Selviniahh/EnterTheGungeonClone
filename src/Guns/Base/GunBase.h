@@ -3,6 +3,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "GunBase.h"
+#include <boost/describe.hpp>
 #include "../../Animation/Animation.h"
 #include "../../Core/GameObjectBase.h"
 #include "../../Managers/StateEnums.h"
@@ -58,5 +59,10 @@ namespace ETG
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
         GunStateEnum CurrentGunState{GunStateEnum::Idle};
+
+        BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase), (),
+            (ProjTexture,muzzleFlashAnim, MuzzleFlashEachFrameSpeed, MuzzleFlashPos , MuzzleFlashOffset, pressTime, velocity, maxProjectileRange, timerForVelocity, isAttacking, OriginOffset, ArrowTex,
+                arrowOffset, arrowOrigin, arrowOriginOffset, arrowPos),
+            ())         //TODO: Is it worth to bother with exposing projectiles array to UI? 
     };
 }

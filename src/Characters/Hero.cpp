@@ -7,9 +7,7 @@
 #include "Components/HeroAnimComp.h"
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
-#include "../Managers/Globals.h"
 #include "../Utils/TextureUtils.h"
-#include "../Utils/StrManipulateUtil.h"
 
 
 float ETG::Hero::MouseAngle = 0;

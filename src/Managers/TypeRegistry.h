@@ -13,6 +13,9 @@
 #include "../Engine/Reflection.h"
 #include "../Characters/Components/HeroMoveComp.h"
 #include "../Characters/Components/HeroAnimComp.h"
+#include "../Guns/Base/GunBase.h"
+#include "../Guns/RogueSpecial/RogueSpecial.h"
+#include "../Projectile/ProjectileBase.h"
 
 namespace ETG
 {
@@ -93,6 +96,10 @@ namespace ETG
             RegisterType<HeroMoveComp>();
             RegisterType<Animation>();
             RegisterType<HeroAnimComp>();
+            RegisterType<GunBase>();
+            RegisterType<RogueSpecial>();
+            RegisterType<RogueSpecialAnimComp>();
+            RegisterType<ProjectileBase>();
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;
