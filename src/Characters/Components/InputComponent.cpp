@@ -8,8 +8,9 @@
 
 namespace ETG
 {
-    InputComponent::InputComponent(): ComponentBase()
+    InputComponent::InputComponent()
     {
+        IsGameObjectUISpecified = true;
         DirectionUtils::PopulateDirectionRanges(DirectionMap);
         // SetObjectNameToSelfClassName();
     }
@@ -47,6 +48,7 @@ namespace ETG
     void InputComponent::PopulateSpecificWidgets()
     {
         ComponentBase::PopulateSpecificWidgets();
+        IsGameObjectUISpecified = true;
 
         //Modify Direction map as table 
         if (ImGui::TreeNode("DirectionMap"))

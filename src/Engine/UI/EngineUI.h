@@ -5,7 +5,11 @@
 #include <memory>
 #include <boost/type_index.hpp>
 #include <SFML/System/Vector2.hpp>
+
+#include "UIUtils.h"
 #include "../../Utils/StrManipulateUtil.h"
+
+class Animation;
 
 namespace sf
 {
@@ -15,9 +19,8 @@ namespace sf
 namespace ETG
 {
     class GameObjectBase;
+    using namespace UIUtils;
 
-    void BeginProperty(const char* label);
-    void EndProperty();
 
     //Base template forwards to the appropriate implementation
     template <typename T>
@@ -46,7 +49,26 @@ namespace ETG
     //float
     template <>
     void ShowImGuiWidget<float>(const char* label, float& value);
-    
+
+    //Animation
+    template <>
+    void ShowImGuiWidget<Animation>(const char* label, Animation& value);
+
+    //sf::Rect<int>
+    template <>
+    void ShowImGuiWidget<sf::Rect<int>>(const char* label, sf::Rect<int>& value);
+
+    //AnimationManager
+    template <>
+    void ShowImGuiWidget<AnimationManager>(const char* label, AnimationManager& value);
+
+    template <typename T>
+    void ShowImGuiWidgetImpl(const char* label, T& value, std::false_type);
+
+    //default implementation for enums
+    template <typename T>
+    void ShowImGuiWidgetImpl(const char* label, T& value, std::true_type);
+
     class EngineUI
     {
     public:
@@ -60,39 +82,36 @@ namespace ETG
     template <typename T>
     void ShowImGuiWidget(const char* label, T& value)
     {
-        ShowImGuiWidgetImpl(label,value, std::is_enum<T>{});
+        ShowImGuiWidgetImpl(label, value, std::is_enum<T>{});
     }
 
     //Implementation for non-enum types. If non defined non enum exposed to UI, this template spceialization will be executed
-    template<typename T>
+    template <typename T>
     void ShowImGuiWidgetImpl(const char* label, T& value, std::false_type)
     {
         //If the value is child of GameObject. Try to downcast and try again. If not there's no other implementation given
-        if constexpr (std::is_convertible_v<T,GameObjectBase*>)
+        if constexpr (std::is_convertible_v<T, GameObjectBase*>)
         {
             if (auto* child = dynamic_cast<GameObjectBase*>(value))
             {
                 ShowImGuiWidget<GameObjectBase*>(label, child);
                 return;
-            }    
+            }
         }
-        
-        
+
         const std::string ErrorMessage = "Non enum Typename: " + boost::typeindex::type_id<T>().pretty_name() + " and variable name " + label + " not found. "
             "Did you define a specialized template in EngineUI.cpp for this typename?";
         std::cerr << ErrorMessage << std::endl;
-        
+
         ImGui::Text(ErrorMessage.c_str());
     }
 
     //default implementation for enums
-    template<typename T>
+    template <typename T>
     void ShowImGuiWidgetImpl(const char* label, T& value, std::true_type)
     {
         BeginProperty(label);
         ImGui::Text(EnumToString(value));
         EndProperty();
     }
-
-    
 }

@@ -17,6 +17,7 @@ namespace ETG
     HeroAnimComp::HeroAnimComp()
     {
         HeroPtr = GameState::GetInstance().GetHero();
+        IsGameObjectUISpecified = true;
         HeroAnimComp::SetAnimations();
     }
 

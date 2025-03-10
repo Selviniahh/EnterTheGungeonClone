@@ -1,18 +1,21 @@
 #pragma once
 #include <SFML/Graphics/Texture.hpp>
 #include <memory>
+#include <boost/describe/class.hpp>
 
-class Animation
+#include "../Core/GameClass.h"
+
+class Animation : public GameClass
 {
 private:
-    float EachFrameSpeed;
     float AnimTimeLeft;
     int CurrentFrame = 0;
     int FrameX;
     int FrameY;
-    mutable std::vector<std::shared_ptr<sf::Texture>> textureCache; 
+    mutable std::vector<std::shared_ptr<sf::Texture>> textureCache;
 
 public:
+    float EachFrameSpeed;
     sf::IntRect CurrRect;
     std::shared_ptr<sf::Texture> Texture;
     sf::Vector2f Origin;
@@ -45,4 +48,6 @@ public:
     //Omit FileName's last number. If file's name is "SpriteSheet_001" Give "SpriteSheet_00"
     //There's no Y axis sprite sheet creation. Only X 
     static Animation CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, float eachFrameSpeed, bool IsSingleSprite = false);
+
+    BOOST_DESCRIBE_CLASS(Animation, (GameClass), (CurrRect, Texture, Origin, FrameRects, IsValid, flipX, Active), (), (EachFrameSpeed))
 };

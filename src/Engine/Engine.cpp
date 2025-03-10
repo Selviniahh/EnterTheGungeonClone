@@ -7,10 +7,13 @@
 #include "../Managers/InputManager.h"
 #include "../Managers/TypeRegistry.h"
 #include "UI/EngineUI.h"
-#include "UI/ModalManager.h"
 
 bool Engine::CurrentGameFocus = false;
 bool Engine::PreviousGameFocus = false;
+
+bool Engine::AbsoluteOrientationOpen = false;
+bool Engine::RelativeOrientationOpen = false;
+bool Engine::PropertiesOpen = false;
 
 using namespace ETG::Globals;
 using namespace ETG;
@@ -159,24 +162,39 @@ void Engine::DisplayProperties() const
 {
     if (SelectedObj != nullptr)
     {
-        if (ImGui::TreeNode("Absolute Orientation"))
+        //Display the Absolute and Relative orientation only if the SelectedObj is not inherited from ComponentBase
+        if (!dynamic_cast<ComponentBase*>(SelectedObj))
         {
-            ImGuiSetAbsoluteOrientation(SelectedObj);
-            ImGui::TreePop();
+            if (ImGui::TreeNode("Absolute Orientation"))
+            {
+                ImGuiSetAbsoluteOrientation(SelectedObj);
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Relative Orientation"))
+            {
+                ImGuiSetRelativeOrientation(SelectedObj);
+                ImGui::TreePop();
+            }
         }
 
-        if (ImGui::TreeNode("Relative Orientation"))
-        {
-            ImGuiSetRelativeOrientation(SelectedObj);
-            ImGui::TreePop();
-        }
-
+        //Use stored state for properties tree node
+        ImGui::SetNextItemOpen(PropertiesOpen);
         if (ImGui::TreeNode("Properties"))
         {
+            PropertiesOpen = true;
             TypeRegistry::ProcessObject(SelectedObj);
-            SelectedObj->PopulateSpecificWidgets();
+
+            if (SelectedObj->IsGameObjectUISpecified && ImGui::TreeNode("Current Object"))
+            {
+                SelectedObj->PopulateSpecificWidgets();
+                ImGui::TreePop();                
+            }
+            
             ImGui::TreePop();
         }
+        else
+            PropertiesOpen = false;
     }
 }
 

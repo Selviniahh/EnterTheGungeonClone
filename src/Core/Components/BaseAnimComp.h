@@ -4,7 +4,6 @@
 #include "../../Utils/Interface/IAnimationComponent.h"
 #include <memory>
 
-
 namespace ETG
 {
     enum class HeroStateEnum;
@@ -29,6 +28,7 @@ namespace ETG
         void Update(const StateEnum& stateEnum, const AnimationKey& animKey);
         virtual void Draw(const sf::Vector2f& position);
         virtual void Draw(sf::Vector2f position, sf::Vector2f Origin, sf::Vector2f Scale, float Rotation, float depth);
+        void PopulateSpecificWidgets() override;
 
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
@@ -43,8 +43,10 @@ namespace ETG
         StateEnum CurrentState;
         AnimationKey CurrentAnimStateKey;
 
-        BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (RelativeOrigin, CurrentTex), (), ()) //CurrTexRect, AnimManagerDict, CurrentState, CurrentAnimStateKey
+
+        BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (CurrTexRect, RelativeOrigin), (), ())
     };
+    //-------------------------------------------------------------Definition-------------------------------------------------------------
 
     template <typename StateEnum>
     void BaseAnimComp<StateEnum>::Update(const StateEnum& stateEnum, const AnimationKey& animKey)
