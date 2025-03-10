@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/describe.hpp>
 #include "../../Core/Components/BaseAnimComp.h"
 #include "../Base/GunBase.h"
 
@@ -10,6 +11,8 @@ namespace ETG
     public:
         RogueSpecialAnimComp();
         void SetAnimations() override;
+        void PopulateSpecificWidgets() override;
+        BOOST_DESCRIBE_CLASS(RogueSpecialAnimComp, (BaseAnimComp), (), (), ())
     };
     
     class RogueSpecial : public GunBase
@@ -19,5 +22,7 @@ namespace ETG
         ~RogueSpecial() override = default;
 
         void Initialize() override;
+
+        BOOST_DESCRIBE_CLASS(RogueSpecial, (GunBase), (), (), ())
     };
 }

@@ -8,6 +8,7 @@
 #include <memory>
 #include "Animation.h"
 #include "../Managers/StateEnums.h"
+#include "boost/describe.hpp"
 
 template <typename>
 struct always_false : std::false_type
@@ -56,7 +57,7 @@ struct AnimationKeyEqual
     }
 };
 
-class AnimationManager
+class AnimationManager : GameClass
 {
 public:
     using AnimationMap = std::unordered_map<AnimationKey, Animation, AnimationKeyHash, AnimationKeyEqual>;
@@ -64,6 +65,8 @@ public:
 
     // For storing whichever key was last used
     AnimationKey LastKey;
+
+    Animation* CurrentAnim = nullptr;
 
     std::shared_ptr<sf::Texture> LastTexture;
 
@@ -90,6 +93,8 @@ public:
 
     // Check if the current animation has finished
     bool IsAnimationFinished();
+
+    BOOST_DESCRIBE_CLASS(AnimationManager, (GameClass), (CurrentAnim, AnimationDict, LastKey), (), ())
 };
 
 // <---------- Implementation ---------->
@@ -106,14 +111,14 @@ void AnimationManager::AddAnimation(T key, const Animation& animation)
 template <typename T>
 void AnimationManager::Update(T key)
 {
-    const AnimationKey variantKey = AnimationKey(key);
+    const auto variantKey = AnimationKey(key);
 
     // If the animation key exists
     if (AnimationDict.contains(variantKey))
     {
-        Animation& anim = AnimationDict[variantKey];
-        LastTexture = anim.Texture;
-        anim.Update();
+        CurrentAnim = &AnimationDict[variantKey];
+        LastTexture = CurrentAnim->Texture;
+        CurrentAnim->Update();
         LastKey = variantKey;
     }
     else

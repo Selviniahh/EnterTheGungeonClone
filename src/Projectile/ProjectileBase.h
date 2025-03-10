@@ -13,4 +13,6 @@ public:
 
     sf::Vector2f ProjVelocity;
     float MaxProjectileRang;
+
+    BOOST_DESCRIBE_CLASS(ProjectileBase, (GameObjectBase), (ProjVelocity, MaxProjectileRang), (), ())
 };

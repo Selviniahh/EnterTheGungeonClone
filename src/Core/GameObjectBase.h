@@ -4,11 +4,13 @@
 #include <memory>
 #include <boost/describe.hpp>
 #include <boost/mp11/algorithm.hpp>
+
+#include "GameClass.h"
 #include "../Utils/Interface/IAnimationComponent.h"
 
 namespace ETG
 {
-    class GameObjectBase
+    class GameObjectBase : public GameClass
     {
     protected:
         struct DrawProperties
@@ -68,6 +70,7 @@ namespace ETG
         GameObjectBase* Owner = nullptr;
         bool DrawBound = true;
         bool DrawOriginPoint = true;
+        bool IsGameObjectUISpecified = false;
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;
         
@@ -105,7 +108,7 @@ namespace ETG
         friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
-        BOOST_DESCRIBE_CLASS(GameObjectBase,(),
+        BOOST_DESCRIBE_CLASS(GameObjectBase,(GameClass),
             (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound),
             (Origin, Depth),
             ())

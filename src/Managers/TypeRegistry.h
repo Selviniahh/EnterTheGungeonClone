@@ -13,37 +13,43 @@
 #include "../Engine/Reflection.h"
 #include "../Characters/Components/HeroMoveComp.h"
 #include "../Characters/Components/HeroAnimComp.h"
+#include "../Guns/Base/GunBase.h"
+#include "../Guns/RogueSpecial/RogueSpecial.h"
+#include "../Projectile/ProjectileBase.h"
 
 namespace ETG
 {
     class TypeRegistry
     {
     public:
-        // Register a specific type for reflection
+        // Register a specific type for reflection.
+        //NOTE: the given T doesn't have to be GameObject or Comp anymore. Utility classes like Animation or AnimManager also can be registered to reflection. 
         template <typename T>
         static void RegisterType()
         {
             // Store the type info for later lookup
-            RegisteredTypes[std::type_index(typeid(T))] = TypeData{
-                std::type_index(typeid(T)),
-                [](GameObjectBase* obj)
-                {
-                    static_assert(std::is_base_of_v<GameObjectBase, T>, "The object T is not child of GameObjectBase");
-
-                    // Convert obj to be the type of T. I know T is child of GameObjectBase
-                    if (auto* Child = dynamic_cast<T*>(obj))
+            RegisteredTypes[std::type_index(typeid(T))] =
+                TypeData{
+                    std::type_index(typeid(T)),
+                    [](GameClass* obj)
                     {
-                        Reflection::PopulateReflection<T>(*Child);
-                        return true;
+                        if constexpr (std::is_base_of_v<GameObjectBase, T>)
+                        {
+                            // Convert obj to be the type of T. T is child of GameObjectBase
+                            if (auto* Child = dynamic_cast<T*>(obj))
+                            {
+                                Reflection::PopulateReflection<T>(*Child);
+                                return true;
+                            }
+                        }
+                       
+                        return false;
                     }
-
-                    return false;
-                }
-            };
+                };
         }
 
         //Process an object using its runtime type
-        static bool ProcessObject(GameObjectBase* obj)
+        static bool ProcessObject(GameClass* obj)
         {
             if (!obj)
                 return false; // Changed from throwing exception to returning false
@@ -55,24 +61,24 @@ namespace ETG
             {
                 //After this line executed, if above handler function not delegated, there's a problem with given obj's type. Make sure it's only GameObject not any child of it.
                 //Before calling ProcessObject, upcast with dynamic_cast
-                return it->second.handler(obj); 
+                return it->second.handler(obj);
             }
 
             //Default to base class if no match
-            Reflection::PopulateReflection<GameObjectBase>(*obj);
+            Reflection::PopulateReflection<GameClass>(*obj);
             return true;
         }
 
         struct TypeData
         {
             std::type_index typeIdx;
-            std::function<bool(GameObjectBase*)> handler;
+            std::function<bool(GameClass*)> handler;
 
             TypeData() : typeIdx(typeid(void)), handler(nullptr)
             {
             }
 
-            TypeData(const std::type_index idx, std::function<bool(GameObjectBase*)> h) : typeIdx(idx), handler(std::move(h))
+            TypeData(const std::type_index idx, std::function<bool(GameClass*)> h) : typeIdx(idx), handler(std::move(h))
             {
             }
         };
@@ -80,15 +86,20 @@ namespace ETG
         static void InitializeTypeRegistry()
         {
             //It doesn't matter to add or not the base class if child is added
-            RegisterType<GameObjectBase>(); 
+            RegisterType<GameClass>();
+            RegisterType<GameObjectBase>();
             RegisterType<ComponentBase>();
             RegisterType<Scene>();
             RegisterType<Hero>();
             RegisterType<UserInterface>();
             RegisterType<InputComponent>();
             RegisterType<HeroMoveComp>();
-            // RegisterType<BaseAnimComp<HeroStateEnum>>();
+            RegisterType<Animation>();
             RegisterType<HeroAnimComp>();
+            RegisterType<GunBase>();
+            RegisterType<RogueSpecial>();
+            RegisterType<RogueSpecialAnimComp>();
+            RegisterType<ProjectileBase>();
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;

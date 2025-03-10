@@ -17,6 +17,11 @@ public:
     static bool CurrentGameFocus;
     static bool PreviousGameFocus;
 
+    // Add these static variables to maintain tree node states
+    static bool AbsoluteOrientationOpen;
+    static bool RelativeOrientationOpen;
+    static bool PropertiesOpen;
+
 private:
     void UpdateDetailsPanel();
     friend void ImGuiSetRelativeOrientation(ETG::GameObjectBase* obj);
@@ -30,6 +35,8 @@ private:
     ImFont* SegoeFont{};
     sf::Vector2f windowSize;
     ETG::GameObjectBase* SelectedObj = nullptr;
+
+    
 
     std::unordered_set<ETG::GameObjectBase*> OwnerObjects;
 };
