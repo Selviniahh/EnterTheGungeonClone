@@ -34,6 +34,8 @@ namespace ETG
             static_cast<float>(Texture->getSize().x / 2),
             static_cast<float>(Texture->getSize().y / 2)
         };
+
+        //The origin manually needs to be given because when gun rotating, it has to rotate around the attachment point which is the handle point of the gun. 
         this->Origin += OriginOffset;
 
         // Load the arrow texture (common for all guns).
@@ -87,6 +89,8 @@ namespace ETG
 
     void GunBase::Draw()
     {
+        GameObjectBase::Draw();
+        
         // Draw the gun.
         const auto& DrawProps = this->GetDrawProperties();
         AnimationComp->Draw(DrawProps.Position, DrawProps.Origin, DrawProps.Scale, DrawProps.Rotation, DrawProps.Depth);

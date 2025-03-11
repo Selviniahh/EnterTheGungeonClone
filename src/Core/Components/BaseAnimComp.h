@@ -20,11 +20,10 @@ namespace ETG
         {
             GameObjectBase::Initialize();
 
-            // Register with owner if we have one
-            if (Owner)
-            {
-                Owner->SetAnimationInterface(this);
-            }
+            if (!Owner) throw std::runtime_error("Owner cannot be empty. Every animation should be an owner game object.");
+            
+            // Register with owner
+            Owner->SetAnimationInterface(this);
         }
 
         virtual void SetAnimations();
@@ -35,6 +34,8 @@ namespace ETG
 
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
+
+        //TODO: This GetOrigin and all relative stuffs needs to go from here 
         [[nodiscard]] sf::Vector2f GetOrigin() const override { return RelativeOrigin; }
 
         sf::IntRect CurrTexRect;
@@ -49,6 +50,7 @@ namespace ETG
 
         BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (CurrentTex, CurrTexRect, RelativeOrigin), (), ())
     };
+
     //-------------------------------------------------------------Definition-------------------------------------------------------------
 
     template <typename StateEnum>
@@ -63,6 +65,7 @@ namespace ETG
         const auto& animState = animManager.AnimationDict[CurrentAnimStateKey];
         CurrTexRect = animState.CurrRect;
         CurrentTex = animState.GetCurrentFrameAsTexture();
+        Owner->Texture = CurrentTex;
         RelativeOrigin = animManager.AnimationDict[AnimManagerDict[CurrentState].LastKey].Origin;
     }
 

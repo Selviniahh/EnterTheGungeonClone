@@ -1,12 +1,13 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics.hpp>
 #include "../Core/GameObjectBase.h"
 #include "../Managers/StateEnums.h"
 #include "../Core/Factory.h"
 
 namespace ETG
 {
+    class GunBase;
+    class Hand;
     class RogueSpecial;
     class HeroAnimComp;
     class InputComponent;
@@ -15,36 +16,31 @@ namespace ETG
     class Hero : public GameObjectBase
     {
     public:
+        explicit Hero(sf::Vector2f Position);
+        ~Hero() override;
+        void Update() override;
+        void Initialize() override;
+        void Draw() override;
+        GunBase* GetCurrentHoldingGun() const;
+
         static float MouseAngle;
         static Direction CurrentDirection;
         static bool IsShooting;
 
-        explicit Hero(sf::Vector2f Position);
-        ~Hero() override;
-        void Update() override;
-        void Draw() override;
-
         HeroStateEnum CurrentHeroState{HeroStateEnum::Idle};
         bool IsDashing = false;
-
+        
         std::unique_ptr<RogueSpecial> RogueSpecial;
         std::unique_ptr<HeroMoveComp> MoveComp;
+        std::unique_ptr<Hand> Hand;
 
     private:
         std::unique_ptr<HeroAnimComp> AnimationComp;
         std::unique_ptr<InputComponent> InputComp;
-
-        std::shared_ptr<sf::Texture> HandTex;
-        sf::Vector2f HandPos;
-        sf::Vector2f RelativeHandLoc{8, 4};
-        sf::Vector2f RelativeGunOffsetPos{2,2};
-
-
-        void SetHandTexLoc();
-
+        
         BOOST_DESCRIBE_CLASS(Hero,(GameObjectBase),
-            (IsDashing, CurrentHeroState),
+            (MouseAngle, CurrentDirection, CurrentHeroState, IsDashing, IsDashing ),
             (),
-            (RelativeHandLoc, RelativeGunOffsetPos))
+            ())
     };
 }

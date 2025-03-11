@@ -61,6 +61,19 @@ void ETG::SpriteBatch::SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const
     GlobSpriteBatch.draw(frame, depth);
 }
 
+void ETG::SpriteBatch::Draw(const GameObjectBase::DrawProperties& DrawProperties)
+{
+    sf::Sprite frame;
+    frame.setTexture(*DrawProperties.Texture);
+    frame.setScale(DrawProperties.Scale);
+    frame.setPosition(DrawProperties.Position); // Position it at the specified location
+    frame.setRotation(DrawProperties.Rotation);
+    frame.setOrigin(DrawProperties.Origin);
+    frame.setColor(sf::Color::White);
+    GlobSpriteBatch.draw(frame, DrawProperties.Depth);
+
+}
+
 void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Color& color, float thickness, float depth)
 {
     // Get a shared pixel texture

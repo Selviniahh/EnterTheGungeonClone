@@ -82,8 +82,3 @@ void ETG::RogueSpecialAnimComp::SetAnimations()
     }
     AnimManagerDict[GunStateEnum::Reload] = ReloadAnimManager;
 }
-
-void ETG::RogueSpecialAnimComp::PopulateSpecificWidgets()
-{
-    BaseAnimComp<GunStateEnum>::PopulateSpecificWidgets();
-}

@@ -11,7 +11,6 @@ namespace ETG
     public:
         RogueSpecialAnimComp();
         void SetAnimations() override;
-        void PopulateSpecificWidgets() override;
         BOOST_DESCRIBE_CLASS(RogueSpecialAnimComp, (BaseAnimComp), (), (), ())
     };
     

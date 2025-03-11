@@ -11,6 +11,7 @@
 
 ETG::GameObjectBase::GameObjectBase()
 {
+    GameObjectBase::Initialize();
 }
 
 ETG::GameObjectBase::~GameObjectBase()
@@ -21,6 +22,12 @@ ETG::GameObjectBase::~GameObjectBase()
 
 void ETG::GameObjectBase::Initialize()
 {
+    if (Texture.get())
+    {
+        Origin.x = Texture->getSize().x / 2;
+        Origin.y = Texture->getSize().y / 2;
+    }
+    ComputeDrawProperties();
 }
 
 void ETG::GameObjectBase::VisualizeOrigin() const
@@ -35,6 +42,7 @@ void ETG::GameObjectBase::Draw()
 {
     VisualizeOrigin();
     DrawBounds();
+    GlobSpriteBatch.Draw(GetDrawProperties()); //Let's see
 }
 
 void ETG::GameObjectBase::Update()
@@ -50,6 +58,7 @@ void ETG::GameObjectBase::ComputeDrawProperties()
     DrawProps.Rotation = Rotation + RelativeRotation;
     DrawProps.Origin = Origin + RelativeOrigin;
     DrawProps.Depth = Depth;
+    DrawProps.Texture = Texture.get();
 }
 
 sf::FloatRect ETG::GameObjectBase::GetBounds() const

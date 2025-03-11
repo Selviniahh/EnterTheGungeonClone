@@ -43,12 +43,11 @@ void ETG::GameManager::Initialize()
     
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
-
-    UI = ETG::CreateGameObjectDefault<UserInterface>();
-    UI->Initialize();
     
     Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10,10});
 
+    UI = ETG::CreateGameObjectDefault<UserInterface>();
+    
     DebugText = std::make_unique<class DebugText>();
     
     //TODO: Work on safely destroying and error resolution for accessing destroyed object

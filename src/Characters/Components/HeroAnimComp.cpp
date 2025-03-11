@@ -17,6 +17,7 @@ namespace ETG
         HeroPtr = GameState::GetInstance().GetHero();
         IsGameObjectUISpecified = true;
         HeroAnimComp::SetAnimations();
+        CurrentState = HeroPtr->CurrentHeroState;
     }
 
     void HeroAnimComp::SetAnimations()

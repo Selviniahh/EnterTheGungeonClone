@@ -70,7 +70,7 @@ namespace ETG::Globals
         frame.setRotation(rotation);
 
         // Draw the sprite
-        GlobSpriteBatch.draw(frame, 0);
+        GlobSpriteBatch.draw(frame, -1);
         return false;
     }
 }

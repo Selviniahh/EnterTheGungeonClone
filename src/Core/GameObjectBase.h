@@ -12,7 +12,7 @@ namespace ETG
 {
     class GameObjectBase : public GameClass
     {
-    protected:
+    public:
         struct DrawProperties
         {
             sf::Vector2f Position{0, 0};
@@ -20,15 +20,16 @@ namespace ETG
             sf::Vector2f Origin{0, 0};
             float Rotation{};
             float Depth{};
+            sf::Texture* Texture = nullptr;
         };
-
+    protected:
         //Push back every GameObject to the SceneObj during initialization.  
         GameObjectBase();
         virtual ~GameObjectBase();
         virtual void Initialize();
         virtual void Draw();
         virtual void Update();
-        
+
         //Base position of GameObjects
         //Inherited Objects such as Gun's position will be attached to hand pos in tick. After the object manipulations are completed, the relative offsets needs given in UI needs to be applied
         //and result will be stored in FinalPos, FinalRot etc. Final properties will be drawn.    
@@ -68,12 +69,12 @@ namespace ETG
     public:
         //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
-        bool DrawBound = true;
+        bool DrawBound = false;
         bool DrawOriginPoint = true;
         bool IsGameObjectUISpecified = false;
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;
-        
+
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
         virtual std::string& GetObjectName() { return ObjectName; }
@@ -83,16 +84,25 @@ namespace ETG
         [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
         [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
         [[nodiscard]] const sf::Vector2f& GetOrigin() const { return Origin; }
+
+        [[nodiscard]] const sf::Vector2f& GetRelativePosition() const { return RelativePos; }
+        [[nodiscard]] const sf::Vector2f& GetRelativeScale() const { return RelativeScale; }
+        [[nodiscard]] const sf::Vector2f& GetRelativeOrigin() const { return RelativeOrigin; }
+
+        sf::Vector2f& SetRelativePosition(const sf::Vector2f& Pos) { return RelativePos = Pos; }
+        sf::Vector2f& SetRelativeScale(const sf::Vector2f& Scale) { return RelativeScale = Scale; }
+        sf::Vector2f& SetRelativeOrigin(const sf::Vector2f& Origin) { return RelativeOrigin = Origin; }
+
         [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
 
         void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
-        
+
         // Animation component management
         void SetAnimationInterface(IAnimationComponent* animComp) { AnimInterface = animComp; }
         IAnimationComponent* GetAnimationInterface() { return AnimInterface; } //Never used yet
-        
+
         // Bounds methods
         [[nodiscard]] sf::FloatRect GetBounds() const;
         void DrawBounds(sf::Color color = sf::Color::Red) const;
@@ -102,15 +112,15 @@ namespace ETG
         std::string SetObjectNameToSelfClassName();
 
         virtual void PopulateSpecificWidgets();
-        
+
 
         //Friend classes for Engine UI
         friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
-        BOOST_DESCRIBE_CLASS(GameObjectBase,(GameClass),
-            (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound),
-            (Origin, Depth),
-            ())
+        BOOST_DESCRIBE_CLASS(GameObjectBase, (GameClass),
+                             (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound),
+                             (Origin, Depth),
+                             ())
     };
 }

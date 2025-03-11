@@ -4,19 +4,23 @@
 
 namespace ETG
 {
+    class GunBase;
+    class Hero;
+
     class UserInterface : public GameObjectBase
     {
     private:
         sf::Texture Frame;
         sf::Texture AmmoBar;
         sf::Texture AmmoDisplay;
-        sf::Texture Gun;
+        GunBase* Gun;
         sf::Vector2f GunPosition;
         sf::Vector2f AmmoBarPosition;
         std::vector<sf::Vector2i> AmmoArr{};
         int lastAmmoCount = 8;
         bool IsReloaded = true;
         bool RemoveLast = true;
+        Hero* Hero = nullptr;
         
         sf::Vector2f FrameOffsetPerc{4,3.5};
         float AmmoBarOffsetPercX = 2.f;

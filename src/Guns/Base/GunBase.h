@@ -26,6 +26,7 @@ namespace ETG
         virtual void Shoot();
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
+        int Ammo;
 
     protected:
         // Rotates an offset vector according to the gun's current rotation.

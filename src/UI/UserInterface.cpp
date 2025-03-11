@@ -1,7 +1,8 @@
 #include "UserInterface.h"
 #include <filesystem>
 
-#include "../Engine/Engine.h"
+#include "../Characters/Hero.h"
+#include "../Guns/Base/GunBase.h"
 #include "../Managers/GameState.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
@@ -10,13 +11,14 @@ namespace ETG
 {
     UserInterface::UserInterface()
     {
+        UserInterface::Initialize();
+        GameObjectBase::Initialize();
     }
 
     void UserInterface::Initialize()
     {
         const std::string ResPath = RESOURCE_PATH;
         Frame.loadFromFile(ResPath + "/UI/Frame.png");
-        Gun.loadFromFile(ResPath + "/Guns/RogueSpecial/RogueSpecial_Idle.png");
         AmmoBar.loadFromFile(ResPath + "/UI/AmmoBarUI.png");
         AmmoDisplay.loadFromFile(ResPath + "/UI/AmmoDisplay.png");
 
@@ -39,11 +41,15 @@ namespace ETG
             (Position.x + (Frame.getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100)),
             Position.y
         };
+
+        if (!Hero) Hero = GameState::GetInstance().GetHero();
     }
 
     void UserInterface::Update()
     {
         GameObjectBase::Update();
+        Gun = Hero->GetCurrentHoldingGun();
+
     }
 
     void UserInterface::Draw()
@@ -63,9 +69,9 @@ namespace ETG
 
         // Draw the gun
         sf::Sprite gun;
-        gun.setTexture(Gun);
+        gun.setTexture(*Gun->Texture);
         gun.setPosition(static_cast<float>(GunPosition.x), static_cast<float>(GunPosition.y));
-        gun.setOrigin(Gun.getSize().x / 2, Gun.getSize().y / 2);
+        gun.setOrigin(Gun->Texture->getSize().x / 2, Gun->Texture->getSize().y / 2);
         gun.setScale(3.f, 3.f);
         Globals::DrawSinglePixelAtLoc(gun.getPosition(), {5, 5});
         GlobSpriteBatch.draw(gun,0);
