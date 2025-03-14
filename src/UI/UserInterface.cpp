@@ -52,9 +52,9 @@ namespace ETG
         PassiveItemIcon.setFillColor(sf::Color::Green);
     }
 
-    void UserInterface::Update(float deltaTime)
+    void UserInterface::Update()
     {
-        GameObjectBase::Update(deltaTime);
+        GameObjectBase::Update();
         Gun = Hero->GetCurrentHoldingGun();
 
     }

@@ -21,7 +21,7 @@ namespace ETG
         explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity);
         ~GunBase() override;
         void Initialize() override;
-        void Update(float deltaTime) override;
+        void Update() override;
         void Draw() override;
         virtual void Shoot();
 

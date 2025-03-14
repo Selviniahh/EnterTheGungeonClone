@@ -36,9 +36,9 @@ void ETG::Hero::Initialize()
 
 ETG::Hero::~Hero() = default;
 
-void ETG::Hero::Update(float deltaTime)
+void ETG::Hero::Update()
 {
-    GameObjectBase::Update(deltaTime);
+    GameObjectBase::Update();
 
     InputComp->Update(*this);
     MoveComp->Update();
@@ -61,7 +61,7 @@ void ETG::Hero::Update(float deltaTime)
     if (IsShooting) RogueSpecial->Shoot();
     
     //Necessary to call end of update because the texture is created at here. 
-    GameObjectBase::Update(deltaTime);
+    GameObjectBase::Update();
 }
 
 void ETG::Hero::Draw()

@@ -32,7 +32,7 @@ namespace ETG
     public:
         UserInterface();
         void Initialize() override;
-        void Update(float deltaTime) override;
+        void Update() override;
         void Draw() override;
 
         void SetActiveItem(ActiveItem* item);

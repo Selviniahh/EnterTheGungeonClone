@@ -18,7 +18,7 @@ void ETG::Hand::Initialize()
 
     if (!Texture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string()))
         std::cerr << "Failed to load hand texture" << std::endl;
-    
+
     GameObjectBase::Initialize();
 }
 
@@ -27,7 +27,7 @@ void ETG::Hand::Draw()
     GameObjectBase::Draw();
 }
 
-void ETG::Hand::Update(float deltaTime)
+void ETG::Hand::Update()
 {
-    GameObjectBase::Update(deltaTime);
+    GameObjectBase::Update();
 }

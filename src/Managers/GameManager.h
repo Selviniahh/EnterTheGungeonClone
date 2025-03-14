@@ -13,6 +13,7 @@ namespace ETG
     class Scene;
     class Hero;
     class UserInterface;
+
     class GameManager
     {
     public:
@@ -33,7 +34,7 @@ namespace ETG
         std::unique_ptr<Hero> Hero;
         std::unique_ptr<UserInterface> UI;
         std::unique_ptr<Scene> Scene;
-        
+
         Engine EngineUI{};
 
         bool HasFocus = true;
@@ -44,12 +45,12 @@ namespace ETG
         void SpawnActiveItem(const std::string& texturePath, const sf::Vector2f& position);
         void SpawnPassiveItem(const std::string& texturePath, const sf::Vector2f& position);
         void HandleItemEquip();
-        void UpdateItems(float deltaTime);
+        void UpdateItems();
 
     public:
         //Hold only scene objects. Used for displaying details panel
-        std::unordered_map<std::string,GameObjectBase*> SceneObjects;
-        
+        std::unordered_map<std::string, GameObjectBase*> SceneObjects;
+
         static sf::Event GameEvent;
     };
 }

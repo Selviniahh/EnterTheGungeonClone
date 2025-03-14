@@ -9,7 +9,7 @@ class PassiveItem : public ETG::GameObjectBase {
 public:
     explicit PassiveItem(const std::string& texturePath);
     void Initialize() override;
-    void Update(float deltaTime) override;
+    void Update() override;
     void Draw() override;
     void PlayEquipSound();
 private:

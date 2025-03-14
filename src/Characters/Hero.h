@@ -20,7 +20,7 @@ namespace ETG
     public:
         explicit Hero(sf::Vector2f Position);
         ~Hero() override;
-        void Update(float deltaTime) override;
+        void Update() override;
         void Initialize() override;
         void Draw() override;
         GunBase* GetCurrentHoldingGun() const;

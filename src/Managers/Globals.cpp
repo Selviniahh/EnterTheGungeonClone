@@ -5,6 +5,7 @@
 namespace ETG::Globals
 {
     float FrameTick = 0.0f;
+    float DeltaTime = 0.0f;
     float ElapsedTimeSeconds = 0.0f;
     float DefaultScale = 1;
     std::shared_ptr<sf::RenderWindow> Window = nullptr;
@@ -46,6 +47,7 @@ namespace ETG::Globals
         //Every loop call this will be called. So in every call it will return the total time passed in seconds.   
         ElapsedTimeClock = tickClock.restart();
         FrameTick = ElapsedTimeClock.asSeconds();
+        DeltaTime = FrameTick;
     }
 
     bool DrawSinglePixelAtLoc(const sf::Vector2f& Loc, const sf::Vector2i scale, const float rotation)

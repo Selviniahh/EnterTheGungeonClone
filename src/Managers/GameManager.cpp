@@ -45,7 +45,7 @@ void ETG::GameManager::Initialize()
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
 
-    Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10,10});
+    Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10, 10});
 
     UI = ETG::CreateGameObjectDefault<UserInterface>();
 
@@ -55,42 +55,50 @@ void ETG::GameManager::Initialize()
     // DestroyGameObject(Hero);
 
     SpawnItems();
-
 }
+
 void ETG::GameManager::SpawnItems()
 {
     /// Spawn active and passive items near the hero's initial position
-    ActiveItem = std::make_unique<ActiveItem>((std::filesystem::path(RESOURCE_PATH)/"Items"/"Active"/"Potion_of_Gun_Friendship.png"));
-    PassiveItem = std::make_unique<PassiveItem>("Resources/Items/Passive/platinum_bullets_001.png");
+    ActiveItem = std::make_unique<class ActiveItem>((std::filesystem::path(RESOURCE_PATH) / "Items" / "Active" / "Potion_of_Gun_Friendship.png").generic_string());
+    PassiveItem = std::make_unique<class PassiveItem>((std::filesystem::path(RESOURCE_PATH) / "Items" / "Passive" / "platinum_bullets_001.png").generic_string());
+
     // Add items to the scene
     SceneObjects["ActiveItem"] = ActiveItem.get();
     SceneObjects["PassiveItem"] = PassiveItem.get();
 }
+
 void ETG::GameManager::HandleItemEquip()
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+    {
         // Check if the hero is near an item and equip it
-        if (Hero->IsNearItem(ActiveItem.get())) {
+        if (Hero->IsNearItem(ActiveItem.get()))
+        {
             ActiveItem->PlayEquipSound();
-            DebugText->DrawDebugText("Active Item Equipped: Potion of Gun Friendship",*Window);
+            DebugText->DrawDebugText("Active Item Equipped: Potion of Gun Friendship", *Window);
             // Equip the active item to the hero
             Hero->EquipActiveItem(ActiveItem.get());
         }
-        else if (Hero->IsNearItem(PassiveItem.get())) {
+        else if (Hero->IsNearItem(PassiveItem.get()))
+        {
             PassiveItem->PlayEquipSound();
-            DebugText->DrawDebugText("Passive Item Equipped: Platinum Bullets",*Window);
+            DebugText->DrawDebugText("Passive Item Equipped: Platinum Bullets", *Window);
             // Equip the passive item to the hero
             Hero->EquipPassiveItem(PassiveItem.get());
         }
     }
 }
-void ETG::GameManager::UpdateItems(float deltaTime)
+
+void ETG::GameManager::UpdateItems()
 {
-    if (ActiveItem) {
-        ActiveItem->Update(deltaTime);
+    if (ActiveItem)
+    {
+        ActiveItem->Update();
     }
-    if (PassiveItem) {
-        PassiveItem->Update(deltaTime);
+    if (PassiveItem)
+    {
+        PassiveItem->Update();
     }
 }
 
@@ -102,12 +110,11 @@ void ETG::GameManager::Update()
         EngineUI.Update();
         Globals::Update();
         InputManager::Update();
-        Hero->Update(deltaTime);
-        UI->Update(deltaTime);
+        Hero->Update();
+        UI->Update();
         HandleItemEquip();
-        UpdateItems(deltaTime);
+        UpdateItems();
     }
-
 }
 
 void ETG::GameManager::Draw()
