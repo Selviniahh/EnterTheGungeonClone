@@ -18,7 +18,7 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     Depth = 2;
     GameState::GetInstance().SetHero(this);
 
-    Hand = ETG::CreateGameObjectAttached<class Hand>(this);
+    Hand = ETG::CreateGameObjectAttached<class Hand>(this, (std::filesystem::path(RESOURCE_PATH) / "Player" / "rogue_hand_001.png").generic_string());
     RogueSpecial = ETG::CreateGameObjectAttached<class RogueSpecial>(this, Hand->GetRelativePosition());
     AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
     AnimationComp->Initialize();
@@ -49,16 +49,16 @@ void ETG::Hero::Update()
     AnimationComp->Update();
 
     //Set hand properties
-    const sf::Vector2f HandOffsetForHero =  AnimationComp->IsFacingRight(CurrentDirection) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
+    const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(CurrentDirection) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
     Hand->Update();
-    
+
     //Gun
     RogueSpecial->SetPosition(Hand->GetPosition() + Hand->GunOffset);
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
     if (IsShooting) RogueSpecial->Shoot();
-    
+
     //Necessary to call end of update because the texture is created at here. 
     GameObjectBase::Update();
 }
@@ -68,7 +68,7 @@ void ETG::Hero::Draw()
     GameObjectBase::Draw();
     RogueSpecial->Draw();
     SpriteBatch::Draw(GetDrawProperties());
-    
+
     Hand->Draw();
 }
 

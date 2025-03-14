@@ -7,8 +7,6 @@
 class BaseHealthComp;
 
 namespace ETG
-
-// Forward declarations
 {
     class Hero;
     class Hand;
@@ -22,17 +20,15 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
-
-    public:
-
-    protected:
+    
         std::unique_ptr<RogueSpecial> RogueSpecial;
         std::unique_ptr<BaseHealthComp> HealthComp;
-        // std::unique_ptr<BaseAnimComp<EnemyStateEnum>> AnimationComp;
         std::unique_ptr<Hand> Hand;
         Hero* Hero;
 
         float timer{};
         float secTimer{};
+
+        BOOST_DESCRIBE_CLASS(EnemyBase, (GameObjectBase), (),(),())
     };
 }

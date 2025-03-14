@@ -39,7 +39,6 @@ namespace ETG
             Animation::CreateSpriteSheet("Player/Idle/Front", "rogue_idle_front_hand_left_001", "png", 0.15f),
             Animation::CreateSpriteSheet("Player/Idle/Right", "rogue_idle_hands_001", "png", 0.15f),
         };
-        const auto idleEnumValues = ConstructEnumVector<HeroIdleEnum>();
         AddAnimationsForState<HeroIdleEnum>(HeroStateEnum::Idle,idleAnims);
         
         //Dash

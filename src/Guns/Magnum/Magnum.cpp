@@ -1,16 +1,14 @@
-#include "RogueSpecial.h"
-#include "../../Core/Factory.h"
 #include <filesystem>
+#include "Magnum.h"
+#include "../../Core/Factory.h"
 
-ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f)
+ETG::Magnum::Magnum(const sf::Vector2f& position): GunBase(position, 0.35f, 200.f, 5000.f, 0.f)
 {
-    AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
-
-    // call the common initialization.
-    RogueSpecial::Initialize();
+    AnimationComp = CreateGameObjectAttached<MagnumAnimComp>(this);
+    Magnum::Initialize();
 }
 
-void ETG::RogueSpecial::Initialize()
+void ETG::Magnum::Initialize()
 {
     OriginOffset = {1.f, 10.f};
     MuzzleFlashEachFrameSpeed = 0.10f;
@@ -34,27 +32,37 @@ void ETG::RogueSpecial::Initialize()
     const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "RogueSpecial" / "Projectile_RogueSpecial.png").string();
     if (!ProjTexture->loadFromFile(projPath))
         throw std::runtime_error("Failed to load Projectile_RogueSpecial.png from path: " + projPath);
-
+    
     GunBase::Initialize();
 }
 
-ETG::RogueSpecialAnimComp::RogueSpecialAnimComp()
+ETG::MagnumAnimComp::MagnumAnimComp()
 {
     IsGameObjectUISpecified = true;
-    RogueSpecialAnimComp::SetAnimations();
+    MagnumAnimComp::SetAnimations();
 }
 
-void ETG::RogueSpecialAnimComp::SetAnimations()
+void ETG::MagnumAnimComp::SetAnimations()
 {
     //Idle Animation
-    const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/RogueSpecial", "RogueSpecial_Idle", "png", 0.15f, true)};
+    const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/Magnum/Idle", "magnum_idle_001", "png", 0.15f, false)};
     AddGunAnimationForState(GunStateEnum::Idle, IdleAnim);
 
     //Shoot animations
-    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/RogueSpecial/Fire", "knav3_fire_001", "png", 0.15f)};
+    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/Magnum/Fire", "magnum_enemy_fire_001", "png", 0.25f)};
     AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim);
 
     //Reload Animation
-    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/RogueSpecial", "RogueSpecial_Reload", "png", 0.15f, true)};
+    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/Magnum/Reload", "magnum_reload_001", "png", 0.15f, false)};
     AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim);
+}
+
+bool ETG::MagnumAnimComp::IsAnimationFinished()
+{
+    auto it = AnimManagerDict.find(CurrentState);
+    if (it != AnimManagerDict.end() && it->second.CurrentAnim)
+    {
+        return it->second.CurrentAnim->IsAnimationFinished();
+    }
+    return true;
 }

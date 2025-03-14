@@ -119,7 +119,6 @@ namespace ETG
         auto animManager = AnimationManager{};
         std::vector<DirectionEnum> enumKeys = ConstructEnumVector<DirectionEnum>();
 
-
         // Make sure we don't exceed the bounds of either array
         size_t count = std::min(enumKeys.size(), animations.size());
 
@@ -131,8 +130,8 @@ namespace ETG
             if (!animations[i].FrameRects.empty())
             {
                 animManager.SetOrigin(enumKeys[i], sf::Vector2f{
-                                          (float)animations[i].FrameRects[0].width / 2,
-                                          (float)animations[i].FrameRects[0].height / 2
+                                          (float)animations[i].FrameRects[0].width / 2, //x
+                                          (float)animations[i].FrameRects[0].height / 2 //y
                                       });
             }
         }
@@ -144,15 +143,16 @@ namespace ETG
     void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation)
     {
         auto animManager = AnimationManager{};
-        animManager.AddAnimation(state, animation);  // Using the state enum itself as the key
-    
-        if (!animation.FrameRects.empty()) {
+        animManager.AddAnimation(state, animation); // Using the state enum itself as the key
+
+        if (!animation.FrameRects.empty())
+        {
             animManager.SetOrigin(state, sf::Vector2f{
-                (float)animation.FrameRects[0].width / 2,
-                (float)animation.FrameRects[0].height / 2
-            });
+                                      (float)animation.FrameRects[0].width / 2,
+                                      (float)animation.FrameRects[0].height / 2
+                                  });
         }
-    
+
         AnimManagerDict[state] = animManager;
     }
 

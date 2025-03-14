@@ -4,8 +4,8 @@
 
 ETG::BulletManAnimComp::BulletManAnimComp()
 {
-    IsGameObjectUISpecified = false; // Set like HeroAnimComp
-    SetAnimations(); // Call SetAnimations directly like HeroAnimComp
+    IsGameObjectUISpecified = false;
+    BulletManAnimComp::SetAnimations(); 
 }
 
 ETG::BulletManAnimComp::~BulletManAnimComp() = default;
@@ -36,18 +36,16 @@ void ETG::BulletManAnimComp::SetAnimations()
         Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_right_001", "png", 0.15f),
         Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_right_001", "png", 0.15f),
     };
-    const auto bulletManIdleEnum = ConstructEnumVector<BulletManIdleEnum>();
     AddAnimationsForState<BulletManIdleEnum>(EnemyStateEnum::Idle,idleAnims);
 
     //Run animation
     const auto RunAnims = std::vector<Animation>{
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_back_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_back_001", "png", 0.15f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run/Left", "bullet_run_left_001", "png", 0.15f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run/LeftBack", "bullet_run_left_back_001", "png", 0.15f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run/Right", "bullet_run_right_001", "png", 0.15f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run/RightBack", "bullet_run_right_back_001", "png", 0.15f),
     };
-    const auto bulletManRunEnum = ConstructEnumVector<BulletManRunEnum>();
-    AddAnimationsForState<BulletManRunEnum>(EnemyStateEnum::Run,RunAnims);
+    AddAnimationsForState<BulletManRunEnum>(EnemyStateEnum::Run, RunAnims);
 }
 
 void ETG::BulletManAnimComp::Update()
@@ -56,7 +54,7 @@ void ETG::BulletManAnimComp::Update()
     if (!BulletMan)
     {
         BulletMan = dynamic_cast<class BulletMan*>(Owner);
-        if (!BulletMan) return; // Safety check
+        if (!BulletMan) return;
     }
     
     AnimationKey newKey;
@@ -83,9 +81,15 @@ void ETG::BulletManAnimComp::Update()
         }
     }
 
-    // Update base animation component with current state and key (same as HeroAnimComp)
     BaseAnimComp<EnemyStateEnum>::Update(BulletMan->BulletManState, CurrentAnimStateKey);
     
+    // Set origin using the CurrentAnimStateKey
+    if (AnimManagerDict.contains(CurrentState) && 
+        AnimManagerDict[CurrentState].AnimationDict.contains(CurrentAnimStateKey))
+    {
+        BulletMan->SetOrigin(AnimManagerDict[CurrentState].AnimationDict[CurrentAnimStateKey].Origin);
+    }
+
     // Make sure the texture gets transferred to the owner
     if (CurrentTex && BulletMan)
     {
