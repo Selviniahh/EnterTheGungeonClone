@@ -7,6 +7,7 @@
 #include "../../Engine/UI/UIUtils.h"
 #include "../../Utils/StrManipulateUtil.h"
 
+//This class looks ugly however because it's heavy templated class, I cannot one by one write all possible template specializations it will be over 100+, so there's nothing I can do
 namespace ETG
 {
     enum class HeroStateEnum;
@@ -15,6 +16,14 @@ namespace ETG
     class BaseAnimComp : public ComponentBase, public IAnimationComponent
     {
     public:
+
+        enum class FlipAxis
+        {
+            X,
+            Y,
+            Both
+        };
+        
         // Override the base class Initialize method to register with owner
         void Initialize() override
         {
@@ -35,8 +44,17 @@ namespace ETG
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
 
-        //TODO: This GetOrigin and all relative stuffs needs to go from here 
-        [[nodiscard]] sf::Vector2f GetOrigin() const override { return RelativeOrigin; }
+        //I know this function is bad. I will think of something
+        static bool IsFacingRight(const Direction& currentDirection);
+
+        template <typename... TObjects>
+        void FlipSprites(const Direction& currentDirection, FlipAxis axis, TObjects&... objects);
+
+        template <typename... TObjects>
+        void FlipSpritesX(const Direction& currentDirection, TObjects&... objects);
+
+        template <typename... TObjects>
+        void FlipSpritesY(const Direction& currentDirection, TObjects&... objects);
 
         sf::IntRect CurrTexRect;
         sf::Vector2f RelativeOrigin{0.f, 0.f};
@@ -90,7 +108,55 @@ namespace ETG
     {
     }
 
+    template <typename StateEnum>
+    bool BaseAnimComp<StateEnum>::IsFacingRight(const Direction& currentDirection)
+    {
+        return
+            currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
+            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight;
+    }
+
+    template <typename StateEnum>
+    template <typename... TObjects>
+    void BaseAnimComp<StateEnum>::FlipSprites(const Direction& currentDirection, FlipAxis axis, TObjects&... objects)
+    {
+        if (!AnimManagerDict.contains(CurrentState))
+            throw std::runtime_error("CurrentState not found in the AnimManagerDict");
+
+        bool facingRight = IsFacingRight(currentDirection);
+
+        bool flipX = (axis == FlipAxis::X) || axis == FlipAxis::Both;
+        bool flipY = (axis == FlipAxis::Y) || axis == FlipAxis::Both;
+
+        //Logic is simple. If facing right, let the scale be 1.0, if it is not facing right, make -1.0
+        auto flipObjectScale = [facingRight, flipX, flipY](auto& obj)
+        {
+            sf::Vector2f scale = obj.GetScale();
+            if (flipX) scale.x = facingRight ? std::abs(scale.x) : -std::abs(scale.x);
+            if (flipY) scale.y = facingRight ? std::abs(scale.y) : -std::abs(scale.y);
+
+            obj.SetScale(scale);
+        };
+
+        (flipObjectScale(objects), ...);
+    }
+
+    template <typename StateEnum>
+    template <typename ... TObjects>
+    void BaseAnimComp<StateEnum>::FlipSpritesX(const Direction& currentDirection, TObjects&... objects)
+    {
+        return FlipSprites(currentDirection, FlipAxis::X, objects...);
+    }
+
+    template <typename StateEnum>
+    template <typename ... TObjects>
+    void BaseAnimComp<StateEnum>::FlipSpritesY(const Direction& currentDirection, TObjects&... objects)
+    {
+        return FlipSprites(currentDirection, FlipAxis::Y, objects...);
+    }
+
     //-----------------------------------------UI----------------------------------------
+
     template <typename StateEnum>
     void BaseAnimComp<StateEnum>::PopulateSpecificWidgets()
     {

@@ -7,6 +7,11 @@
 
 namespace ETG
 {
+    class BulletMan;
+}
+
+namespace ETG
+{
     class DebugText;
     class Scene;
     class Hero;
@@ -29,6 +34,7 @@ namespace ETG
         std::unique_ptr<Hero> Hero;
         std::unique_ptr<UserInterface> UI;
         std::unique_ptr<Scene> Scene;
+        std::unique_ptr<BulletMan> BulletMan;
         
         Engine EngineUI{};
 

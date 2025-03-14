@@ -61,6 +61,8 @@ add_executable(ETG main.cpp
         src/Engine/UI/UIUtils.cpp
         src/Characters/Hand/Hand.cpp
         src/Characters/Hand/Hand.h
+        src/Enemy/BulletMan/BulletMan.cpp
+        src/Enemy/BulletMan/BulletMan.h
 )
 
 # Easiest and fastest way is VCPKG 

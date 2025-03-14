@@ -34,8 +34,8 @@ namespace ETG
         auto animManagerRun = AnimationManager{};
         for (int i = 0; i < runAnims.size(); ++i)
         {
-            animManagerRun.AddAnimation(RunEnumValues[i], runAnims[i]);
-            animManagerRun.SetOrigin(RunEnumValues[i], sf::Vector2f{(float)runAnims[i].FrameRects[0].width / 2, (float)runAnims[i].FrameRects[0].height / 2});
+            animManagerRun.AddAnimation(HeroRunEnumValues[i], runAnims[i]);
+            animManagerRun.SetOrigin(HeroRunEnumValues[i], sf::Vector2f{(float)runAnims[i].FrameRects[0].width / 2, (float)runAnims[i].FrameRects[0].height / 2});
         }
         AnimManagerDict[HeroStateEnum::Run] = animManagerRun;
 
@@ -49,8 +49,8 @@ namespace ETG
         auto animManagerIdle = AnimationManager{};
         for (int i = 0; i < idleAnims.size(); ++i)
         {
-            animManagerIdle.AddAnimation(IdleEnumValues[i], idleAnims[i]);
-            animManagerIdle.SetOrigin(IdleEnumValues[i], sf::Vector2f{(float)idleAnims[i].FrameRects[0].width / 2, (float)idleAnims[i].FrameRects[0].height / 2});
+            animManagerIdle.AddAnimation(HeroIdleEnumValues[i], idleAnims[i]);
+            animManagerIdle.SetOrigin(HeroIdleEnumValues[i], sf::Vector2f{(float)idleAnims[i].FrameRects[0].width / 2, (float)idleAnims[i].FrameRects[0].height / 2});
         }
         AnimManagerDict[HeroStateEnum::Idle] = animManagerIdle;
 
@@ -65,8 +65,8 @@ namespace ETG
         auto animManagerDash = AnimationManager{};
         for (int i = 0; i < dashAnims.size(); ++i)
         {
-            animManagerDash.AddAnimation(DashEnumValues[i], dashAnims[i]);
-            animManagerDash.SetOrigin(DashEnumValues[i], sf::Vector2f{(float)dashAnims[i].FrameRects[0].width / 2, (float)dashAnims[i].FrameRects[0].height / 2});
+            animManagerDash.AddAnimation(HeroDashEnumValues[i], dashAnims[i]);
+            animManagerDash.SetOrigin(HeroDashEnumValues[i], sf::Vector2f{(float)dashAnims[i].FrameRects[0].width / 2, (float)dashAnims[i].FrameRects[0].height / 2});
         }
         AnimManagerDict[HeroStateEnum::Dash] = animManagerDash;
     }
@@ -75,14 +75,14 @@ namespace ETG
     {
         AnimationKey newKey;
 
-        if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
-            newKey = InputComponent::GetDashDirectionEnum();
+        if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
+            newKey = DirectionUtils::GetHeroIdleDirectionEnum(HeroPtr->CurrentDirection);
 
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Run)
-            newKey = DirectionUtils::GetRunEnum(HeroPtr->CurrentDirection);
+            newKey = DirectionUtils::GetHeroRunEnum(HeroPtr->CurrentDirection);
 
-        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
-            newKey = DirectionUtils::GetIdleDirectionEnum(HeroPtr->CurrentDirection);
+        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
+            newKey = InputComponent::GetDashDirectionEnum();
 
         if (newKey != CurrentAnimStateKey)
         {

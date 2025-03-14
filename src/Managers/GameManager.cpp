@@ -8,6 +8,7 @@
 #include "../Core/Scene/Scene.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
+#include "../Enemy/BulletMan/BulletMan.h"
 
 sf::Event ETG::GameManager::GameEvent{};
 using namespace ETG::Globals;
@@ -47,7 +48,11 @@ void ETG::GameManager::Initialize()
     Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10,10});
 
     UI = ETG::CreateGameObjectDefault<UserInterface>();
+
+    BulletMan = ETG::CreateGameObjectDefault<class BulletMan>(sf::Vector2f{50,50});
+    BulletMan->Initialize();
     
+    //Always initialize debug text last 
     DebugText = std::make_unique<class DebugText>();
     
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
@@ -65,6 +70,7 @@ void ETG::GameManager::Update()
         InputManager::Update();
         Hero->Update();
         UI->Update();
+        BulletMan->Update();
     }
 
 }
@@ -77,9 +83,10 @@ void ETG::GameManager::Draw()
     //NOTE: Draw the main game scene with Custom view. These draws will be drawn zoomed
     Window->setView(Globals::MainView);
 
-    ETG::GlobSpriteBatch.begin();
+    GlobSpriteBatch.begin();
     Hero->Draw();
-    ETG::GlobSpriteBatch.end(*Window);
+    BulletMan->Draw();
+    GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.
     //NOTE: Which means, even though The view zoomed or moved, these draws will always stay persistent in initial given coords
