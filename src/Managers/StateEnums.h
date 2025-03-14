@@ -88,42 +88,4 @@ namespace ETG
     };
     BOOST_DESCRIBE_ENUM(Direction, Right, FrontHandRight, FrontHandLeft, Left, BackDiagonalLeft, BackHandLeft, BackHandRight, BackDiagonalRight)
 
-    static std::vector<ETG::HeroRunEnum> HeroRunEnumValues = {
-        HeroRunEnum::Run_Back,
-        HeroRunEnum::Run_BackWard,
-        HeroRunEnum::Run_Forward,
-        HeroRunEnum::Run_Front
-    };
-
-    static std::vector<ETG::HeroIdleEnum> HeroIdleEnumValues
-    {
-        HeroIdleEnum::Idle_Back,
-        HeroIdleEnum::Idle_BackWard,
-        HeroIdleEnum::Idle_Front,
-        HeroIdleEnum::Idle_Right,
-    };
-
-    static std::vector<ETG::HeroDashEnum> HeroDashEnumValues = {
-
-        HeroDashEnum::Dash_Back,
-        HeroDashEnum::Dash_BackWard,
-        HeroDashEnum::Dash_Front,
-        HeroDashEnum::Dash_Left,
-        HeroDashEnum::Dash_Right
-    };
-
-    static std::vector<ETG::BulletManRunEnum> BulletManRunEnumValues = {
-        BulletManRunEnum::Run_Left,
-        BulletManRunEnum::Run_Left_Back,
-        BulletManRunEnum::Run_Right,
-        BulletManRunEnum::Run_Right_Back
-    };
-
-    static std::vector<ETG::BulletManIdleEnum> BulletManIdleEnumValues
-    {
-        BulletManIdleEnum::Idle_Back,
-        BulletManIdleEnum::Idle_Right,
-        BulletManIdleEnum::Idle_Left
-    };
-
 }

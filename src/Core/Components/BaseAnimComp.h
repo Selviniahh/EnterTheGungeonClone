@@ -16,21 +16,20 @@ namespace ETG
     class BaseAnimComp : public ComponentBase, public IAnimationComponent
     {
     public:
-
         enum class FlipAxis
         {
             X,
             Y,
             Both
         };
-        
+
         // Override the base class Initialize method to register with owner
         void Initialize() override
         {
             GameObjectBase::Initialize();
 
             if (!Owner) throw std::runtime_error("Owner cannot be empty. Every animation should be an owner game object.");
-            
+
             // Register with owner
             Owner->SetAnimationInterface(this);
         }
@@ -40,6 +39,11 @@ namespace ETG
         virtual void Draw(const sf::Vector2f& position);
         virtual void Draw(sf::Vector2f position, sf::Vector2f Origin, sf::Vector2f Scale, float Rotation, float depth);
         void PopulateSpecificWidgets() override;
+
+        template <typename DirectionEnum>
+        void AddAnimationsForState(StateEnum state, const std::vector<Animation>& animations);
+
+        void AddGunAnimationForState(StateEnum state, const Animation& animation);
 
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
@@ -109,6 +113,50 @@ namespace ETG
     }
 
     template <typename StateEnum>
+    template <typename DirectionEnum>
+    void BaseAnimComp<StateEnum>::AddAnimationsForState(StateEnum state, const std::vector<Animation>& animations)
+    {
+        auto animManager = AnimationManager{};
+        std::vector<DirectionEnum> enumKeys = ConstructEnumVector<DirectionEnum>();
+
+
+        // Make sure we don't exceed the bounds of either array
+        size_t count = std::min(enumKeys.size(), animations.size());
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            animManager.AddAnimation(enumKeys[i], animations[i]);
+
+            // Only set the origin if the animation has valid frames
+            if (!animations[i].FrameRects.empty())
+            {
+                animManager.SetOrigin(enumKeys[i], sf::Vector2f{
+                                          (float)animations[i].FrameRects[0].width / 2,
+                                          (float)animations[i].FrameRects[0].height / 2
+                                      });
+            }
+        }
+
+        AnimManagerDict[state] = animManager;
+    }
+
+    template <typename StateEnum>
+    void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation)
+    {
+        auto animManager = AnimationManager{};
+        animManager.AddAnimation(state, animation);  // Using the state enum itself as the key
+    
+        if (!animation.FrameRects.empty()) {
+            animManager.SetOrigin(state, sf::Vector2f{
+                (float)animation.FrameRects[0].width / 2,
+                (float)animation.FrameRects[0].height / 2
+            });
+        }
+    
+        AnimManagerDict[state] = animManager;
+    }
+
+    template <typename StateEnum>
     bool BaseAnimComp<StateEnum>::IsFacingRight(const Direction& currentDirection)
     {
         return
@@ -142,20 +190,22 @@ namespace ETG
     }
 
     template <typename StateEnum>
-    template <typename ... TObjects>
+    template <typename... TObjects>
     void BaseAnimComp<StateEnum>::FlipSpritesX(const Direction& currentDirection, TObjects&... objects)
     {
         return FlipSprites(currentDirection, FlipAxis::X, objects...);
     }
 
     template <typename StateEnum>
-    template <typename ... TObjects>
+    template <typename... TObjects>
     void BaseAnimComp<StateEnum>::FlipSpritesY(const Direction& currentDirection, TObjects&... objects)
     {
         return FlipSprites(currentDirection, FlipAxis::Y, objects...);
     }
 
+
     //-----------------------------------------UI----------------------------------------
+
 
     template <typename StateEnum>
     void BaseAnimComp<StateEnum>::PopulateSpecificWidgets()

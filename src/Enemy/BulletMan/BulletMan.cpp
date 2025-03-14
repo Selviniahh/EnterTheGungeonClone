@@ -1,12 +1,11 @@
 #include "BulletMan.h"
 #include <filesystem>
-#include <iostream>
-
 #include "../../Core/Factory.h"
 #include "../../Managers/DebugTexts.h"
 #include "../../Managers/SpriteBatch.h"
 #include "../../Utils/Math.h"
 #include "../../Utils/StrManipulateUtil.h"
+#include "Components/BulletManAnimComp.h"
 
 ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 {
@@ -15,6 +14,8 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
     BulletManDir = Direction::Right; // Initialize direction
     Depth = 2; // Set depth like Hero does
 }
+
+ETG::BulletMan::~BulletMan() = default;
 
 void ETG::BulletMan::Initialize()
 {
@@ -68,103 +69,3 @@ void ETG::BulletMan::Draw()
     SpriteBatch::Draw(GetDrawProperties());
 }
 
-ETG::BulletManAnimComp::BulletManAnimComp()
-{
-    IsGameObjectUISpecified = false; // Set like HeroAnimComp
-    SetAnimations(); // Call SetAnimations directly like HeroAnimComp
-}
-
-void ETG::BulletManAnimComp::Initialize()
-{
-    BaseAnimComp<EnemyStateEnum>::Initialize();
-    
-    // Set initial state here (after initialization)
-    if (Owner)
-    {
-        BulletMan = dynamic_cast<class BulletMan*>(Owner);
-        if (BulletMan)
-        {
-            CurrentState = BulletMan->BulletManState;
-            CurrentAnimStateKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->BulletManDir);
-        }
-    }
-}
-
-void ETG::BulletManAnimComp::SetAnimations()
-{
-    BaseAnimComp::SetAnimations();
-
-    //Idle Animation
-    const auto idleAnims = std::vector<Animation>{
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_back_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_right_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_left_001", "png", 0.15f),
-    };
-
-    auto IdleAnimManager = AnimationManager();
-    for (int i = 0; i < idleAnims.size(); ++i)
-    {
-        IdleAnimManager.AddAnimation(BulletManIdleEnumValues[i], idleAnims[i]);
-        IdleAnimManager.SetOrigin(BulletManIdleEnumValues[i], sf::Vector2f{(float)idleAnims[i].FrameRects[0].width / 2, (float)idleAnims[i].FrameRects[0].height / 2});
-    }
-    AnimManagerDict[EnemyStateEnum::Idle] = IdleAnimManager;
-
-    //Run animation
-    const auto RunAnims = std::vector<Animation>{
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_back_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_back_001", "png", 0.15f),
-    };
-
-    auto RunAnimManager = AnimationManager();
-    for (int i = 0; i < RunAnims.size(); ++i)
-    {
-        RunAnimManager.AddAnimation(BulletManRunEnumValues[i], RunAnims[i]);
-        RunAnimManager.SetOrigin(BulletManRunEnumValues[i], sf::Vector2f{(float)RunAnims[i].FrameRects[0].width / 2, (float)RunAnims[i].FrameRects[0].height / 2});
-    }
-    AnimManagerDict[EnemyStateEnum::Run] = RunAnimManager;
-}
-
-void ETG::BulletManAnimComp::Update()
-{
-    // Ensure we have a valid BulletMan pointer
-    if (!BulletMan)
-    {
-        BulletMan = dynamic_cast<class BulletMan*>(Owner);
-        if (!BulletMan) return; // Safety check
-    }
-    
-    AnimationKey newKey;
-
-    // Set key based on state (identical to HeroAnimComp approach)
-    if (BulletMan->BulletManState == EnemyStateEnum::Idle)
-        newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->BulletManDir);
-    
-    else if (BulletMan->BulletManState == EnemyStateEnum::Run)
-        newKey = DirectionUtils::GetBulletManRunEnum(BulletMan->BulletManDir);
-    else
-        newKey = BulletManIdleEnum::Idle_Back; // Default fallback
-
-    // If key has changed, update and restart animation (just like HeroAnimComp)
-    if (newKey != CurrentAnimStateKey)
-    {
-        CurrentAnimStateKey = newKey;
-
-        //Restart the key
-        auto& animManager = AnimManagerDict[CurrentState];
-        if (animManager.AnimationDict.contains(CurrentAnimStateKey))
-        {
-            animManager.AnimationDict[CurrentAnimStateKey].Restart();
-        }
-    }
-
-    // Update base animation component with current state and key (same as HeroAnimComp)
-    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->BulletManState, CurrentAnimStateKey);
-    
-    // Make sure the texture gets transferred to the owner
-    if (CurrentTex && BulletMan)
-    {
-        BulletMan->Texture = CurrentTex;
-    }
-}
