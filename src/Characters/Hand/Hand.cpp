@@ -27,7 +27,7 @@ void ETG::Hand::Draw()
     GameObjectBase::Draw();
 }
 
-void ETG::Hand::Update()
+void ETG::Hand::Update(float deltaTime)
 {
-    GameObjectBase::Update();
+    GameObjectBase::Update(deltaTime);
 }

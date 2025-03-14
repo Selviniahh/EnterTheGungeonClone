@@ -45,7 +45,7 @@ void ETG::GameObjectBase::Draw()
     GlobSpriteBatch.Draw(GetDrawProperties()); //Let's see
 }
 
-void ETG::GameObjectBase::Update()
+void ETG::GameObjectBase::Update(float deltaTime)
 {
     //Calculate the final drawing properties. The Base position modified from the source and relative pos given in the UI will be summed to form the final value before being drawn
     ComputeDrawProperties();

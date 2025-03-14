@@ -54,9 +54,9 @@ namespace ETG
         this->Depth = 2;
     }
 
-    void GunBase::Update()
+    void GunBase::Update(float deltaTime)
     {
-        GameObjectBase::Update();
+        GameObjectBase::Update(deltaTime);
 
         timerForVelocity += Globals::FrameTick;
 

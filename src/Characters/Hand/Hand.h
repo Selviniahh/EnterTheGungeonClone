@@ -13,7 +13,7 @@ namespace ETG
 
         void Initialize() override;
         void Draw() override;
-        void Update() override;
+        void Update(float deltaTime) override;
 
         BOOST_DESCRIBE_CLASS(Hand, (GameObjectBase), (HandOffset, GunOffset), (), ())
     };

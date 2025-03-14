@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics/Texture.hpp>
 #include "../Core/GameObjectBase.h"
+#include "../Items//ActiveItem.h"
+#include "../Items/PassiveItem.h"
 
 namespace ETG
 {
@@ -30,9 +32,20 @@ namespace ETG
     public:
         UserInterface();
         void Initialize() override;
-        void Update() override;
+        void Update(float deltaTime) override;
         void Draw() override;
 
+        void SetActiveItem(ActiveItem* item);
+        void SetPassiveItem(PassiveItem* item);
+
+    private:
+        ActiveItem* m_ActiveItem = nullptr;
+        PassiveItem* m_PassiveItem = nullptr;
+
+        sf::RectangleShape ActiveItemUI;
+        sf::RectangleShape PassiveItemIcon;
+        void DrawActiveItemUI();
+        void DrawPassiveItemUI();
         BOOST_DESCRIBE_CLASS(UserInterface,(GameObjectBase),
             (IsReloaded),
             (),

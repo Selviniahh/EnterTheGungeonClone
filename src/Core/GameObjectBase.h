@@ -28,7 +28,7 @@ namespace ETG
         virtual ~GameObjectBase();
         virtual void Initialize();
         virtual void Draw();
-        virtual void Update();
+        virtual void Update(float deltaTime);
 
         //Base position of GameObjects
         //Inherited Objects such as Gun's position will be attached to hand pos in tick. After the object manipulations are completed, the relative offsets needs given in UI needs to be applied

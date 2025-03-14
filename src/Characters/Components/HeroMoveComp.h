@@ -14,7 +14,7 @@ namespace ETG
         void UpdateMovement();
 
         // Override Update to include our movement update.
-        void Update() override;
+        void Update(float deltaTime) override;
 
         // Pointer to the associated Hero (set from GameState or elsewhere).
         Hero* HeroPtr = nullptr;

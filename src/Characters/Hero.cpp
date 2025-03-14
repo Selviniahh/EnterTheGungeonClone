@@ -36,9 +36,9 @@ void ETG::Hero::Initialize()
 
 ETG::Hero::~Hero() = default;
 
-void ETG::Hero::Update()
+void ETG::Hero::Update(float deltaTime)
 {
-    GameObjectBase::Update();
+    GameObjectBase::Update(deltaTime);
 
     InputComp->Update(*this);
     MoveComp->Update();
@@ -61,7 +61,7 @@ void ETG::Hero::Update()
     if (IsShooting) RogueSpecial->Shoot();
     
     //Necessary to call end of update because the texture is created at here. 
-    GameObjectBase::Update();
+    GameObjectBase::Update(deltaTime);
 }
 
 void ETG::Hero::Draw()
@@ -79,4 +79,17 @@ void ETG::Hero::Draw()
 ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const
 {
     return dynamic_cast<GunBase*>(RogueSpecial.get());
+}
+void ETG::Hero::EquipActiveItem(ActiveItem* item) {
+    EquippedActiveItem = item;
+}
+
+void ETG::Hero::EquipPassiveItem(PassiveItem* item) {
+    EquippedPassiveItem = item;
+    // Apply passive effect (e.g., 20% faster fire rate)
+}
+
+bool ETG::Hero::IsNearItem(GameObjectBase* item) {
+    // Check if the hero is near the item (e.g., collision detection)
+    return true; // Placeholder
 }

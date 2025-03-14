@@ -8,6 +8,7 @@
 #include "../Core/Scene/Scene.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
+#include <filesystem>
 
 sf::Event ETG::GameManager::GameEvent{};
 using namespace ETG::Globals;
@@ -32,7 +33,7 @@ void ETG::GameManager::Initialize()
     GameState::GetInstance();
     GameState::GetInstance().SetSceneObjs(SceneObjects);
 
-    //What's going on at here is only applicable for Scene object. 
+    //What's going on at here is only applicable for Scene object.
     Scene = std::make_unique<class Scene>();
     Scene->SetObjectNameToSelfClassName();
     GameState::GetInstance().SetSceneObj(Scene.get());
@@ -40,31 +41,71 @@ void ETG::GameManager::Initialize()
 
     //NOTE: Secondly EngineUI needs to be initialized
     EngineUI.Initialize();
-    
+
     Globals::Initialize(Window);
     InputManager::InitializeDebugText();
-    
+
     Hero = ETG::CreateGameObjectDefault<class Hero>(sf::Vector2f{10,10});
 
     UI = ETG::CreateGameObjectDefault<UserInterface>();
-    
+
     DebugText = std::make_unique<class DebugText>();
-    
+
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
     // DestroyGameObject(Hero);
 
-    
+    SpawnItems();
+
+}
+void ETG::GameManager::SpawnItems()
+{
+    /// Spawn active and passive items near the hero's initial position
+    ActiveItem = std::make_unique<ActiveItem>((std::filesystem::path(RESOURCE_PATH)/"Items"/"Active"/"Potion_of_Gun_Friendship.png"));
+    PassiveItem = std::make_unique<PassiveItem>("Resources/Items/Passive/platinum_bullets_001.png");
+    // Add items to the scene
+    SceneObjects["ActiveItem"] = ActiveItem.get();
+    SceneObjects["PassiveItem"] = PassiveItem.get();
+}
+void ETG::GameManager::HandleItemEquip()
+{
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+        // Check if the hero is near an item and equip it
+        if (Hero->IsNearItem(ActiveItem.get())) {
+            ActiveItem->PlayEquipSound();
+            DebugText->DrawDebugText("Active Item Equipped: Potion of Gun Friendship",*Window);
+            // Equip the active item to the hero
+            Hero->EquipActiveItem(ActiveItem.get());
+        }
+        else if (Hero->IsNearItem(PassiveItem.get())) {
+            PassiveItem->PlayEquipSound();
+            DebugText->DrawDebugText("Passive Item Equipped: Platinum Bullets",*Window);
+            // Equip the passive item to the hero
+            Hero->EquipPassiveItem(PassiveItem.get());
+        }
+    }
+}
+void ETG::GameManager::UpdateItems(float deltaTime)
+{
+    if (ActiveItem) {
+        ActiveItem->Update(deltaTime);
+    }
+    if (PassiveItem) {
+        PassiveItem->Update(deltaTime);
+    }
 }
 
 void ETG::GameManager::Update()
 {
+    float deltaTime = Globals::ElapsedTimeSeconds;
     if (HasFocus)
     {
         EngineUI.Update();
         Globals::Update();
         InputManager::Update();
-        Hero->Update();
-        UI->Update();
+        Hero->Update(deltaTime);
+        UI->Update(deltaTime);
+        HandleItemEquip();
+        UpdateItems(deltaTime);
     }
 
 }
@@ -89,7 +130,7 @@ void ETG::GameManager::Draw()
     UI->Draw();
     ETG::GlobSpriteBatch.end(*Window);
 
-    //NOTE: non batch draws here. 
+    //NOTE: non batch draws here.
     DebugText->Draw(*Window);
 
     EngineUI.Draw();
