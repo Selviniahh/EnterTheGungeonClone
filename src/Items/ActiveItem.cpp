@@ -1,8 +1,6 @@
 #include "ActiveItem.h"
 #include <iostream>
 #include "../Managers/Globals.h"
-#include "../Characters/Hero.h"
-
 
 ActiveItem::ActiveItem(const std::string& texturePath)
 {
@@ -44,20 +42,9 @@ void ActiveItem::Update()
     }
 }
 
-void ActiveItem::Draw() {
-    if (Texture) {
-        // Access hero through GameState
-        ETG::Hero* hero = ETG::GameState::GetInstance().GetHero();
-        if (hero && hero->IsMouseNearHero(*ETG::Globals::Window)) {
-            sf::Sprite sprite;
-            sprite.setTexture(*Texture);
-            sprite.setScale(0.5f, 0.5f);
-            sprite.setPosition(GetPosition());
-            ETG::Globals::Window->draw(sprite);
-        }
-    } else {
-        std::cerr << "ActiveItem texture is null!" << std::endl;
-    }
+void ActiveItem::Draw()
+{
+    ETG::GameObjectBase::Draw(); // Draw the base texture
 }
 
 void ActiveItem::Use()

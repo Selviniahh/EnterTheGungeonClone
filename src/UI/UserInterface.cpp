@@ -114,10 +114,13 @@ namespace ETG
     void UserInterface::DrawActiveItemUI() {
         if (m_ActiveItem) {
             if (m_ActiveItem->IsConsuming()) {
+                // Draw consumption slider
                 float progress = m_ActiveItem->GetConsumptionProgress();
                 ActiveItemUI.setSize(sf::Vector2f(100 * progress, 20));
                 Globals::Window->draw(ActiveItemUI);
-            } else if (m_ActiveItem->IsOnCooldown()) {
+            }
+            else if (m_ActiveItem->IsOnCooldown()) {
+                // Draw cooldown slider
                 float progress = m_ActiveItem->GetCooldownProgress();
                 ActiveItemUI.setSize(sf::Vector2f(100 * progress, 20));
                 ActiveItemUI.setFillColor(sf::Color::Red);
@@ -125,8 +128,10 @@ namespace ETG
             }
         }
     }
+
     void UserInterface::DrawPassiveItemUI() {
         if (m_PassiveItem) {
+            // Draw passive item icon in the bottom left corner
             PassiveItemIcon.setPosition(10, Globals::Window->getSize().y - 42);
             Globals::Window->draw(PassiveItemIcon);
         }

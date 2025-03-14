@@ -26,8 +26,8 @@ namespace ETG
         GunBase* GetCurrentHoldingGun() const;
         void EquipActiveItem(ActiveItem* item);
         void EquipPassiveItem(PassiveItem* item);
-        bool IsMouseNearHero(const sf::RenderWindow& window) const ;
-        bool IsNearItem(GameObjectBase* item) const;
+        bool IsNearItem(GameObjectBase* item);
+
         static float MouseAngle;
         static Direction CurrentDirection;
         static bool IsShooting;

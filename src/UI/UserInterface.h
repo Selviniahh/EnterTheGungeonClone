@@ -23,7 +23,7 @@ namespace ETG
         bool IsReloaded = true;
         bool RemoveLast = true;
         Hero* Hero = nullptr;
-
+        
         sf::Vector2f FrameOffsetPerc{4,3.5};
         float AmmoBarOffsetPercX = 2.f;
 
@@ -38,16 +38,14 @@ namespace ETG
         void SetActiveItem(ActiveItem* item);
         void SetPassiveItem(PassiveItem* item);
 
-
     private:
-        void DrawActiveItemUI();
-        void DrawPassiveItemUI();
-
         ActiveItem* m_ActiveItem = nullptr;
         PassiveItem* m_PassiveItem = nullptr;
 
         sf::RectangleShape ActiveItemUI;
         sf::RectangleShape PassiveItemIcon;
+        void DrawActiveItemUI();
+        void DrawPassiveItemUI();
         BOOST_DESCRIBE_CLASS(UserInterface,(GameObjectBase),
             (IsReloaded),
             (),

@@ -5,7 +5,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-class ActiveItem : public ETG::GameObjectBase {
+class ActiveItem : public ETG::GameObjectBase
+{
 public:
     ActiveItem(const std::string& texturePath);
     void Initialize() override;

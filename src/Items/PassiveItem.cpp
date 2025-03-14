@@ -1,13 +1,7 @@
 #include "PassiveItem.h"
-#include "../Managers/Globals.h"
-#include "../Managers/GameState.h"
-#include "../Characters/Hero.h" // Include Hero header to get the complete class definition
+
 #include <filesystem>
 #include <iostream>
-
-namespace ETG {
-    class GameState; // Forward declaration of GameState if needed
-}
 
 PassiveItem::PassiveItem(const std::string& texturePath)
 {
@@ -31,20 +25,9 @@ void PassiveItem::Update()
     // No update logic needed for passive items
 }
 
-void PassiveItem::Draw() {
-    if (Texture) {
-        // Access hero through GameState
-        ETG::Hero* hero = ETG::GameState::GetInstance().GetHero();
-        if (hero && hero->IsMouseNearHero(*ETG::Globals::Window)) {
-            sf::Sprite sprite;
-            sprite.setTexture(*Texture);
-            sprite.setScale(0.5f, 0.5f);
-            sprite.setPosition(GetPosition());
-            ETG::Globals::Window->draw(sprite);
-        }
-    } else {
-        std::cerr << "PassiveItem texture is null!" << std::endl;
-    }
+void PassiveItem::Draw()
+{
+    ETG::GameObjectBase::Draw(); // Draw the base texture
 }
 
 void PassiveItem::PlayEquipSound()
