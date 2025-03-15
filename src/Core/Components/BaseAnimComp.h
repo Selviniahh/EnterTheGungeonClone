@@ -7,7 +7,8 @@
 #include "../../Engine/UI/UIUtils.h"
 #include "../../Utils/StrManipulateUtil.h"
 
-//This class looks ugly however because it's heavy templated class, I cannot one by one write all possible template specializations it will be over 100+, so there's nothing I can do
+//This class looks ugly however because it's heavy templated class, I cannot use one by one write all possible template specializations it will be over 100+, so there's nothing I can do
+//NOTE: An animation meant to manage animations, NOT TO MODIFY OBJECT ORIENTATION PROPERTIES 
 namespace ETG
 {
     enum class HeroStateEnum;
@@ -24,20 +25,10 @@ namespace ETG
         };
 
         // Override the base class Initialize method to register with owner
-        void Initialize() override
-        {
-            GameObjectBase::Initialize();
-
-            if (!Owner) throw std::runtime_error("Owner cannot be empty. Every animation should be an owner game object.");
-
-            // Register with owner
-            Owner->SetAnimationInterface(this);
-        }
+        void Initialize() override;
 
         virtual void SetAnimations();
         void Update(const StateEnum& stateEnum, const AnimationKey& animKey);
-        virtual void Draw(const sf::Vector2f& position);
-        virtual void Draw(sf::Vector2f position, sf::Vector2f Origin, sf::Vector2f Scale, float Rotation, float depth);
         void PopulateSpecificWidgets() override;
 
         template <typename DirectionEnum>
@@ -60,21 +51,20 @@ namespace ETG
         template <typename... TObjects>
         void FlipSpritesY(const Direction& currentDirection, TObjects&... objects);
 
-        sf::IntRect CurrTexRect;
-        sf::Vector2f RelativeOrigin{0.f, 0.f};
-        std::shared_ptr<sf::Texture> CurrentTex;
-
         //Animation properties
         std::unordered_map<StateEnum, AnimationManager> AnimManagerDict{};
         StateEnum CurrentState;
         AnimationKey CurrentAnimStateKey;
 
+    private:
+        //These private fields just to be displayed in UI. Do not consider to make them public to access something. If there's a variable at here that you want to access, there'll always be a way other than making this public
+        std::shared_ptr<sf::Texture> CurrentTex;
+        sf::IntRect CurrTexRect;
 
-        BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (CurrentTex, CurrTexRect, RelativeOrigin), (), ())
+        BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (), (), (CurrentTex, CurrTexRect))
     };
 
     //-------------------------------------------------------------Definition-------------------------------------------------------------
-
     template <typename StateEnum>
     void BaseAnimComp<StateEnum>::Update(const StateEnum& stateEnum, const AnimationKey& animKey)
     {
@@ -88,23 +78,17 @@ namespace ETG
         CurrTexRect = animState.CurrRect;
         CurrentTex = animState.GetCurrentFrameAsTexture();
         Owner->Texture = CurrentTex;
-        RelativeOrigin = animManager.AnimationDict[AnimManagerDict[CurrentState].LastKey].Origin;
     }
 
     template <typename StateEnum>
-    void BaseAnimComp<StateEnum>::Draw(const sf::Vector2f& position)
+    void BaseAnimComp<StateEnum>::Initialize()
     {
-        if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
+        ComponentBase::Initialize();
 
-        AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, this->Rotation, RelativeOrigin, this->Scale, this->Depth);
-    }
+        if (!Owner) throw std::runtime_error("Owner cannot be empty. Every animation should be an owner game object.");
 
-    template <typename StateEnum>
-    void BaseAnimComp<StateEnum>::Draw(const sf::Vector2f position, const sf::Vector2f Origin, const sf::Vector2f Scale, const float Rotation, const float depth)
-    {
-        if (!AnimManagerDict.contains(CurrentState)) throw std::runtime_error("AnimManagerDict doesn't contain given state");
-
-        AnimManagerDict[CurrentState].Draw(CurrentTex, position, sf::Color::White, Rotation, Origin, Scale, depth);
+        // Register with owner
+        Owner->SetAnimationInterface(this);
     }
 
     template <typename StateEnum>
@@ -119,9 +103,9 @@ namespace ETG
         auto animManager = AnimationManager{};
         std::vector<DirectionEnum> enumKeys = ConstructEnumVector<DirectionEnum>();
 
-
         // Make sure we don't exceed the bounds of either array
-        size_t count = std::min(enumKeys.size(), animations.size());
+        if (enumKeys.size() != animations.size()) throw std::runtime_error("animation size and enumKeys size are not same. You have to ensure given enum type and animation sizes are equal");
+        const size_t count = enumKeys.size();
 
         for (size_t i = 0; i < count; ++i)
         {
@@ -131,8 +115,8 @@ namespace ETG
             if (!animations[i].FrameRects.empty())
             {
                 animManager.SetOrigin(enumKeys[i], sf::Vector2f{
-                                          (float)animations[i].FrameRects[0].width / 2,
-                                          (float)animations[i].FrameRects[0].height / 2
+                                          (float)animations[i].FrameRects[0].width / 2, //x
+                                          (float)animations[i].FrameRects[0].height / 2 //y
                                       });
             }
         }
@@ -144,15 +128,16 @@ namespace ETG
     void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation)
     {
         auto animManager = AnimationManager{};
-        animManager.AddAnimation(state, animation);  // Using the state enum itself as the key
-    
-        if (!animation.FrameRects.empty()) {
+        animManager.AddAnimation(state, animation); // Using the state enum itself as the key
+
+        if (!animation.FrameRects.empty())
+        {
             animManager.SetOrigin(state, sf::Vector2f{
-                (float)animation.FrameRects[0].width / 2,
-                (float)animation.FrameRects[0].height / 2
-            });
+                                      (float)animation.FrameRects[0].width / 2,
+                                      (float)animation.FrameRects[0].height / 2
+                                  });
         }
-    
+
         AnimManagerDict[state] = animManager;
     }
 
@@ -233,11 +218,6 @@ namespace ETG
             UIUtils::DisplayIntRectangle(CurrTexRect);
             ImGui::TreePop();
         }
-
-        // Display RelativeOrigin
-        UIUtils::BeginProperty("Relative Origin");
-        ImGui::InputFloat2("##RelOrigin", &RelativeOrigin.x);
-        UIUtils::EndProperty();
 
         // Display AnimManagerDict
         if (ImGui::TreeNode("Animation Managers Dictionary"))

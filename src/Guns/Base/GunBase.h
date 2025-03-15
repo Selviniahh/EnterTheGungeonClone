@@ -6,8 +6,10 @@
 #include <boost/describe.hpp>
 #include "../../Animation/Animation.h"
 #include "../../Core/GameObjectBase.h"
+#include "../../Core/Components/ArrowComp.h"
 #include "../../Managers/StateEnums.h"
 #include "../../Core/Components/BaseAnimComp.h"
+#include "../VFX/MuzzleFlash.h"
 
 class ProjectileBase;
 
@@ -18,7 +20,7 @@ namespace ETG
     class GunBase : public GameObjectBase
     {
     public:
-        explicit GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity);
+        GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity, int Depth);
         ~GunBase() override;
         void Initialize() override;
         void Update() override;
@@ -34,36 +36,25 @@ namespace ETG
 
         std::vector<std::unique_ptr<ProjectileBase>> projectiles;
         std::shared_ptr<sf::Texture> ProjTexture;
+        std::unique_ptr<ArrowComp> ArrowComp;
+        std::unique_ptr<MuzzleFlash> MuzzleFlash;
 
         // Muzzle flash variables (instance sets up its own animation).
-        Animation muzzleFlashAnim;
-        float MuzzleFlashEachFrameSpeed;
-        sf::Vector2f MuzzleFlashPos;
-        sf::Vector2f MuzzleFlashOffset;
-
         float pressTime;
         float velocity;
         float maxProjectileRange;
         float timerForVelocity;
         bool isAttacking{};
 
-        // Origin offset for spawning projectiles.
+        //Gun needs to have custom Origin offset cuz, it needs to be attached to Hero's hand
         sf::Vector2f OriginOffset;
-
-        // Arrow variables (common to all guns). Arrow will be disabled in Release
-        std::shared_ptr<sf::Texture> ArrowTex;
-        sf::Vector2f arrowOffset;
-        sf::Vector2f arrowOrigin;
-        sf::Vector2f arrowOriginOffset;
-        sf::Vector2f arrowPos;
-
+        
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
         GunStateEnum CurrentGunState{GunStateEnum::Idle};
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase), (),
-            (ProjTexture,muzzleFlashAnim, MuzzleFlashEachFrameSpeed, MuzzleFlashPos , MuzzleFlashOffset, pressTime, velocity, maxProjectileRange, timerForVelocity, isAttacking, OriginOffset, ArrowTex,
-                arrowOffset, arrowOrigin, arrowOriginOffset, arrowPos),
-            ())         //TODO: Is it worth to bother with exposing projectiles array to UI? 
+            (ProjTexture, pressTime, velocity, maxProjectileRange, timerForVelocity, isAttacking, OriginOffset),
+            ())         //TODO Later expose ArrowComp and muzzleflash to the Gun 
     };
 }

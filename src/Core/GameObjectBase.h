@@ -22,6 +22,7 @@ namespace ETG
             float Depth{};
             sf::Texture* Texture = nullptr;
         };
+
     protected:
         //Push back every GameObject to the SceneObj during initialization.  
         GameObjectBase();
@@ -82,6 +83,7 @@ namespace ETG
         [[nodiscard]] const GameObjectBase* GetOwner() const { return Owner; }
 
         [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
+        [[nodiscard]] float GetRotation() const { return Rotation; }
         [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
         [[nodiscard]] const sf::Vector2f& GetOrigin() const { return Origin; }
 
@@ -89,13 +91,15 @@ namespace ETG
         [[nodiscard]] const sf::Vector2f& GetRelativeScale() const { return RelativeScale; }
         [[nodiscard]] const sf::Vector2f& GetRelativeOrigin() const { return RelativeOrigin; }
 
-        sf::Vector2f& SetRelativePosition(const sf::Vector2f& Pos) { return RelativePos = Pos; }
-        sf::Vector2f& SetRelativeScale(const sf::Vector2f& Scale) { return RelativeScale = Scale; }
-        sf::Vector2f& SetRelativeOrigin(const sf::Vector2f& Origin) { return RelativeOrigin = Origin; }
+        //NOTE: Unused for a long time. 
+        // sf::Vector2f& SetRelativePosition(const sf::Vector2f& Pos) { return RelativePos = Pos; }
+        // sf::Vector2f& SetRelativeScale(const sf::Vector2f& Scale) { return RelativeScale = Scale; }
+        // sf::Vector2f& SetRelativeOrigin(const sf::Vector2f& Origin) { return RelativeOrigin = Origin; }
 
         [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
 
         void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
+        void SetRotation(const float& rotation) { this->Rotation = rotation; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
 

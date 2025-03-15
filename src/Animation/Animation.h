@@ -15,6 +15,7 @@ private:
     mutable std::vector<std::shared_ptr<sf::Texture>> textureCache;
 
 public:
+    std::string AnimPathName;
     float EachFrameSpeed;
     sf::IntRect CurrRect;
     std::shared_ptr<sf::Texture> Texture;

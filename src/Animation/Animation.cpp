@@ -161,5 +161,6 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
     spriteTex->loadFromImage(spriteImage);
 
     auto anim = Animation{spriteTex, eachFrameSpeed, int(imageArr.size()), 1};
+    anim.AnimPathName = RelativePath + FileName;
     return anim;
 }

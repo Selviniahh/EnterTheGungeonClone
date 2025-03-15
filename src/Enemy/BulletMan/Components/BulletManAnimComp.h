@@ -21,7 +21,7 @@ namespace ETG
         void Initialize() override;
         void Update() override;
 
-        ETG::BulletMan* BulletMan{};
+        BulletMan* BulletMan{};
         std::shared_ptr<sf::Texture> Texture; // Add texture field to match BaseAnimComp pattern
     };
 
