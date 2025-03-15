@@ -76,3 +76,40 @@ ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const
 {
     return dynamic_cast<GunBase*>(RogueSpecial.get());
 }
+void ETG::Hero::EquipActiveItem(ActiveItem* item) {
+    EquippedActiveItem = item;
+}
+
+void ETG::Hero::EquipPassiveItem(PassiveItem* item) {
+    EquippedPassiveItem = item;
+    // Apply passive effect (e.g., 20% faster fire rate)
+}
+
+
+bool ETG::Hero::IsMouseNearHero(const sf::RenderWindow& window) const {
+    // Get the mouse position in the world coordinates
+    sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+    // Calculate distance between mouse cursor and hero
+    float distance = std::sqrt(
+        std::pow(mousePosition.x - GetPosition().x, 2) +
+        std::pow(mousePosition.y - GetPosition().y, 2)
+    );
+
+    // Define proximity threshold (e.g., 100 pixels)
+    const float proximityThreshold = 10.0f;
+    return distance < proximityThreshold;
+}
+bool ETG::Hero::IsNearItem(GameObjectBase* item) const {
+    if (!item) return false;
+
+    // Calculate distance between hero and item
+    float distance = std::sqrt(
+        std::pow(item->GetPosition().x - GetPosition().x, 2) +
+        std::pow(item->GetPosition().y - GetPosition().y, 2)
+    );
+
+    // Define proximity threshold (e.g., 50 pixels)
+    const float proximityThreshold = 50.0f;
+    return distance < proximityThreshold;
+}

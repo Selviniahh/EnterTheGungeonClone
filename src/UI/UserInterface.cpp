@@ -6,6 +6,8 @@
 #include "../Managers/GameState.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
+#include "../Items/ActiveItem.h"
+#include "../Items/PassiveItem.h"
 
 namespace ETG
 {
@@ -43,6 +45,11 @@ namespace ETG
         };
 
         if (!Hero) Hero = GameState::GetInstance().GetHero();
+        ActiveItemUI.setSize(sf::Vector2f(100, 20));
+        ActiveItemUI.setFillColor(sf::Color::Blue);
+
+        PassiveItemIcon.setSize(sf::Vector2f(32, 32));
+        PassiveItemIcon.setFillColor(sf::Color::Green);
     }
 
     void UserInterface::Update()
@@ -92,5 +99,41 @@ namespace ETG
         //     ammoDisplaySprite.setPosition(static_cast<float>(ammoPosition.x), static_cast<float>(ammoPosition.y));
         //     Globals::Window->draw(ammoDisplaySprite);
         // }
+        // Draw Active and Passive Item UI
+        DrawActiveItemUI();
+        DrawPassiveItemUI();
+    }
+    void UserInterface::SetActiveItem(ActiveItem* item) {
+        m_ActiveItem  = item;
+    }
+
+    void UserInterface::SetPassiveItem(PassiveItem* item) {
+        m_PassiveItem = item;
+    }
+
+    void UserInterface::DrawActiveItemUI() {
+        if (m_ActiveItem) {
+            if (m_ActiveItem->IsConsuming()) {
+                // Draw consumption slider
+                float progress = m_ActiveItem->GetConsumptionProgress();
+                ActiveItemUI.setSize(sf::Vector2f(100 * progress, 20));
+                Globals::Window->draw(ActiveItemUI);
+            }
+            else if (m_ActiveItem->IsOnCooldown()) {
+                // Draw cooldown slider
+                float progress = m_ActiveItem->GetCooldownProgress();
+                ActiveItemUI.setSize(sf::Vector2f(100 * progress, 20));
+                ActiveItemUI.setFillColor(sf::Color::Red);
+                Globals::Window->draw(ActiveItemUI);
+            }
+        }
+    }
+
+    void UserInterface::DrawPassiveItemUI() {
+        if (m_PassiveItem) {
+            // Draw passive item icon in the bottom left corner
+            PassiveItemIcon.setPosition(10, Globals::Window->getSize().y - 42);
+            Globals::Window->draw(PassiveItemIcon);
+        }
     }
 }
