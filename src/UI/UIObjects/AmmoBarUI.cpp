@@ -1,0 +1,61 @@
+#include "AmmoBarUI.h"
+#include "../../Guns/Base/GunBase.h"
+#include "../../Managers/Globals.h"
+#include "../../Managers/SpriteBatch.h"
+#include <filesystem>
+
+namespace ETG
+{
+    AmmoBarUI::AmmoBarUI()
+    {
+        AmmoBarUI::Initialize();
+        GameObjectBase::Initialize();
+    }
+
+    void AmmoBarUI::Initialize()
+    {
+        const std::string ResPath = RESOURCE_PATH;
+
+        // Load textures
+        ammoBarTexture = std::make_shared<sf::Texture>();
+        ammoDisplayTexture = std::make_shared<sf::Texture>();
+        
+        if (!ammoBarTexture->loadFromFile(ResPath + "/UI/AmmoBarUI.png"))
+            throw std::runtime_error("Failed to load AmmoBarUI.png");
+
+        if (!ammoDisplayTexture->loadFromFile(ResPath + "/UI/AmmoDisplay.png")) //TODO: Soon after you fix those, take it from Hero's gun
+            throw std::runtime_error("Failed to load AmmoDisplay.png");
+
+        // Set up initial draw properties
+        const sf::Vector2u barSize = ammoBarTexture->getSize();
+
+        // Set up ammo bar draw properties
+        Texture = ammoBarTexture;
+        Origin = {
+            static_cast<float>(barSize.x) / 2.0f,
+            static_cast<float>(barSize.y) / 2.0f
+        };
+    }
+
+    void AmmoBarUI::Update()
+    {
+        GameObjectBase::Update();
+
+        //NOTE: Update ammo display will be handled later
+    }
+
+    void AmmoBarUI::FlipTexture(const bool horizontally, const bool vertically)
+    {
+        float scaleX = horizontally ? -1.0f : 1.0f;
+        float scaleY = vertically ? -1.0f : 1.0f;
+    
+        // Set base scale
+        this->Scale = {scaleX, scaleY};
+    }
+
+    void AmmoBarUI::Draw()
+    {
+        // Draw ammo bar
+        SpriteBatch::Draw(GetDrawProperties());
+    }
+}

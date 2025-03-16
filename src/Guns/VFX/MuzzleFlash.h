@@ -12,6 +12,7 @@ namespace ETG
         ~MuzzleFlash() override = default;
         MuzzleFlash(const std::string& relativePath, const std::string& fileName, const std::string& extension, float frameSpeed = 0.10f);
         void Initialize() override;
+        void UpdatePosition();
         void Update() override;
         void Draw() override;
         

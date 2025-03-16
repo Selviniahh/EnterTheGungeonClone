@@ -20,6 +20,7 @@ namespace ETG
             sf::Vector2f Origin{0, 0};
             float Rotation{};
             float Depth{};
+            sf::Color Color{sf::Color::White};
             sf::Texture* Texture = nullptr;
         };
 
@@ -98,7 +99,7 @@ namespace ETG
 
         [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
 
-        void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
+        virtual void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
         void SetRotation(const float& rotation) { this->Rotation = rotation; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }

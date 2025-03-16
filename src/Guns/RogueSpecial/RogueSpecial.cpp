@@ -2,7 +2,7 @@
 #include "../../Core/Factory.h"
 #include <filesystem>
 
-ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f,2)
+ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f,2,300,10)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
 
@@ -21,7 +21,6 @@ void ETG::RogueSpecial::Initialize()
     MuzzleFlash->SetOffset({37.f, -6.f});
 
     // Load the projectile texture for RogueSpecial.
-    // Fixed: Don't try to load before initializing ProjTexture
     const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "RogueSpecial" / "Projectile_RogueSpecial.png").string();
     if (!ProjTexture->loadFromFile(projPath))
         throw std::runtime_error("Failed to load Projectile_RogueSpecial.png from path: " + projPath);

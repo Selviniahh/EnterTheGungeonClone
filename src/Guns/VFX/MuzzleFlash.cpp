@@ -1,5 +1,4 @@
 #include "MuzzleFlash.h"
-
 #include <complex>
 #include <filesystem>
 #include "../../Managers/Globals.h"
@@ -45,7 +44,20 @@ namespace ETG
             }
         }
 
-        // Update position based on parent if available
+        UpdatePosition();
+    }
+
+    void MuzzleFlash::Draw()
+    {
+        if (!isActive || !Animation.Texture) return;
+
+        // Draw the muzzle flash animation
+        Animation.Draw(Animation.Texture, Position, sf::Color::White, Rotation, Origin, Scale, Depth);
+    }
+
+    // Update position based on parent if available
+    void MuzzleFlash::UpdatePosition()
+    {
         if (parentObject)
         {
             // Get parent's properties
@@ -68,14 +80,6 @@ namespace ETG
             Position = parentProps.Position + rotatedOffset;
             Rotation = parentProps.Rotation;
         }
-    }
-
-    void MuzzleFlash::Draw()
-    {
-        if (!isActive || !Animation.Texture) return;
-
-        // Draw the muzzle flash animation
-        Animation.Draw(Animation.Texture, Position, sf::Color::White, Rotation, Origin, Scale, Depth);
     }
 
     void MuzzleFlash::Activate()

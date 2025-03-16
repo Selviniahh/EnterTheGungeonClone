@@ -69,7 +69,7 @@ void ETG::SpriteBatch::Draw(const GameObjectBase::DrawProperties& DrawProperties
     frame.setPosition(DrawProperties.Position); // Position it at the specified location
     frame.setRotation(DrawProperties.Rotation);
     frame.setOrigin(DrawProperties.Origin);
-    frame.setColor(sf::Color::White);
+    frame.setColor(DrawProperties.Color);
     GlobSpriteBatch.draw(frame, DrawProperties.Depth);
 
 }

@@ -20,7 +20,7 @@ namespace ETG
     class GunBase : public GameObjectBase
     {
     public:
-        GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity, int Depth);
+        GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity, int Depth, int ammoSize, int magazineSize);
         ~GunBase() override;
         void Initialize() override;
         void Update() override;
@@ -28,14 +28,23 @@ namespace ETG
         virtual void Shoot();
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
-        int Ammo;
+
+        //Total ammo count 
+        int AmmoSize{};
+
+        //Total magazine count
+        int MagazineSize{};
+
+        //Current magazine ammo count (this will be subtracted and reset)
+        int MagazineAmmo{};
+
+        std::shared_ptr<sf::Texture> ProjTexture;
 
     protected:
         // Rotates an offset vector according to the gun's current rotation.
         sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
 
         std::vector<std::unique_ptr<ProjectileBase>> projectiles;
-        std::shared_ptr<sf::Texture> ProjTexture;
         std::unique_ptr<ArrowComp> ArrowComp;
         std::unique_ptr<MuzzleFlash> MuzzleFlash;
 

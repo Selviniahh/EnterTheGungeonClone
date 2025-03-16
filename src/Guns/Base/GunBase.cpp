@@ -9,8 +9,8 @@
 
 namespace ETG
 {
-    GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity, int Depth)
-        : pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity)
+    GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity, int Depth, const int ammoSize, const int magazineSize)
+        : AmmoSize(ammoSize), MagazineSize(magazineSize), pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity)
     {
         // Initialize common position and textures
         this->Position = Position;
@@ -94,7 +94,7 @@ namespace ETG
 
             // Spawn projectile.
             std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObjectDefault<ProjectileBase>(*ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
-            proj.get()->Update(); //Necessary to set initial position
+            proj->Update(); //Necessary to set initial position
             projectiles.push_back(std::move(proj));
         }
     }

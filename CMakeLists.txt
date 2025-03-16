@@ -68,6 +68,10 @@ add_executable(ETG main.cpp
         src/Core/Components/ArrowComp.h
         src/Guns/VFX/MuzzleFlash.cpp
         src/Guns/VFX/MuzzleFlash.h
+        src/UI/UIObjects/AmmoBarUI.cpp
+        src/UI/UIObjects/AmmoBarUI.h
+        src/UI/UIObjects/AmmoIndicatorsUI.cpp
+        src/UI/UIObjects/AmmoIndicatorsUI.h
 )
 
 # Easiest and fastest way is VCPKG 
