@@ -20,23 +20,14 @@ namespace ETG
     void AmmoIndicatorsUI::SetBottomBar(AmmoBarUI* bottom)
     {
         bottomBar = bottom;
-        
+
         // Update indicators if we already have a gun reference
-        if (currentGun) {
+        if (currentGun)
+        {
             UpdateIndicators();
         }
     }
 
-    void AmmoIndicatorsUI::SetGun(GunBase* gun)
-    {
-        currentGun = gun;
-        
-        // Update indicators if we have the bottom bar reference
-        if (bottomBar) {
-            UpdateIndicators();
-        }
-    }
-    
     void AmmoIndicatorsUI::SetTopBarPositionCallback(std::function<void(float)> callback)
     {
         topBarPositionCallback = callback;
@@ -45,9 +36,10 @@ namespace ETG
     void AmmoIndicatorsUI::Update()
     {
         GameObjectBase::Update();
-        
+
         // Only update if we have all necessary references
-        if (currentGun && bottomBar) {
+        if (currentGun && bottomBar)
+        {
             UpdateIndicators();
         }
     }
@@ -56,30 +48,31 @@ namespace ETG
     {
         // Clear previous indicators
         ammoIndicatorProps.clear();
-        
-        if (!currentGun || !currentGun->ProjTexture || !bottomBar) return;
-        
+
+        if (!currentGun || !currentGun->ProjTexture || !bottomBar) throw std::runtime_error("There's no current gun");
+
         // Get magazine info from gun
         const int magazineSize = currentGun->MagazineSize;
-        const int currentAmmo = currentGun->MagazineAmmo;
-        
+        const int currMagAmmoSize = currentGun->MagazineAmmo;
+
         if (magazineSize <= 0) return;
-        
+
         // Get position for bottom bar
         const sf::Vector2f bottomPos = bottomBar->GetPosition();
-        
+
         // Calculate spacing based on projectile texture size
         const float ammoHeight = static_cast<float>(currentGun->ProjTexture->getSize().y);
-        const float spacing = ammoHeight * indicatorSpacing;
-        
+        EachAmmoSpacing = ammoHeight * indicatorSpacing;
+
         // Start X position (centered with the bottom bar)
         const float startX = bottomPos.x;
-        
+
         // Create indicators - start from bottom and move upward
-        float currentY = bottomPos.y - spacing; // Start just above the bottom bar
-        float topMostY = currentY;              // Track the topmost indicator position
-        
-        for (int i = 0; i < magazineSize; i++) {
+        float currentY = bottomPos.y - EachAmmoSpacing; // Start just above the bottom bar
+        float topMostY = currentY; // Track the topmost indicator position
+
+        for (int i = 0; i < magazineSize; i++)
+        {
             DrawProperties props;
             props.Position = {startX, currentY};
             props.Scale = {1.0f, 1.0f};
@@ -90,28 +83,32 @@ namespace ETG
             props.Rotation = 0.0f;
             props.Depth = 0.0f;
             props.Texture = currentGun->ProjTexture.get();
-            
+
             // Apply visual styling based on ammo state
-            // if (i >= currentAmmo) {
-            //     // Used or empty ammo
-            //     props.Color = sf::Color(255, 255, 255, 128);  // 50% alpha for empty slots
-            // } else {
-            //     // Available ammo
-            //     props.Color = sf::Color::White;
-            // }
-            
+            if (i >= currMagAmmoSize)
+            {
+                // Used or empty ammo
+                props.Color = sf::Color(255, 255, 255, 128); // 50% alpha for empty slots
+            }
+            else
+            {
+                // Available ammo
+                props.Color = sf::Color::White;
+            }
+
             ammoIndicatorProps.push_back(props);
-            
+
             // Move up for next indicator
-            currentY -= spacing;
+            currentY -= EachAmmoSpacing;
             topMostY = currentY; // Update topmost position
         }
-        
+
         // After all indicators are positioned, calculate where the top bar should be
-        float topBarY = topMostY - topBarOffset; // Additional offset for the top bar
-        
+        const float topBarY = topMostY;
+
         // Notify the top bar's new position if callback is set
-        if (topBarPositionCallback) {
+        if (topBarPositionCallback)
+        {
             topBarPositionCallback(topBarY);
         }
     }
@@ -119,7 +116,8 @@ namespace ETG
     void AmmoIndicatorsUI::Draw()
     {
         // Draw all ammo indicators
-        for (const auto& props : ammoIndicatorProps) {
+        for (const auto& props : ammoIndicatorProps)
+        {
             SpriteBatch::Draw(props);
         }
     }

@@ -18,13 +18,9 @@ namespace ETG
 
         // Load textures
         ammoBarTexture = std::make_shared<sf::Texture>();
-        ammoDisplayTexture = std::make_shared<sf::Texture>();
         
         if (!ammoBarTexture->loadFromFile(ResPath + "/UI/AmmoBarUI.png"))
             throw std::runtime_error("Failed to load AmmoBarUI.png");
-
-        if (!ammoDisplayTexture->loadFromFile(ResPath + "/UI/AmmoDisplay.png")) //TODO: Soon after you fix those, take it from Hero's gun
-            throw std::runtime_error("Failed to load AmmoDisplay.png");
 
         // Set up initial draw properties
         const sf::Vector2u barSize = ammoBarTexture->getSize();
@@ -40,8 +36,6 @@ namespace ETG
     void AmmoBarUI::Update()
     {
         GameObjectBase::Update();
-
-        //NOTE: Update ammo display will be handled later
     }
 
     void AmmoBarUI::FlipTexture(const bool horizontally, const bool vertically)

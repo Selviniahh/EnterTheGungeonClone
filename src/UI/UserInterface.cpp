@@ -18,17 +18,12 @@ namespace ETG
     void UserInterface::Initialize()
     {
         if (!hero) hero = GameState::GetInstance().GetHero();
+        currentGun = hero->GetCurrentHoldingGun();
+        if (!currentGun) throw std::runtime_error("Current Gun not found");
 
         InitializeFrameProperties();
+        UpdateGunUIProperties();
         InitializeAmmoBar();
-
-        // Get initial gun reference and initialize positions
-        currentGun = hero->GetCurrentHoldingGun();
-        if (currentGun)
-        {
-            UpdateGunUIProperties();
-            UpdateAmmoBarTopPos(); // Set initial position once
-        }
     }
 
 
@@ -40,18 +35,16 @@ namespace ETG
         if ((currentGun = hero->GetCurrentHoldingGun()))
         {
             UpdateGunUIProperties();
-        
+
             // No need to explicitly call UpdateAmmoBarTopPos() anymore
             // since AmmoIndicatorsUI will handle positioning
 
             // Update all ammo UI components with current gun
-            ammoBarBottom->SetGun(currentGun);
             ammoIndicators->SetGun(currentGun);
-            ammoBarTop->SetGun(currentGun);
         }
 
         // Update UI components
-        ammoBarBottom->Update();
+        ammoBarBottom->Update(); //For now this update not doing anyhting
         ammoIndicators->Update(); // This will update top bar position through callback
         ammoBarTop->Update();
     }
@@ -105,21 +98,7 @@ namespace ETG
             static_cast<float>(frameSize.y) / 2.0f
         };
     }
-
-    // Remove or simplify the UpdateAmmoBarTopPos method since positioning is now handled by AmmoIndicatorsUI
-
-    void UserInterface::UpdateAmmoBarTopPos()
-    {
-        // No longer needs to calculate the top bar position
-        // Just make sure we have valid gun reference for other UI components
-        if (!currentGun || !currentGun->ProjTexture) return;
-
-        // Update any other UI elements if needed
-        const float ammoTexHeight = static_cast<float>(currentGun->ProjTexture->getSize().y);
-        const float additionalSpacing = ammoTexHeight * (SpacingPercent / 100.0f);
-        EachAmmoSpacing = ammoTexHeight + additionalSpacing;
-    }
-
+    
     // Update the Update method
 
     void UserInterface::InitializeAmmoBar()
@@ -129,20 +108,24 @@ namespace ETG
 
         // Create and position bottom ammo bar
         ammoBarBottom = CreateGameObjectAttached<AmmoBarUI>(this);
-        ammoBarBottom->SetPosition({ammoBarX, framePosition.y + AmmoBarOffsetY});
+        ammoBarBottom->SetPosition({ammoBarX, framePosition.y + InitialAmmoBarOffsetY});
         ammoBarBottom->FlipTexture(false, true);
 
         // Create top ammo bar with an initial position (will be updated by indicators)
         ammoBarTop = CreateGameObjectAttached<AmmoBarUI>(this);
-        ammoBarTop->SetPosition({ammoBarX, framePosition.y - AmmoBarOffsetY});
+        ammoBarTop->SetPosition({ammoBarX, framePosition.y - InitialAmmoBarOffsetY});
 
         // Create ammo indicators
         ammoIndicators = CreateGameObjectAttached<AmmoIndicatorsUI>(this);
+        ammoIndicators->SetGun(currentGun);
         ammoIndicators->SetBottomBar(ammoBarBottom.get());
-    
+        ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing } }); //TODO: Not sure to remove this line or not
+
         // Set callback for updating the top bar position
-        ammoIndicators->SetTopBarPositionCallback([this](float topY) {
-            if (ammoBarTop) {
+        ammoIndicators->SetTopBarPositionCallback([this](float topY)
+        {
+            if (ammoBarTop)
+            {
                 ammoBarTop->SetPosition({ammoBarTop->GetPosition().x, topY});
             }
         });

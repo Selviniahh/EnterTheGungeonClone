@@ -15,6 +15,7 @@ namespace ETG
         // Initialize common position and textures
         this->Position = Position;
         this->Depth = Depth;
+        this->MagazineAmmo = MagazineSize;
 
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ProjTexture) ProjTexture = std::make_shared<sf::Texture>();
@@ -75,6 +76,8 @@ namespace ETG
     {
         if (timerForVelocity >= pressTime)
         {
+            MagazineAmmo--;
+
             // Restart muzzle flash animation.
             MuzzleFlash->Restart();
 
