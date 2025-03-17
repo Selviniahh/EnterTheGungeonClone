@@ -3,6 +3,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include "../Core/GameObjectBase.h"
 #include "UIObjects/AmmoBarUI.h"
+#include "UIObjects/AmmoCounter.h"
 #include "UIObjects/AmmoIndicatorsUI.h"
 
 namespace ETG
@@ -24,13 +25,14 @@ namespace ETG
         sf::Vector2f framePosition;
 
         // References
-        GunBase* currentGun = nullptr;
+        GunBase* CurrentGun = nullptr;
         Hero* hero = nullptr;
 
         // UI Components
         std::unique_ptr<AmmoBarUI> ammoBarBottom;
         std::unique_ptr<AmmoBarUI> ammoBarTop;
         std::unique_ptr<AmmoIndicatorsUI> ammoIndicators;
+        std::unique_ptr<AmmoCounter> ammoCounter;
 
         // Configuration
         sf::Vector2f FrameOffsetPerc{4, 3.5};
@@ -53,6 +55,6 @@ namespace ETG
         BOOST_DESCRIBE_CLASS(UserInterface, (GameObjectBase),
                              (),
                              (frameTexture),
-                             (currentGun))
+                             (CurrentGun))
     };
 }

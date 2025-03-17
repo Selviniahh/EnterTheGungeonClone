@@ -6,6 +6,7 @@
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Core/Factory.h"
+#include "UIObjects/AmmoCounter.h"
 
 namespace ETG
 {
@@ -18,12 +19,14 @@ namespace ETG
     void UserInterface::Initialize()
     {
         if (!hero) hero = GameState::GetInstance().GetHero();
-        currentGun = hero->GetCurrentHoldingGun();
-        if (!currentGun) throw std::runtime_error("Current Gun not found");
+        CurrentGun = hero->GetCurrentHoldingGun();
+        if (!CurrentGun) throw std::runtime_error("Current Gun not found");
 
         InitializeFrameProperties();
         UpdateGunUIProperties();
         InitializeAmmoBar();
+
+        ammoCounter = ETG::CreateGameObjectAttached<AmmoCounter>(this, sf::Vector2f{frameDrawProps.Position.x - 15, frameDrawProps.Position.y - 100});
     }
 
 
@@ -32,15 +35,13 @@ namespace ETG
         GameObjectBase::Update();
 
         // Get current gun and update properties
-        if ((currentGun = hero->GetCurrentHoldingGun()))
+        if ((CurrentGun = hero->GetCurrentHoldingGun()))
         {
             UpdateGunUIProperties();
 
-            // No need to explicitly call UpdateAmmoBarTopPos() anymore
-            // since AmmoIndicatorsUI will handle positioning
-
             // Update all ammo UI components with current gun
-            ammoIndicators->SetGun(currentGun);
+            ammoIndicators->SetGun(CurrentGun);
+            ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->AmmoSize);
         }
 
         // Update UI components
@@ -55,9 +56,10 @@ namespace ETG
         SpriteBatch::Draw(frameDrawProps);
 
         // Draw the gun if available
-        if (currentGun && currentGun->Texture)
+        if (CurrentGun && CurrentGun->Texture)
         {
             SpriteBatch::Draw(gunDrawProps);
+            ammoCounter->Draw();
         }
 
         // Draw ammo bars and indicators
@@ -117,7 +119,7 @@ namespace ETG
 
         // Create ammo indicators
         ammoIndicators = CreateGameObjectAttached<AmmoIndicatorsUI>(this);
-        ammoIndicators->SetGun(currentGun);
+        ammoIndicators->SetGun(CurrentGun);
         ammoIndicators->SetBottomBar(ammoBarBottom.get());
         ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing } }); //TODO: Not sure to remove this line or not
 
@@ -133,13 +135,13 @@ namespace ETG
 
     void UserInterface::UpdateGunUIProperties()
     {
-        currentGun = hero->GetCurrentHoldingGun();
-        gunDrawProps.Texture = currentGun->Texture.get();
+        CurrentGun = hero->GetCurrentHoldingGun();
+        gunDrawProps.Texture = CurrentGun->Texture.get();
         gunDrawProps.Position = framePosition;
         gunDrawProps.Scale = {3.0f, 3.0f}; // UI gun scale factor
         gunDrawProps.Origin = {
-            static_cast<float>(currentGun->Texture->getSize().x) / 2.0f,
-            static_cast<float>(currentGun->Texture->getSize().y) / 2.0f
+            static_cast<float>(CurrentGun->Texture->getSize().x) / 2.0f,
+            static_cast<float>(CurrentGun->Texture->getSize().y) / 2.0f
         };
     }
 }

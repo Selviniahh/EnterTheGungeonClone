@@ -56,6 +56,6 @@ public:
         float sineValue = std::sin(Timer * std::numbers::pi);
 
         //apply lerp
-        return static_cast<T>(std::lerp(25.0f, 255.0f, sineValue));
+        return static_cast<T>(std::lerp(a, b, sineValue));
     }
 };
