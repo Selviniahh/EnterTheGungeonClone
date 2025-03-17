@@ -2,6 +2,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <complex>
 #include <numbers>
+#include "../Managers/Globals.h"
 
 class Math
 {
@@ -41,5 +42,20 @@ public:
     static bool IsInRange(const T& value, const T& min, const T& max)
     {
         return value >= min && value <= max;
+    }
+
+    template<typename T>
+    static T SinWaveLerp(T a, T b, T interval)
+    {
+        //Update the timer (0 to  and back) // Update timer
+        static float Timer = 0.f; 
+        Timer += ETG::Globals::FrameTick / interval;
+        if (Timer > 1.0f) Timer = 0.0f;
+
+        //Generate sine wave (-1 to +1)
+        float sineValue = std::sin(Timer * std::numbers::pi);
+
+        //apply lerp
+        return static_cast<T>(std::lerp(25.0f, 255.0f, sineValue));
     }
 };
