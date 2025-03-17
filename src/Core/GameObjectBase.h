@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <boost/describe.hpp>
-#include <boost/mp11/algorithm.hpp>
 
 #include "GameClass.h"
 #include "../Utils/Interface/IAnimationComponent.h"
@@ -39,6 +38,7 @@ namespace ETG
         sf::Vector2f Scale = {1, 1};
         float Rotation{};
         sf::Vector2f Origin{0.f, 0.f};
+        sf::Color Color{sf::Color::White};
         float Depth{};
 
         //This will be true for drawable game objects. False for components

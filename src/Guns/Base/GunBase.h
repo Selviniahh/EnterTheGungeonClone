@@ -9,6 +9,7 @@
 #include "../../Core/Components/ArrowComp.h"
 #include "../../Managers/StateEnums.h"
 #include "../../Core/Components/BaseAnimComp.h"
+#include "../../Core/Events/EventDelegate.h"
 #include "../VFX/MuzzleFlash.h"
 
 class ProjectileBase;
@@ -26,6 +27,7 @@ namespace ETG
         void Update() override;
         void Draw() override;
         virtual void Shoot();
+        virtual void Reload();
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
 
@@ -39,11 +41,11 @@ namespace ETG
         int MagazineAmmo{};
 
         std::shared_ptr<sf::Texture> ProjTexture;
+        EventDelegate<bool> OnAmmoStateChanged;
 
     protected:
         // Rotates an offset vector according to the gun's current rotation.
-        sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
-
+        [[nodiscard]] sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
         std::vector<std::unique_ptr<ProjectileBase>> projectiles;
         std::unique_ptr<ArrowComp> ArrowComp;
         std::unique_ptr<MuzzleFlash> MuzzleFlash;

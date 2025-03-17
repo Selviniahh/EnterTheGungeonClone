@@ -42,7 +42,7 @@ void ETG::GameObjectBase::Draw()
 {
     VisualizeOrigin();
     DrawBounds();
-    GlobSpriteBatch.Draw(GetDrawProperties()); //Let's see
+    SpriteBatch::Draw(GetDrawProperties()); //Let's see
 }
 
 void ETG::GameObjectBase::Update()
@@ -59,6 +59,7 @@ void ETG::GameObjectBase::ComputeDrawProperties()
     DrawProps.Origin = Origin + RelativeOrigin;
     DrawProps.Depth = Depth;
     DrawProps.Texture = Texture.get();
+    DrawProps.Color = Color;
 }
 
 sf::FloatRect ETG::GameObjectBase::GetBounds() const

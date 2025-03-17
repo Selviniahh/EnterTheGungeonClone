@@ -70,6 +70,12 @@ namespace ETG
         {
             proj->Update();
         }
+
+        //If R pressed, reload
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        {
+            Reload();
+        }
     }
 
     void GunBase::Shoot()
@@ -100,6 +106,19 @@ namespace ETG
             proj->Update(); //Necessary to set initial position
             projectiles.push_back(std::move(proj));
         }
+
+        if (MagazineAmmo == 0)
+        {
+            OnAmmoStateChanged.Broadcast(true);
+        }
+    }
+
+    void GunBase::Reload()
+    {
+        //Some reload logic
+        AmmoSize -= MagazineSize - MagazineAmmo; //Set ammoSize
+        MagazineAmmo = MagazineSize;
+        OnAmmoStateChanged.Broadcast(false); // Notify that we have ammo again
     }
 
     void GunBase::Draw()

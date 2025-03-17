@@ -73,6 +73,7 @@ add_executable(ETG main.cpp
         src/UI/UIObjects/AmmoIndicatorsUI.cpp
         src/UI/UIObjects/AmmoIndicatorsUI.h
         src/Guns/VFX/ReloadText.h
+        src/Core/Events/EventDelegate.h
 )
 
 # Easiest and fastest way is VCPKG 

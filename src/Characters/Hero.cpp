@@ -22,8 +22,8 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 
     Hand = ETG::CreateGameObjectAttached<class Hand>(this);
     RogueSpecial = ETG::CreateGameObjectAttached<class RogueSpecial>(this, Hand->GetRelativePosition());
-    AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
     ReloadText = ETG::CreateGameObjectAttached<class ReloadText>(this);
+    AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
     AnimationComp->Initialize();
     AnimationComp->Update(); //Set the Texture during Initialization
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
@@ -35,6 +35,7 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 void ETG::Hero::Initialize()
 {
     GameObjectBase::Initialize();
+    ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
 }
 
 ETG::Hero::~Hero() = default;
@@ -61,22 +62,12 @@ void ETG::Hero::Update()
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
 
-    if (IsShooting)
+    if (IsShooting && RogueSpecial->MagazineAmmo != 0)
     {
-        //There's still magazine, it can shoot
-        if (RogueSpecial->MagazineAmmo != 0)
-        {
-            RogueSpecial->Shoot();
-        }
-
-        else //Needs reload
-        {
-            ReloadText->NeedsReload = true;
-        }
+        RogueSpecial->Shoot();
     }
 
     ReloadText->Update();
-    //Necessary to call end of update because the texture is created at here. 
     GameObjectBase::Update();
 }
 
