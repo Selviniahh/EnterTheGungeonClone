@@ -6,6 +6,7 @@
 
 namespace ETG
 {
+    class ReloadText;
     class GunBase;
     class Hand;
     class RogueSpecial;
@@ -33,6 +34,7 @@ namespace ETG
         std::unique_ptr<RogueSpecial> RogueSpecial;
         std::unique_ptr<HeroMoveComp> MoveComp;
         std::unique_ptr<Hand> Hand;
+        std::unique_ptr<ReloadText> ReloadText;
 
 
     private:

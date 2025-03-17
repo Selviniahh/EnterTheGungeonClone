@@ -3,10 +3,12 @@
 #include "../Managers/GameState.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
+#include "../Guns/VFX/ReloadText.h"
 #include "Components/HeroAnimComp.h"
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "Hand/Hand.h"
+#include "../Guns/VFX/ReloadText.h"
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -21,6 +23,7 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     Hand = ETG::CreateGameObjectAttached<class Hand>(this);
     RogueSpecial = ETG::CreateGameObjectAttached<class RogueSpecial>(this, Hand->GetRelativePosition());
     AnimationComp = ETG::CreateGameObjectAttached<HeroAnimComp>(this);
+    ReloadText = ETG::CreateGameObjectAttached<class ReloadText>(this);
     AnimationComp->Initialize();
     AnimationComp->Update(); //Set the Texture during Initialization
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
@@ -49,16 +52,30 @@ void ETG::Hero::Update()
     AnimationComp->Update();
 
     //Set hand properties
-    const sf::Vector2f HandOffsetForHero =  AnimationComp->IsFacingRight(CurrentDirection) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
+    const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(CurrentDirection) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
     Hand->Update();
-    
+
     //Gun
     RogueSpecial->SetPosition(Hand->GetPosition() + Hand->GunOffset);
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
-    if (IsShooting) RogueSpecial->Shoot();
-    
+
+    if (IsShooting)
+    {
+        //There's still magazine, it can shoot
+        if (RogueSpecial->MagazineAmmo != 0)
+        {
+            RogueSpecial->Shoot();
+        }
+
+        else //Needs reload
+        {
+            ReloadText->NeedsReload = true;
+        }
+    }
+
+    ReloadText->Update();
     //Necessary to call end of update because the texture is created at here. 
     GameObjectBase::Update();
 }
@@ -68,7 +85,8 @@ void ETG::Hero::Draw()
     GameObjectBase::Draw();
     RogueSpecial->Draw();
     SpriteBatch::Draw(GetDrawProperties());
-    
+
+    ReloadText->Draw();
     Hand->Draw();
 }
 
