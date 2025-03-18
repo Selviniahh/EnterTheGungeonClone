@@ -1,6 +1,7 @@
 #include "MuzzleFlash.h"
 #include <complex>
 #include <filesystem>
+#include <numbers>
 #include "../../Managers/Globals.h"
 #include "../../Managers/SpriteBatch.h"
 

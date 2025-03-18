@@ -22,7 +22,7 @@ namespace ETG
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ProjTexture) ProjTexture = std::make_shared<sf::Texture>();
         if (!Texture) Texture = std::make_shared<sf::Texture>();
-        if (!ArrowComp) ArrowComp = CreateGameObjectAttached<class ArrowComp>(this, std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png");
+        if (!ArrowComp) ArrowComp = CreateGameObjectAttached<class ArrowComp>(this, (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png").string());
         if (!MuzzleFlash) MuzzleFlash = CreateGameObjectAttached<class MuzzleFlash>(this, "Guns/RogueSpecial/MuzzleFlash/", "RS_muzzleflash_001", "png");
         ReloadSlider = ETG::CreateGameObjectAttached<class ReloadSlider>(this);
 
