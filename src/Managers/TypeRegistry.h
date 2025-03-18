@@ -17,6 +17,12 @@
 #include "../Guns/RogueSpecial/RogueSpecial.h"
 #include "../Projectile/ProjectileBase.h"
 #include "../Characters/Hand/Hand.h"
+#include "../Core/Components/ArrowComp.h"
+#include "../Guns/VFX/MuzzleFlash.h"
+#include "../UI/UIObjects/AmmoBarUI.h"
+#include "../UI/UIObjects/AmmoIndicatorsUI.h"
+#include "../UI/UIObjects/AmmoCounter.h"
+#include "../UI/UIObjects/ReloadSlider.h"
 
 //TODO: This class should be completely automated. A script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
 //TODO: generate all the RegisterType<ClassName> automatically. All source should be gathered in build directory and every file should have suffix "Gen` For example "HeroGen" just like unreal engine
@@ -109,6 +115,12 @@ namespace ETG
             RegisterType<RogueSpecialAnimComp>();
             RegisterType<ProjectileBase>();
             RegisterType<Hand>();
+            RegisterType<ArrowComp>();
+            RegisterType<MuzzleFlash>();
+            RegisterType<AmmoBarUI>();
+            RegisterType<AmmoIndicatorsUI>();
+            RegisterType<AmmoCounter>();
+            RegisterType<ReloadSlider>();
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;

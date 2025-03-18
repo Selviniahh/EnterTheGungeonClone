@@ -34,6 +34,10 @@ namespace ETG
     template <>
     void ShowImGuiWidget<bool>(const char* label, bool& value);
 
+    //int
+    template <>
+    void ShowImGuiWidget<int>(const char* label, int& value);
+
     //String
     template <>
     void ShowImGuiWidget<std::string>(const char* label, std::string& value);
@@ -45,6 +49,10 @@ namespace ETG
     //vector2<float>
     template <>
     void ShowImGuiWidget<sf::Vector2<float>>(const char* label, sf::Vector2<float>& value);
+
+    //sf::vector2<Vector2u>
+    template <>
+    void ShowImGuiWidget<sf::Vector2u>(const char* label, sf::Vector2u& value);
 
     //float
     template <>

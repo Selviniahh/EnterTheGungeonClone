@@ -63,7 +63,6 @@ namespace ETG
         float velocity;
         float maxProjectileRange;
         float timerForVelocity;
-        bool isAttacking{};
 
         //Gun needs to have custom Origin offset cuz, it needs to be attached to Hero's hand
         sf::Vector2f OriginOffset;
@@ -71,8 +70,8 @@ namespace ETG
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
 
-        BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase), (),
-                             (ProjTexture, pressTime, velocity, maxProjectileRange, timerForVelocity, isAttacking, OriginOffset),
+        BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase), (CurrentGunState, AmmoSize, MagazineSize, MagazineAmmo, ReloadTime, IsReloading),
+                             (ProjTexture, pressTime, velocity, maxProjectileRange, OriginOffset),
                              ())
     };
 }

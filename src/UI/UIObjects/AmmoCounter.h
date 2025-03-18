@@ -28,6 +28,8 @@ namespace ETG
 
         // Update the text content
         void UpdateText();
+
+        BOOST_DESCRIBE_CLASS(AmmoCounter, (GameObjectBase),(),(),(currentAmmo, maxAmmo, screenPosition))
     };
 
     inline AmmoCounter::AmmoCounter(sf::Vector2f position)

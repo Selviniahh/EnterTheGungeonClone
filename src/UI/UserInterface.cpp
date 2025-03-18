@@ -26,7 +26,17 @@ namespace ETG
         UpdateGunUIProperties();
         InitializeAmmoBar();
 
-        ammoCounter = ETG::CreateGameObjectAttached<AmmoCounter>(this, sf::Vector2f{frameDrawProps.Position.x - 15, frameDrawProps.Position.y - 100});
+        sf::Vector2f ammoCounterPos = sf::Vector2f{frameDrawProps.Position.x - 15, frameDrawProps.Position.y - 100};
+        ammoCounter = ETG::CreateGameObjectAttached<AmmoCounter>(this, ammoCounterPos);
+
+        // Ensure all attached objects are properly initialized and named
+        for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs()) {
+            if (sceneObj->Owner == this && sceneObj->GetObjectName() == "_NET_WM_USER_T") {
+                // Fix the problematic object by setting its name properly
+                sceneObj->SetObjectNameToSelfClassName();
+                std::cout << "Fixed object name: " << sceneObj->GetObjectName() << std::endl;
+            }
+        }
     }
 
 

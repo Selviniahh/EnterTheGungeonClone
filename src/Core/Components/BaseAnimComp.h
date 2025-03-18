@@ -61,7 +61,7 @@ namespace ETG
         std::shared_ptr<sf::Texture> CurrentTex;
         sf::IntRect CurrTexRect;
 
-        BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (), (), (CurrentTex, CurrTexRect))
+        BOOST_DESCRIBE_CLASS(BaseAnimComp, (ComponentBase), (CurrentState), (), (CurrentTex, CurrTexRect))
     };
 
     //-------------------------------------------------------------Definition-------------------------------------------------------------

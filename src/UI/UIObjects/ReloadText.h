@@ -36,6 +36,8 @@ namespace ETG
 
         // Callback for the ammo state changed event
         void OnAmmoStateChanged(bool isEmpty);
+
+        BOOST_DESCRIBE_CLASS(ReloadText, (GameObjectBase),(),(),(isVisible,TextureYOffset, NeedsReload, BlinkInterval, blinkTimer))
     };
 
     inline ReloadText::ReloadText()

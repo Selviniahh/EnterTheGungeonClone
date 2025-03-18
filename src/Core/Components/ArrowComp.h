@@ -17,6 +17,8 @@ namespace ETG
 
         sf::Vector2f arrowOriginOffset;
         sf::Vector2f arrowOffset;
+
+        BOOST_DESCRIBE_CLASS(ArrowComp, (ComponentBase), (arrowOriginOffset, arrowOffset),(),())
     };
 
     inline ArrowComp::ArrowComp(const std::string& texturePath)

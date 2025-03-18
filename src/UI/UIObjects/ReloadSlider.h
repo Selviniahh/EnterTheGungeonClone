@@ -39,5 +39,7 @@ namespace ETG
         Hero* Hero = nullptr;
         GunBase* Gun = nullptr;
         bool IsAnimating = false;
+
+        BOOST_DESCRIBE_CLASS(ReloadSlider, (GameObjectBase), (), (), (SliderBar, SliderValue, reloadTimer, BarOffsetY, PositionTolerance, IsAnimating))
     };    
 }

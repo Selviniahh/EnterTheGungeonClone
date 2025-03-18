@@ -58,8 +58,6 @@ namespace ETG
         void Draw() override;
 
         BOOST_DESCRIBE_CLASS(UserInterface, (GameObjectBase),
-                             (),
-                             (frameTexture),
-                             (CurrentGun))
+                             (), (frameTexture), (CurrentGun, framePosition, FrameOffsetPerc, AmmoBarOffsetPercX, InitialAmmoBarOffsetY, frameSize, GameScreenSize))
     };
 }

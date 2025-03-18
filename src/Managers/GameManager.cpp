@@ -24,7 +24,7 @@ void ETG::GameManager::Initialize()
 {
     //During development for different resolution and size monitors, Window mode will be half of host's window size
     const auto VideoMode = sf::VideoMode::getDesktopMode();
-    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width / 1.1, VideoMode.height / 1.1), "SFML example");
+    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width / 1.4, VideoMode.height / 1.4), "SFML example");
     // Window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getDesktopMode(), "SFML example", sf::Style::Fullscreen);
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
@@ -129,9 +129,9 @@ void ETG::GameManager::ProcessEvents()
             sf::View defaultView(sf::FloatRect(0.f, 0.f, GameEvent.size.width, GameEvent.size.height));
             Window->setView(defaultView);
 
+            //TODO: When the window is resized, I need to recalculate every position of every UI object.
             // Recalculate UI positions based on the new screen size.
-            // This could be done by calling a dedicated update method in your UI.
-            UI->Initialize(); // or UI.UpdatePositions(); if you separate the logic.
+            // UI->Initialize(); // or UI.UpdatePositions(); if you separate the logic.
         }
 
         //Poll and process events for ImGUI

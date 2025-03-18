@@ -24,7 +24,7 @@ namespace ETG
         void Update() override;
         void Initialize() override;
         void Draw() override;
-        GunBase* GetCurrentHoldingGun() const;
+        [[nodiscard]] GunBase* GetCurrentHoldingGun() const;
 
         static float MouseAngle;
         static Direction CurrentDirection;
@@ -44,7 +44,7 @@ namespace ETG
         std::unique_ptr<InputComponent> InputComp;
         
         BOOST_DESCRIBE_CLASS(Hero,(GameObjectBase),
-            (MouseAngle, CurrentDirection, CurrentHeroState, IsDashing, IsDashing ),
+            (MouseAngle, CurrentDirection, CurrentHeroState, IsDashing, IsShooting),
             (),
             ())
     };

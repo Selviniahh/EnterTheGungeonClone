@@ -13,12 +13,6 @@ namespace ETG
         // Textures
         std::shared_ptr<sf::Texture> ammoBarTexture;
 
-        // Draw properties
-        std::vector<DrawProperties> ammoDrawProps;
-
-        // Positions
-        std::vector<sf::Vector2f> ammoDisplayPositions;
-
     public:
         AmmoBarUI();
         ~AmmoBarUI() override = default;
@@ -31,6 +25,6 @@ namespace ETG
         // Update the ammo display based on current gun state
         void FlipTexture(bool horizontally = true, bool vertically = true);
 
-        BOOST_DESCRIBE_CLASS(AmmoBarUI, (GameObjectBase),(),(ammoBarTexture),())
+        BOOST_DESCRIBE_CLASS(AmmoBarUI, (GameObjectBase),(),(),(ammoBarTexture))
     };
 }
