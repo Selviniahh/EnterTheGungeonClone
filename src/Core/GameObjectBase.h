@@ -15,7 +15,7 @@ namespace ETG
         struct DrawProperties
         {
             sf::Vector2f Position{0, 0};
-            sf::Vector2f Scale{0, 0};
+            sf::Vector2f Scale{1, 1};
             sf::Vector2f Origin{0, 0};
             float Rotation{};
             float Depth{};

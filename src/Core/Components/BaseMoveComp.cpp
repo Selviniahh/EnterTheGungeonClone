@@ -22,7 +22,7 @@ void BaseMoveComp::UpdateMovement(const sf::Vector2f& inputDir, sf::Vector2f& po
         Velocity += normDir * Acceleration * deltaTime;
         
         // Clamp speed to MaxSpeed.
-        float currentSpeed = Math::Length(Velocity);
+        float currentSpeed = Math::VectorLength(Velocity);
         if (currentSpeed > MaxSpeed)
         {
             Velocity = Math::Normalize(Velocity) * MaxSpeed;
@@ -31,7 +31,7 @@ void BaseMoveComp::UpdateMovement(const sf::Vector2f& inputDir, sf::Vector2f& po
     else
     {
         // No input: decelerate.
-        float currentSpeed = Math::Length(Velocity);
+        float currentSpeed = Math::VectorLength(Velocity);
         float decAmount = Deceleration * deltaTime;
         if (decAmount > currentSpeed)
         {

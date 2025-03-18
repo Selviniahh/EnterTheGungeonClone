@@ -13,6 +13,8 @@ namespace ETG
     class HeroAnimComp;
     class InputComponent;
     class HeroMoveComp;
+    class ReloadSlider;
+
     
     class Hero : public GameObjectBase
     {

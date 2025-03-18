@@ -32,6 +32,7 @@ namespace ETG
         bool NeedsReload = false;
         
         float BlinkInterval = 2.5f; //total time for fade cycle
+        float blinkTimer{}; 
 
         // Callback for the ammo state changed event
         void OnAmmoStateChanged(bool isEmpty);
@@ -59,7 +60,7 @@ namespace ETG
         if (gun)
         {
             // Register our callback with the gun's event
-            gun->OnAmmoStateChanged.AddListener([this](const bool isEmpty)
+            gun->OnAmmoRunOut.AddListener([this](const bool isEmpty)
             {
                 this->OnAmmoStateChanged(isEmpty);
             });
@@ -81,7 +82,7 @@ namespace ETG
         if (!NeedsReload) return;
         Position = Hero->GetPosition() + sf::Vector2f{0, TextureYOffset};
         
-        Color.a = Math::SinWaveLerp(25.f, 255.f, BlinkInterval);
+        Color.a = Math::SinWaveLerp(25.f, 255.f, BlinkInterval, blinkTimer);
         GameObjectBase::Update();
     }
 

@@ -3,12 +3,12 @@
 #include "../Managers/GameState.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
-#include "../Guns/VFX/ReloadText.h"
+#include "../UI/UIObjects/ReloadText.h"
 #include "Components/HeroAnimComp.h"
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "Hand/Hand.h"
-#include "../Guns/VFX/ReloadText.h"
+#include "../UI/UIObjects/ReloadSlider.h"
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -28,7 +28,6 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     AnimationComp->Update(); //Set the Texture during Initialization
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
-
     Hero::Initialize();
 }
 
@@ -36,6 +35,7 @@ void ETG::Hero::Initialize()
 {
     GameObjectBase::Initialize();
     ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
+    
 }
 
 ETG::Hero::~Hero() = default;
@@ -62,11 +62,13 @@ void ETG::Hero::Update()
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
 
-    if (IsShooting && RogueSpecial->MagazineAmmo != 0)
+    //Shoot only if 
+    if (IsShooting && RogueSpecial->MagazineAmmo != 0 && !RogueSpecial->IsReloading)
     {
         RogueSpecial->Shoot();
     }
 
+    //Will run only if reload needed 
     ReloadText->Update();
     GameObjectBase::Update();
 }

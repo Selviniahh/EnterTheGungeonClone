@@ -8,6 +8,11 @@
 
 namespace ETG
 {
+    class ReloadSlider;
+}
+
+namespace ETG
+{
     class GunBase;
     class Hero;
 

@@ -6,11 +6,13 @@
 #include "../../Managers/Globals.h"
 #include "../../Managers/SpriteBatch.h"
 #include "../../Core/Factory.h"
+#include "../../UI/UIObjects/ReloadSlider.h"
+#include "../../Utils/Math.h"
 
 namespace ETG
 {
-    GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity, int Depth, const int ammoSize, const int magazineSize)
-        : AmmoSize(ammoSize), MagazineSize(magazineSize), pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity)
+    GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity, int Depth, const int ammoSize, const int magazineSize, const float reloadTime)
+        : AmmoSize(ammoSize), MagazineSize(magazineSize), pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity), ReloadTime(reloadTime)
     {
         // Initialize common position and textures
         this->Position = Position;
@@ -22,6 +24,7 @@ namespace ETG
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ArrowComp) ArrowComp = CreateGameObjectAttached<class ArrowComp>(this, std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png");
         if (!MuzzleFlash) MuzzleFlash = CreateGameObjectAttached<class MuzzleFlash>(this, "Guns/RogueSpecial/MuzzleFlash/", "RS_muzzleflash_001", "png");
+        ReloadSlider = ETG::CreateGameObjectAttached<class ReloadSlider>(this);
 
         GunBase::Initialize();
     }
@@ -40,6 +43,8 @@ namespace ETG
 
         // Muzzle flash animation should be set up by the derived class.
         MuzzleFlash->SetParent(this);
+
+        ReloadSlider->LinkToGun(this);
     }
 
     void GunBase::Update()
@@ -55,7 +60,7 @@ namespace ETG
         }
 
         // Update arrow properties.
-        ArrowComp->SetPosition(this->Position + RotateVector(ArrowComp->arrowOffset));
+        ArrowComp->SetPosition(this->Position + Math::RotateVector(Rotation, Scale, ArrowComp->arrowOffset));
         ArrowComp->SetRotation(this->GetDrawProperties().Rotation);
         ArrowComp->Update();
 
@@ -74,8 +79,10 @@ namespace ETG
         //If R pressed, reload
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
         {
+            CurrentGunState = GunStateEnum::Reload; //update animation
             Reload();
         }
+        ReloadSlider->Update();
     }
 
     void GunBase::Shoot()
@@ -91,7 +98,7 @@ namespace ETG
             CurrentGunState = GunStateEnum::Shoot;
             timerForVelocity = 0;
 
-            // Restart shoot animation.
+            // Restart shoot animation. //TODO: How can I fix this weird double map? Hero, enemies all needs double dictionary. In the future, more complex guns will also require to have complex animations as well. 
             AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();
 
             // Calculate projectile velocity.
@@ -109,16 +116,15 @@ namespace ETG
 
         if (MagazineAmmo == 0)
         {
-            OnAmmoStateChanged.Broadcast(true);
+            OnAmmoRunOut.Broadcast(true);
         }
     }
 
     void GunBase::Reload()
     {
-        //Some reload logic
-        AmmoSize -= MagazineSize - MagazineAmmo; //Set ammoSize
-        MagazineAmmo = MagazineSize;
-        OnAmmoStateChanged.Broadcast(false); // Notify that we have ammo again
+        IsReloading = true;
+        OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
+        OnReloadInvoke.Broadcast(true);
     }
 
     void GunBase::Draw()
@@ -139,16 +145,6 @@ namespace ETG
 
         // Draw the muzzle flash.
         MuzzleFlash->Draw();
-    }
-
-    sf::Vector2f GunBase::RotateVector(const sf::Vector2f& offset) const
-    {
-        const float angleRad = Rotation * (std::numbers::pi / 180.f);
-        sf::Vector2f scaledOffset(offset.x * this->Scale.x, offset.y * this->Scale.y);
-
-        return {
-            scaledOffset.x * std::cos(angleRad) - scaledOffset.y * std::sin(angleRad),
-            scaledOffset.x * std::sin(angleRad) + scaledOffset.y * std::cos(angleRad)
-        };
+        ReloadSlider->Draw();
     }
 }

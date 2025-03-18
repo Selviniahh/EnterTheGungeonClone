@@ -2,7 +2,7 @@
 #include "../../Core/Factory.h"
 #include <filesystem>
 
-ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f,2,300,10)
+ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f,2,300,10, 3.0f)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
 

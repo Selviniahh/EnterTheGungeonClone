@@ -16,12 +16,13 @@ class ProjectileBase;
 
 namespace ETG
 {
+    class ReloadSlider;
     enum class GunStateEnum;
-    
+
     class GunBase : public GameObjectBase
     {
     public:
-        GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity, int Depth, int ammoSize, int magazineSize);
+        GunBase(sf::Vector2f Position, float pressTime, float velocity, float maxProjectileRange, float timerForVelocity, int Depth, int ammoSize, int magazineSize, float reloadTime);
         ~GunBase() override;
         void Initialize() override;
         void Update() override;
@@ -40,12 +41,19 @@ namespace ETG
         //Current magazine ammo count (this will be subtracted and reset)
         int MagazineAmmo{};
 
+        //State will not contain direction. It will be idle, shoot etc. 
+        GunStateEnum CurrentGunState{GunStateEnum::Idle};
+
         std::shared_ptr<sf::Texture> ProjTexture;
-        EventDelegate<bool> OnAmmoStateChanged;
+        std::unique_ptr<ReloadSlider> ReloadSlider;
+        EventDelegate<bool> OnAmmoRunOut;
+        EventDelegate<bool> OnReloadInvoke;
+
+        bool IsReloading{};
+        float ReloadTime;
 
     protected:
         // Rotates an offset vector according to the gun's current rotation.
-        [[nodiscard]] sf::Vector2f RotateVector(const sf::Vector2f& offset) const;
         std::vector<std::unique_ptr<ProjectileBase>> projectiles;
         std::unique_ptr<ArrowComp> ArrowComp;
         std::unique_ptr<MuzzleFlash> MuzzleFlash;
@@ -59,13 +67,12 @@ namespace ETG
 
         //Gun needs to have custom Origin offset cuz, it needs to be attached to Hero's hand
         sf::Vector2f OriginOffset;
-        
+
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
-        GunStateEnum CurrentGunState{GunStateEnum::Idle};
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase), (),
-            (ProjTexture, pressTime, velocity, maxProjectileRange, timerForVelocity, isAttacking, OriginOffset),
-            ())         //TODO Later expose ArrowComp and muzzleflash to the Gun 
+                             (ProjTexture, pressTime, velocity, maxProjectileRange, timerForVelocity, isAttacking, OriginOffset),
+                             ())
     };
 }
