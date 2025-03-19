@@ -79,6 +79,10 @@ add_executable(ETG main.cpp
         src/UI/UIObjects/ReloadSlider.h
         src/Core/Components/CollisionComponent.cpp
         src/Core/Components/CollisionComponent.h
+        src/Items/Active/ActiveItemBase.h
+        src/Items/Passive/PassiveItemBase.h
+        src/Items/Passive/PlatinumBullets.cpp
+        src/Items/Passive/PlatinumBullets.h
 )
 
 # Easiest and fastest way is VCPKG 

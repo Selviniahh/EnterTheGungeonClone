@@ -34,7 +34,7 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 
     //Collision comp:
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
-    CollisionComp->CollisionRadius = 15.f;
+    CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
     
     Hero::Initialize();

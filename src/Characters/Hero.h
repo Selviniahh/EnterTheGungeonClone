@@ -7,10 +7,6 @@
 namespace ETG
 {
     class CollisionComponent;
-}
-
-namespace ETG
-{
     class ReloadText;
     class GunBase;
     class Hand;

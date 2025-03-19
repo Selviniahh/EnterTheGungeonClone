@@ -12,7 +12,7 @@
 namespace ETG
 {
     GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity, int Depth, const int ammoSize, const int magazineSize, const float reloadTime)
-        : AmmoSize(ammoSize), MagazineSize(magazineSize), pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity), ReloadTime(reloadTime)
+        : AmmoSize(ammoSize), MagazineSize(magazineSize), FireRate(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), Timer(timerForVelocity), ReloadTime(reloadTime)
     {
         // Initialize common position and textures
         this->Position = Position;
@@ -51,7 +51,7 @@ namespace ETG
     {
         GameObjectBase::Update();
 
-        timerForVelocity += Globals::FrameTick;
+        Timer += Globals::FrameTick;
 
         // If the shoot animation finished, revert to idle.
         if (AnimationComp->CurrentState == GunStateEnum::Shoot && AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
@@ -87,7 +87,7 @@ namespace ETG
 
     void GunBase::Shoot()
     {
-        if (timerForVelocity >= pressTime)
+        if (Timer >= FireRate)
         {
             MagazineAmmo--;
 
@@ -96,7 +96,7 @@ namespace ETG
 
             //Set animation to Shoot
             CurrentGunState = GunStateEnum::Shoot;
-            timerForVelocity = 0;
+            Timer = 0;
 
             // Restart shoot animation. //TODO: How can I fix this weird double map? Hero, enemies all needs double dictionary. In the future, more complex guns will also require to have complex animations as well. 
             AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();

@@ -58,20 +58,22 @@ namespace ETG
         std::unique_ptr<ArrowComp> ArrowComp;
         std::unique_ptr<MuzzleFlash> MuzzleFlash;
 
+    public:
         // Muzzle flash variables (instance sets up its own animation).
-        float pressTime;
+        float FireRate;
         float velocity;
         float maxProjectileRange;
-        float timerForVelocity;
+        float Timer;
 
         //Gun needs to have custom Origin offset cuz, it needs to be attached to Hero's hand
         sf::Vector2f OriginOffset;
 
+    protected:
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase), (CurrentGunState, AmmoSize, MagazineSize, MagazineAmmo, ReloadTime, IsReloading),
-                             (ProjTexture, pressTime, velocity, maxProjectileRange, OriginOffset),
+                             (ProjTexture, FireRate, velocity, maxProjectileRange, OriginOffset),
                              ())
     };
 }

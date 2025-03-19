@@ -76,6 +76,7 @@ namespace ETG
         bool IsGameObjectUISpecified = false;
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;
+        bool IsVisible{true}; //For now I will only use this for Passive and Active item pick up. 
 
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }

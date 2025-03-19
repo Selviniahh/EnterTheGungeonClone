@@ -1,14 +1,7 @@
 #pragma once
-
 #include <unordered_map>
 #include "Globals.h"
 #include "../Engine/Engine.h"
-
-
-namespace ETG
-{
-    class BulletMan;
-}
 
 namespace ETG
 {
@@ -16,6 +9,9 @@ namespace ETG
     class Scene;
     class Hero;
     class UserInterface;
+    class PlatinumBullets;
+    class BulletMan;
+
     class GameManager
     {
     public:
@@ -35,6 +31,8 @@ namespace ETG
         std::unique_ptr<UserInterface> UI;
         std::unique_ptr<Scene> Scene;
         std::unique_ptr<BulletMan> BulletMan;
+
+        std::unique_ptr<PlatinumBullets> PlatinumBullets; 
         
         Engine EngineUI{};
 

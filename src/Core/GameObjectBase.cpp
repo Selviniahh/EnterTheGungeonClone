@@ -40,6 +40,7 @@ void ETG::GameObjectBase::VisualizeOrigin() const
 
 void ETG::GameObjectBase::Draw()
 {
+    if (!IsVisible) return;
     VisualizeOrigin();
     DrawBounds();
     SpriteBatch::Draw(GetDrawProperties()); //Let's see
