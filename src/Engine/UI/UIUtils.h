@@ -23,7 +23,8 @@ namespace UIUtils
     void DisplayTexture(const std::shared_ptr<sf::Texture>& value);
     void DisplayAnimationKey(const AnimationKey& key);
     void DisplayAnimationManager(const char* label, AnimationManager& manager);
-    
+    void DisplayColorPicker(const char* label, sf::Color& color);
+
     void BeginProperty(const char* label);
     void EndProperty();
 }

@@ -3,8 +3,10 @@
 #include "../Core/Components/BaseAnimComp.h"
 #include "../Managers/StateEnums.h"
 
+
 // Forward declarations
 class BaseHealthComp;
+class CollisionComponent;
 
 namespace ETG
 

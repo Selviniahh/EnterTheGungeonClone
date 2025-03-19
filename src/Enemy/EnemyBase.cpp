@@ -4,6 +4,7 @@
 #include "../Core/Components/BaseHealthComp.h"
 #include "../Characters/Hand/Hand.h"
 #include "../Characters/Hero.h"
+#include "../Core/Components/CollisionComponent.h"
 
 namespace ETG
 {

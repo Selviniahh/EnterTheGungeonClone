@@ -20,5 +20,7 @@ namespace ETG
         Direction BulletManDir{Direction::Right}; // Initialize with default direction
 
         std::unique_ptr<BulletManAnimComp> AnimationComp;
+        std::unique_ptr<CollisionComponent> CollisionComp;
+
     };
 }
