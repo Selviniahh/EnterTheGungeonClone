@@ -36,7 +36,14 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 15.f;
     CollisionComp->SetCollisionEnabled(true);
+    
+    Hero::Initialize();
+}
 
+void ETG::Hero::Initialize()
+{
+    GameObjectBase::Initialize();
+    ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
 
     //Set up collision delegates. Move these to initialize after it works well. 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
@@ -55,13 +62,6 @@ ETG::Hero::Hero(const sf::Vector2f Position)
             enemyObj->SetColor(sf::Color::White);
         }
     });
-    Hero::Initialize();
-}
-
-void ETG::Hero::Initialize()
-{
-    GameObjectBase::Initialize();
-    ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
 }
 
 ETG::Hero::~Hero() = default;
