@@ -133,12 +133,37 @@ void ETG::ShowImGuiWidget<sf::Vector2<float>>(const char* label, sf::Vector2<flo
 }
 
 template <>
+void ETG::ShowImGuiWidget<sf::Vector2<unsigned>>(const char* label, sf::Vector2u& value)
+{
+    BeginProperty(label);
+        
+    // Create temporary int values that ImGui can work with
+    int tempValues[2] = { static_cast<int>(value.x), static_cast<int>(value.y) };
+        
+    // Use ImGui::InputInt2 to edit the values
+    if (ImGui::InputInt2("##vector2u", tempValues))
+    {
+        // Validate and convert back to unsigned
+        value.x = tempValues[0] >= 0 ? static_cast<unsigned>(tempValues[0]) : value.x;
+        value.y = tempValues[1] >= 0 ? static_cast<unsigned>(tempValues[1]) : value.y;
+    }
+        
+    EndProperty();
+}
+
+template <>
 void ETG::ShowImGuiWidget<float>(const char* label, float& value)
 {
     BeginProperty(label);
-
     ImGui::InputFloat("##value", &value);
+    EndProperty();
+}
 
+template <>
+void ETG::ShowImGuiWidget<int>(const char* label, int& value)
+{
+    BeginProperty(label);
+    ImGui::InputInt("##value", &value);
     EndProperty();
 }
 

@@ -6,12 +6,15 @@
 
 namespace ETG
 {
+    class ReloadText;
     class GunBase;
     class Hand;
     class RogueSpecial;
     class HeroAnimComp;
     class InputComponent;
     class HeroMoveComp;
+    class ReloadSlider;
+
     
     class Hero : public GameObjectBase
     {
@@ -21,7 +24,7 @@ namespace ETG
         void Update() override;
         void Initialize() override;
         void Draw() override;
-        GunBase* GetCurrentHoldingGun() const;
+        [[nodiscard]] GunBase* GetCurrentHoldingGun() const;
 
         static float MouseAngle;
         static Direction CurrentDirection;
@@ -33,6 +36,7 @@ namespace ETG
         std::unique_ptr<RogueSpecial> RogueSpecial;
         std::unique_ptr<HeroMoveComp> MoveComp;
         std::unique_ptr<Hand> Hand;
+        std::unique_ptr<ReloadText> ReloadText;
 
 
     private:
@@ -40,7 +44,7 @@ namespace ETG
         std::unique_ptr<InputComponent> InputComp;
         
         BOOST_DESCRIBE_CLASS(Hero,(GameObjectBase),
-            (MouseAngle, CurrentDirection, CurrentHeroState, IsDashing, IsDashing ),
+            (MouseAngle, CurrentDirection, CurrentHeroState, IsDashing, IsShooting),
             (),
             ())
     };

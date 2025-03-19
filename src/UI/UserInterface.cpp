@@ -1,11 +1,12 @@
 #include "UserInterface.h"
 #include <filesystem>
-
 #include "../Characters/Hero.h"
 #include "../Guns/Base/GunBase.h"
 #include "../Managers/GameState.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
+#include "../Core/Factory.h"
+#include "UIObjects/AmmoCounter.h"
 
 namespace ETG
 {
@@ -17,80 +18,140 @@ namespace ETG
 
     void UserInterface::Initialize()
     {
-        const std::string ResPath = RESOURCE_PATH;
-        Frame.loadFromFile(ResPath + "/UI/Frame.png");
-        AmmoBar.loadFromFile(ResPath + "/UI/AmmoBarUI.png");
-        AmmoDisplay.loadFromFile(ResPath + "/UI/AmmoDisplay.png");
+        if (!hero) hero = GameState::GetInstance().GetHero();
+        CurrentGun = hero->GetCurrentHoldingGun();
+        if (!CurrentGun) throw std::runtime_error("Current Gun not found");
 
-        //NOTE: GameScreenSize is subtracting GameScreenSize with the area that designated as Engine UI. So that Gun UI and Engine UI wouldn't overlap.
-        GameScreenSize = {(float)Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize().x,(float)Globals::ScreenSize.y};
+        InitializeFrameProperties();
+        UpdateGunUIProperties();
+        InitializeAmmoBar();
 
-        const sf::Vector2u frameSize = Frame.getSize();
+        sf::Vector2f ammoCounterPos = sf::Vector2f{frameDrawProps.Position.x - 15, frameDrawProps.Position.y - 100};
+        ammoCounter = ETG::CreateGameObjectAttached<AmmoCounter>(this, ammoCounterPos);
 
-        const float FrameOffsetX = GameScreenSize.x * (FrameOffsetPerc.x / 100);
-        const float FrameOffsetY = GameScreenSize.y * (FrameOffsetPerc.y / 100);
-
-        Position = {
-            (GameScreenSize.x - FrameOffsetX - frameSize.x / 2),
-            (GameScreenSize.y - FrameOffsetY - frameSize.y / 2)
-        };
-
-        GunPosition = {Position.x, Position.y};
-
-        AmmoBarPosition = {
-            (Position.x + (Frame.getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100)),
-            Position.y
-        };
-
-        if (!Hero) Hero = GameState::GetInstance().GetHero();
+        // Ensure all attached objects are properly initialized and named
+        for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs()) {
+            if (sceneObj->Owner == this && sceneObj->GetObjectName() == "_NET_WM_USER_T") {
+                // Fix the problematic object by setting its name properly
+                sceneObj->SetObjectNameToSelfClassName();
+                std::cout << "Fixed object name: " << sceneObj->GetObjectName() << std::endl;
+            }
+        }
     }
+
 
     void UserInterface::Update()
     {
         GameObjectBase::Update();
-        Gun = Hero->GetCurrentHoldingGun();
 
+        // Get current gun and update properties
+        if ((CurrentGun = hero->GetCurrentHoldingGun()))
+        {
+            UpdateGunUIProperties();
+
+            // Update all ammo UI components with current gun
+            ammoIndicators->SetGun(CurrentGun);
+            ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->AmmoSize);
+        }
+
+        // Update UI components
+        ammoBarBottom->Update(); //For now this update not doing anyhting
+        ammoIndicators->Update(); // This will update top bar position through callback
+        ammoBarTop->Update();
     }
 
     void UserInterface::Draw()
     {
-        // Just draw the textures, no reloading!
-        auto& DrawProps = GetDrawProperties();
-        sf::Sprite frame;
-
         // Draw the frame
-        frame.setTexture(Frame);
-        frame.setPosition(DrawProps.Position.x, DrawProps.Position.y);
-        frame.setOrigin(Frame.getSize().x / 2, Frame.getSize().y / 2);
-        frame.setRotation(DrawProps.Rotation);
-        frame.setScale(DrawProps.Scale);
-        Globals::DrawSinglePixelAtLoc(frame.getPosition(), {5, 5});
-        Globals::Window->draw(frame);
+        SpriteBatch::Draw(frameDrawProps);
 
-        // Draw the gun
-        sf::Sprite gun;
-        gun.setTexture(*Gun->Texture);
-        gun.setPosition(static_cast<float>(GunPosition.x), static_cast<float>(GunPosition.y));
-        gun.setOrigin(Gun->Texture->getSize().x / 2, Gun->Texture->getSize().y / 2);
-        gun.setScale(3.f, 3.f);
-        Globals::DrawSinglePixelAtLoc(gun.getPosition(), {5, 5});
-        GlobSpriteBatch.draw(gun,0);
+        // Draw the gun if available
+        if (CurrentGun && CurrentGun->Texture)
+        {
+            SpriteBatch::Draw(gunDrawProps);
+            ammoCounter->Draw();
+        }
 
-        // Draw ammo bar
-        sf::Sprite ammo;
-        ammo.setTexture(AmmoBar);
-        ammo.setOrigin(AmmoBar.getSize().x / 2, AmmoBar.getSize().y / 2);
-        ammo.setPosition(static_cast<float>(AmmoBarPosition.x), static_cast<float>(AmmoBarPosition.y));
-        Globals::DrawSinglePixelAtLoc(ammo.getPosition(), {5, 5});
-        GlobSpriteBatch.draw(ammo, 0);
+        // Draw ammo bars and indicators
+        ammoBarBottom->Draw();
+        ammoIndicators->Draw(); // Draw indicators between bars
+        ammoBarTop->Draw();
+    }
 
-        // // Draw ammo display. Because gun not implemented yet, let it stay like this
-        // sf::Sprite ammoDisplaySprite;
-        // ammoDisplaySprite.setTexture(AmmoDisplay);
-        // for (auto& ammoPosition : AmmoArr)
-        // {
-        //     ammoDisplaySprite.setPosition(static_cast<float>(ammoPosition.x), static_cast<float>(ammoPosition.y));
-        //     Globals::Window->draw(ammoDisplaySprite);
-        // }
+    void UserInterface::InitializeFrameProperties()
+    {
+        const std::string ResPath = RESOURCE_PATH;
+
+        // Load textures
+        frameTexture = std::make_shared<sf::Texture>();
+        if (!frameTexture->loadFromFile(ResPath + "/UI/Frame.png"))
+            throw std::runtime_error("Failed to load Frame.png");
+
+        // Calculate game screen size (accounting for engine UI)
+        GameScreenSize = {
+            static_cast<float>(Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize().x),
+            static_cast<float>(Globals::ScreenSize.y)
+        };
+
+        frameSize = frameTexture->getSize();
+        const float FrameOffsetX = GameScreenSize.x * (FrameOffsetPerc.x / 100);
+        const float FrameOffsetY = GameScreenSize.y * (FrameOffsetPerc.y / 100);
+        framePosition = {
+            (GameScreenSize.x - FrameOffsetX - frameSize.x / 2),
+            (GameScreenSize.y - FrameOffsetY - frameSize.y / 2)
+        };
+
+        // Set up frame draw properties
+        frameDrawProps.Texture = frameTexture.get();
+        frameDrawProps.Position = framePosition;
+        frameDrawProps.Scale = {1.0f, 1.0f};
+        frameDrawProps.Origin = {
+            static_cast<float>(frameSize.x) / 2.0f,
+            static_cast<float>(frameSize.y) / 2.0f
+        };
+    }
+    
+    // Update the Update method
+
+    void UserInterface::InitializeAmmoBar()
+    {
+        // Calculate base X position for ammo bars
+        float ammoBarX = framePosition.x + (frameSize.x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100);
+
+        // Create and position bottom ammo bar
+        ammoBarBottom = CreateGameObjectAttached<AmmoBarUI>(this);
+        ammoBarBottom->SetPosition({ammoBarX, framePosition.y + InitialAmmoBarOffsetY});
+        ammoBarBottom->FlipTexture(false, true);
+
+        // Create top ammo bar with an initial position (will be updated by indicators)
+        ammoBarTop = CreateGameObjectAttached<AmmoBarUI>(this);
+        ammoBarTop->SetPosition({ammoBarX, framePosition.y - InitialAmmoBarOffsetY});
+
+        // Create ammo indicators
+        ammoIndicators = CreateGameObjectAttached<AmmoIndicatorsUI>(this);
+        ammoIndicators->SetGun(CurrentGun);
+        ammoIndicators->SetBottomBar(ammoBarBottom.get());
+        ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing } }); //TODO: Not sure to remove this line or not
+
+        // Set callback for updating the top bar position
+        ammoIndicators->SetTopBarPositionCallback([this](float topY)
+        {
+            if (ammoBarTop)
+            {
+                ammoBarTop->SetPosition({ammoBarTop->GetPosition().x, topY});
+            }
+        });
+    }
+
+    void UserInterface::UpdateGunUIProperties()
+    {
+        CurrentGun = hero->GetCurrentHoldingGun();
+        gunDrawProps.Texture = CurrentGun->Texture.get();
+        gunDrawProps.Position = framePosition;
+        gunDrawProps.Scale = {3.0f, 3.0f}; // UI gun scale factor
+        gunDrawProps.Origin = {
+            static_cast<float>(CurrentGun->Texture->getSize().x) / 2.0f,
+            static_cast<float>(CurrentGun->Texture->getSize().y) / 2.0f
+        };
     }
 }

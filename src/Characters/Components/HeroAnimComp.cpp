@@ -42,15 +42,15 @@ namespace ETG
         const auto idleEnumValues = ConstructEnumVector<HeroIdleEnum>();
         AddAnimationsForState<HeroIdleEnum>(HeroStateEnum::Idle,idleAnims);
         
-        //Dash
-        const auto dashAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "png", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "png", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "png", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/Left", "rogue_dodge_left_001", "png", 0.15f),
-            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", 0.15f),
-        };
-        AddAnimationsForState<HeroDashEnum>(HeroStateEnum::Dash, dashAnims);
+        //NOTE: Commented dash because dash not implemented yet.
+        // const auto dashAnims = std::vector<Animation>{
+        //     Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "png", 0.15f),
+        //     Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "png", 0.15f),
+        //     Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "png", 0.15f),
+        //     Animation::CreateSpriteSheet("Player/Dash/Left", "rogue_dodge_left_001", "png", 0.15f),
+        //     Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", 0.15f),
+        // };
+        // AddAnimationsForState<HeroDashEnum>(HeroStateEnum::Dash, dashAnims);
     }
 
     void HeroAnimComp::Update()

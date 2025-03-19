@@ -65,6 +65,18 @@ add_executable(ETG main.cpp
         src/Enemy/BulletMan/BulletMan.h
         src/Enemy/BulletMan/Components/BulletManAnimComp.cpp
         src/Enemy/BulletMan/Components/BulletManAnimComp.h
+        src/Core/Components/ArrowComp.h
+        src/Guns/VFX/MuzzleFlash.cpp
+        src/Guns/VFX/MuzzleFlash.h
+        src/UI/UIObjects/AmmoBarUI.cpp
+        src/UI/UIObjects/AmmoBarUI.h
+        src/UI/UIObjects/AmmoIndicatorsUI.cpp
+        src/UI/UIObjects/AmmoIndicatorsUI.h
+        src/UI/UIObjects/ReloadText.h
+        src/Core/Events/EventDelegate.h
+        src/UI/UIObjects/AmmoCounter.h
+        src/UI/UIObjects/ReloadSlider.cpp
+        src/UI/UIObjects/ReloadSlider.h
 )
 
 # Easiest and fastest way is VCPKG 
