@@ -70,6 +70,10 @@ namespace ETG
     template <>
     void ShowImGuiWidget<AnimationManager>(const char* label, AnimationManager& value);
 
+    //Color
+    template <>
+    void ShowImGuiWidget<sf::Color>(const char* label, sf::Color& color);
+
     template <typename T>
     void ShowImGuiWidgetImpl(const char* label, T& value, std::false_type);
 

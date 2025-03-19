@@ -1,5 +1,8 @@
 #include "Hero.h"
 #include <filesystem>
+
+#include "../Core/Components/CollisionComponent.h"
+#include "../Enemy/EnemyBase.h"
 #include "../Managers/GameState.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
@@ -28,6 +31,12 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     AnimationComp->Update(); //Set the Texture during Initialization
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
+
+    //Collision comp:
+    CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
+    CollisionComp->CollisionRadius = 15.f;
+    CollisionComp->SetCollisionEnabled(true);
+    
     Hero::Initialize();
 }
 
@@ -35,7 +44,24 @@ void ETG::Hero::Initialize()
 {
     GameObjectBase::Initialize();
     ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
-    
+
+    //Set up collision delegates. Move these to initialize after it works well. 
+    CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
+    {
+       if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
+       {
+           enemyObj->SetColor(sf::Color::Blue);
+       }
+    });
+
+    CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
+    {
+       //Handle collisin exit
+        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
+        {
+            enemyObj->SetColor(sf::Color::White);
+        }
+    });
 }
 
 ETG::Hero::~Hero() = default;
@@ -44,6 +70,7 @@ void ETG::Hero::Update()
 {
     GameObjectBase::Update();
 
+    CollisionComp->Update();
     InputComp->Update(*this);
     MoveComp->Update();
 
@@ -81,6 +108,8 @@ void ETG::Hero::Draw()
 
     ReloadText->Draw();
     Hand->Draw();
+
+    if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
 ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const

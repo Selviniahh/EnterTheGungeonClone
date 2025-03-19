@@ -79,10 +79,10 @@ sf::FloatRect ETG::GameObjectBase::GetBounds() const
     {
         // Fallback to using the texture size if available
         return {
-            Position.x - Texture->getSize().x / 2.f,
-            Position.y - Texture->getSize().y / 2.f,
-            static_cast<float>(Texture->getSize().x),
-            static_cast<float>(Texture->getSize().y)
+            Position.x - Texture->getSize().x / 2.f, //X coordinate of the top-left corner
+            Position.y - Texture->getSize().y / 2.f, //Y coordinate of the top-left corner
+            static_cast<float>(Texture->getSize().x), //usual width size
+            static_cast<float>(Texture->getSize().y) //usual height size
         };
     }
 
@@ -119,7 +119,6 @@ void ETG::GameObjectBase::PopulateSpecificWidgets()
     
 }
 
-//It feels good to write everything myself 
 void ETG::GameObjectBase::IncrementName()
 {
     const auto& SceneObjs = ETG::GameState::GetInstance().GetSceneObjs();

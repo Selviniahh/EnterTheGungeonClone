@@ -77,6 +77,8 @@ add_executable(ETG main.cpp
         src/UI/UIObjects/AmmoCounter.h
         src/UI/UIObjects/ReloadSlider.cpp
         src/UI/UIObjects/ReloadSlider.h
+        src/Core/Components/CollisionComponent.cpp
+        src/Core/Components/CollisionComponent.h
 )
 
 # Easiest and fastest way is VCPKG 

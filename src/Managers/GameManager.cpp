@@ -28,6 +28,7 @@ void ETG::GameManager::Initialize()
     // Window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getDesktopMode(), "SFML example", sf::Style::Fullscreen);
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
+    GameState::GetInstance().SetRenderWindow(Window.get());
 
     //Initialize GameState instance before anything and initialize SceneObj vector
     GameState::GetInstance();

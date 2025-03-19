@@ -214,6 +214,72 @@ void UIUtils::DisplayAnimationManager(const char* label, AnimationManager& manag
     }
 }
 
+void UIUtils::DisplayColorPicker(const char* label, sf::Color& color)
+{
+    // Convert sf::Color (0-255) to ImGui color format (0.0f-1.0f)
+    float colorArray[4] = {
+        color.r / 255.0f,
+        color.g / 255.0f,
+        color.b / 255.0f,
+        color.a / 255.0f
+    };
+    
+    // Set up flags for the color picker
+    ImGuiColorEditFlags flags = 
+        ImGuiColorEditFlags_DisplayRGB |     // Display RGB values
+        ImGuiColorEditFlags_DisplayHSV |     // Display HSV values
+        ImGuiColorEditFlags_PickerHueWheel | // Show hue as a wheel
+        ImGuiColorEditFlags_NoSidePreview;   // Hide side preview
+
+    bool showAlpha = true;
+    
+    // Add alpha control if requested
+    if (showAlpha) {
+        flags |= ImGuiColorEditFlags_AlphaBar;
+    } else {
+        flags |= ImGuiColorEditFlags_NoAlpha;
+    }
+    
+    // Begin a popup when clicked
+    if (ImGui::ColorButton(label, ImVec4(colorArray[0], colorArray[1], colorArray[2], colorArray[3]), flags))
+    {
+        ImGui::OpenPopup(label);
+    }
+    
+    // Show tooltip when hovered
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::Text("RGB: (%d, %d, %d)", color.r, color.g, color.b);
+        if (showAlpha) {
+            ImGui::Text("Alpha: %d", color.a);
+        }
+        ImGui::EndTooltip();
+    }
+    
+    ImGui::SameLine();
+    ImGui::TextUnformatted(label);
+    
+    // Show the actual color picker in a popup
+    if (ImGui::BeginPopup(label))
+    {
+        ImGui::Text("Color Picker");
+        ImGui::Separator();
+        
+        bool changed = ImGui::ColorPicker4("##picker", colorArray, flags);
+        
+        if (changed)
+        {
+            color.r = static_cast<sf::Uint8>(colorArray[0] * 255.0f + 0.5f);
+            color.g = static_cast<sf::Uint8>(colorArray[1] * 255.0f + 0.5f);
+            color.b = static_cast<sf::Uint8>(colorArray[2] * 255.0f + 0.5f);
+            color.a = static_cast<sf::Uint8>(colorArray[3] * 255.0f + 0.5f);
+        }
+        
+        ImGui::EndPopup();
+    }
+}
+
 void UIUtils::BeginProperty(const char* label)
 {
     ImGui::PushID(label);

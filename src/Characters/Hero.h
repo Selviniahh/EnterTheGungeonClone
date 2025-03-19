@@ -6,6 +6,11 @@
 
 namespace ETG
 {
+    class CollisionComponent;
+}
+
+namespace ETG
+{
     class ReloadText;
     class GunBase;
     class Hand;
@@ -37,6 +42,7 @@ namespace ETG
         std::unique_ptr<HeroMoveComp> MoveComp;
         std::unique_ptr<Hand> Hand;
         std::unique_ptr<ReloadText> ReloadText;
+        std::unique_ptr<CollisionComponent> CollisionComp;
 
 
     private:

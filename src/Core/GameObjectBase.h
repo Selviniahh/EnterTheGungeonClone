@@ -87,6 +87,7 @@ namespace ETG
         [[nodiscard]] float GetRotation() const { return Rotation; }
         [[nodiscard]] const sf::Vector2f& GetScale() const { return Scale; }
         [[nodiscard]] const sf::Vector2f& GetOrigin() const { return Origin; }
+        [[nodiscard]] const sf::Color& GetColor() const { return Color; }
 
         [[nodiscard]] const sf::Vector2f& GetRelativePosition() const { return RelativePos; }
         [[nodiscard]] const sf::Vector2f& GetRelativeScale() const { return RelativeScale; }
@@ -103,6 +104,8 @@ namespace ETG
         void SetRotation(const float& rotation) { this->Rotation = rotation; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
+        void SetColor(const sf::Color& color) { this->Color = color; }
+
 
         // Animation component management
         void SetAnimationInterface(IAnimationComponent* animComp) { AnimInterface = animComp; }

@@ -191,3 +191,9 @@ void ETG::ShowImGuiWidget<AnimationManager>(const char* label, AnimationManager&
 {
     DisplayAnimationManager(label, value);
 }
+
+template <>
+void ETG::ShowImGuiWidget<sf::Color>(const char* label, sf::Color& color)
+{
+    UIUtils::DisplayColorPicker(label, color);
+}
