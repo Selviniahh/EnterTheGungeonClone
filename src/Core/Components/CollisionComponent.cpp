@@ -1,8 +1,7 @@
+#include <imgui.h>
 #include "CollisionComponent.h"
 #include "../../Core/GameObjectBase.h"
 #include "../../Managers/Globals.h"
-#include <imgui.h>
-
 #include "../../Managers/SpriteBatch.h"
 
 namespace ETG
@@ -42,6 +41,7 @@ namespace ETG
         // Check for collisions with all other collision components
         for (auto* otherComp : AllCollisionRegistries)
         {
+            //Skip the unappropriated ones
             if (otherComp == this || !otherComp->IsCollisionEnabled() || !otherComp->Owner)
                 continue;
 
@@ -55,21 +55,20 @@ namespace ETG
                 // Handle collision events
                 if (!wasColliding)
                 {
-                    // New collision
-                    CollisionEventData eventData(Owner, otherComp->Owner, otherComp);
+                    CollisionEventData eventData(Owner, otherComp->Owner, otherComp, CalculateImpactPoint(otherComp));
                     OnCollisionEnter.Broadcast(eventData);
                 }
                 else
                 {
-                    // Continuing collision
-                    CollisionEventData eventData(Owner, otherComp->Owner, otherComp);
+                    // Last tick collided, now still colliding
+                    CollisionEventData eventData(Owner, otherComp->Owner, otherComp, CalculateImpactPoint(otherComp));
                     OnCollisionStay.Broadcast(eventData);
                 }
             }
             else if (wasColliding)
             {
                 // Collision ended
-                CollisionEventData eventData(Owner, otherComp->Owner, otherComp);
+                CollisionEventData eventData(Owner, otherComp->Owner, otherComp, CalculateImpactPoint(otherComp));
                 OnCollisionExit.Broadcast(eventData);
             }
         }
@@ -82,26 +81,21 @@ namespace ETG
                 // This collision has ended
                 if (otherComp && otherComp->Owner)
                 {
-                    CollisionEventData eventData(Owner, otherComp->Owner, otherComp);
+                    CollisionEventData eventData(Owner, otherComp->Owner, otherComp, CalculateImpactPoint(otherComp));
                     OnCollisionExit.Broadcast(eventData);
                 }
             }
         }
 
-        // Update current collisions
+        // Update current collisions. If stillColliding is empty, it will also remove the previous element from CurrentCollisions
         CurrentCollisions = std::move(stillColliding);
-    }
-
-    sf::FloatRect CollisionComponent::GetCollisionBounds() const
-    {
-        return ExpandedBounds;
     }
 
     void CollisionComponent::UpdateBounds()
     {
         if (!Owner) return;
 
-        // Get basic bounds from owner
+        // Get basic bounds from owner that not expanded yet. 
         const sf::FloatRect baseBounds = Owner->GetBounds();
 
         // Expand by radius
@@ -116,11 +110,27 @@ namespace ETG
     bool CollisionComponent::CheckCollision(const CollisionComponent* other) const
     {
         if (!other) throw std::runtime_error("The object: " + other->GetOwner()->ObjectName + " not found");
-
+        //Thankfully at least I am not have to implement intersection this time myself. 
         return ExpandedBounds.intersects(other->GetCollisionBounds());
     }
 
-    void CollisionComponent::DrawDebug(sf::RenderWindow& window)
+    sf::Vector2f CollisionComponent::CalculateImpactPoint(const CollisionComponent* other) const
+    {
+        sf::FloatRect intersection;
+        sf::FloatRect otherObjBounds = other->GetCollisionBounds();
+
+        if (ExpandedBounds.intersects(otherObjBounds, intersection))
+        {
+            return {
+                intersection.left + intersection.width / 2.0f, //x
+                intersection.top + intersection.height / 2.0f //y
+            };
+        }
+
+        return {0, 0};
+    }
+
+    void CollisionComponent::Visualize(sf::RenderWindow& window)
     {
         if (!ShowCollisionBounds || !CollisionEnabled || !Owner) return;
 
@@ -150,26 +160,45 @@ namespace ETG
         {
             if (otherComp && otherComp->Owner)
             {
-                // Draw a line connecting the centers
-                sf::Vector2f selfCenter(
-                    ExpandedBounds.left + ExpandedBounds.width / 2,
-                    ExpandedBounds.top + ExpandedBounds.height / 2
-                );
+                if (DrawCollisionLineBetweenCenters)
+                {
+                    DrawCollisionLineBetweenCenter(window, otherComp);
+                }
 
-                sf::FloatRect otherBounds = otherComp->GetCollisionBounds();
-                sf::Vector2f otherCenter(
-                    otherBounds.left + otherBounds.width / 2,
-                    otherBounds.top + otherBounds.height / 2
-                );
-
-                sf::Vertex line[] = {
-                    sf::Vertex(selfCenter, sf::Color::Red),
-                    sf::Vertex(otherCenter, sf::Color::Red)
-                };
-
-                window.draw(line, 2, sf::Lines);
+                if (DrawImpactPoint)
+                {
+                    sf::CircleShape circle;
+                    circle.setOrigin(5.0f, 5.0f);
+                    circle.setRadius(5);
+                    circle.setPosition(CalculateImpactPoint(otherComp));
+                    circle.setFillColor(sf::Color::Green);
+                    if (circle.getPosition() != sf::Vector2f{0, 0})
+                        Globals::Window->draw(circle);
+                }
             }
         }
+    }
+
+    void CollisionComponent::DrawCollisionLineBetweenCenter(sf::RenderWindow& window, const CollisionComponent* otherComp) const
+    {
+        // Draw a line connecting the centers
+        sf::Vector2f selfCenter(
+            ExpandedBounds.left + ExpandedBounds.width / 2,
+            ExpandedBounds.top + ExpandedBounds.height / 2
+        );
+
+        sf::FloatRect otherBounds = otherComp->GetCollisionBounds();
+        sf::Vector2f otherCenter(
+            otherBounds.left + otherBounds.width / 2,
+            otherBounds.top + otherBounds.height / 2
+        );
+
+        sf::Vertex line[] = {
+            sf::Vertex(selfCenter, sf::Color::Red),
+            sf::Vertex(otherCenter, sf::Color::Red)
+        };
+
+        window.draw(line, 2, sf::Lines);
     }
 
     std::vector<CollisionComponent*>& CollisionComponent::GetRegistry()
@@ -177,6 +206,7 @@ namespace ETG
         return AllCollisionRegistries;
     }
 
+    //TODO: I am not sure if I should remove this function. For now let's put it bottom of this class to ignore easier 
     void CollisionComponent::SetCollisionEnabled(const bool enabled)
     {
         if (CollisionEnabled == enabled) return;
@@ -191,56 +221,12 @@ namespace ETG
             {
                 if (otherComp && otherComp->Owner)
                 {
-                    const CollisionEventData eventData(Owner, otherComp->Owner, otherComp);
+                    const CollisionEventData eventData(Owner, otherComp->Owner, otherComp, CalculateImpactPoint(otherComp));
                     OnCollisionExit.Broadcast(eventData);
                 }
             }
 
             CurrentCollisions.clear();
-        }
-    }
-
-    void CollisionComponent::PopulateSpecificWidgets()
-    {
-        ComponentBase::PopulateSpecificWidgets();
-
-        ImGui::Checkbox("Collision Enabled", &CollisionEnabled);
-        ImGui::Checkbox("Show Collision Bounds", &ShowCollisionBounds);
-        ImGui::SliderFloat("Collision Radius", &CollisionRadius, 0.0f, 100.0f);
-
-        // Color picker for visualization
-        float color[4] = {
-            CollisionVisualizationColor.r / 255.0f,
-            CollisionVisualizationColor.g / 255.0f,
-            CollisionVisualizationColor.b / 255.0f,
-            CollisionVisualizationColor.a / 255.0f
-        };
-
-        if (ImGui::ColorEdit4("Collision Color", color))
-        {
-            CollisionVisualizationColor = sf::Color(
-                static_cast<sf::Uint8>(color[0] * 255),
-                static_cast<sf::Uint8>(color[1] * 255),
-                static_cast<sf::Uint8>(color[2] * 255),
-                static_cast<sf::Uint8>(color[3] * 255)
-            );
-        }
-
-        ImGui::Separator();
-
-        // Show active collisions in ImGui
-        ImGui::Text("Active Collisions: %zu", CurrentCollisions.size());
-        if (!CurrentCollisions.empty())
-        {
-            ImGui::BeginChild("Collisions", ImVec2(0, 100), true);
-            for (auto& [otherComp, _] : CurrentCollisions)
-            {
-                if (otherComp && otherComp->Owner)
-                {
-                    ImGui::Text("- %s", otherComp->Owner->GetObjectName().c_str());
-                }
-            }
-            ImGui::EndChild();
         }
     }
 }

@@ -26,28 +26,27 @@ namespace ETG
         sf::Color CollisionVisualizationColor = sf::Color::Yellow;
 
         //Get the current collision bounds (including radius)
-        sf::FloatRect GetCollisionBounds() const;
+        sf::FloatRect GetCollisionBounds() const {return ExpandedBounds;};
 
         //Events for collision
         EventDelegate<CollisionEventData> OnCollisionEnter;
         EventDelegate<CollisionEventData> OnCollisionStay;
         EventDelegate<CollisionEventData> OnCollisionExit;
 
-        //Draw debug visualization
-        void DrawDebug(sf::RenderWindow& window);
+        //Draw current object, radius expanded borders, impact point, line between collided object's center points.
+        void Visualize(sf::RenderWindow& window);
 
-        //Get collision registry (all activecollision components)
+        //Get collision registry (all active collision components)
         static std::vector<CollisionComponent*>& GetRegistry();
 
         void SetCollisionEnabled(bool enabled);
         bool IsCollisionEnabled() const { return CollisionEnabled; }
-        void PopulateSpecificWidgets() override;
 
     private:
         //Cache the owner's bounds + radius
         sf::FloatRect ExpandedBounds;
 
-        //Track which objects we are currently colldiing with
+        //Hold which objects we are currently colliding with
         std::unordered_map<CollisionComponent*, bool> CurrentCollisions;
 
         //Registry of all active collision components. To see the owner of any element look at: otherComp->ComponentBase->GameObjectBase->Owner 
@@ -55,22 +54,29 @@ namespace ETG
 
         //Whether this collision component is active
         bool CollisionEnabled{};
+        bool DrawCollisionLineBetweenCenters{};
+        bool DrawImpactPoint{true};
 
-        //Update internal bounds cache
+        //In Update before starting collision check, update the Owner's bounds including CollisionRadius
         void UpdateBounds();
 
         //Check colision with another component
         bool CheckCollision(const CollisionComponent* other) const;
-    private:
-        BOOST_DESCRIBE_CLASS(CollisionComponent, (ComponentBase), (CollisionRadius, ShowCollisionBounds, CollisionEnabled, CollisionVisualizationColor), (), ()) //TODO: Define color in template specialization GameEngineUI
+        sf::Vector2f CalculateImpactPoint(const CollisionComponent* other) const;
+        void DrawCollisionLineBetweenCenter(sf::RenderWindow& window, const CollisionComponent* otherComp) const;
+
+        BOOST_DESCRIBE_CLASS(CollisionComponent, (ComponentBase), (CollisionEnabled, ShowCollisionBounds, CollisionRadius,DrawImpactPoint,DrawCollisionLineBetweenCenters, CollisionVisualizationColor), (), ())
     };
 
     struct CollisionEventData
     {
-        GameObjectBase* Self = nullptr; //The object that owns this collision component
+        GameObjectBase* Self = nullptr; //The object that owns this collision component. NOTE: NOT THIS POINTER
         GameObjectBase* Other = nullptr; //The object that collided with this one 
-        CollisionComponent* OtherComp = nullptr; //The collision component of the other object
+        CollisionComponent* OtherComp = nullptr; //The collision component of the other objects
+        sf::Vector2f ImpactPoint;
 
-        CollisionEventData(GameObjectBase* self, GameObjectBase* other, CollisionComponent* otherComp) : Self(self), Other(other), OtherComp(otherComp) {}
+        CollisionEventData(GameObjectBase* self, GameObjectBase* other, CollisionComponent* otherComp, const sf::Vector2f impactPoint) : Self(self), Other(other), OtherComp(otherComp), ImpactPoint(impactPoint)
+        {
+        }
     };
 }

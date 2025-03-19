@@ -43,7 +43,6 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     {
        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
        {
-           std::cout << "Hero collided with enemy: " << enemyObj->GetObjectName() << std::endl;
            enemyObj->SetColor(sf::Color::Blue);
        }
     });
@@ -53,7 +52,6 @@ ETG::Hero::Hero(const sf::Vector2f Position)
        //Handle collisin exit
         if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
         {
-            std::cout << "Hero no longer colliding with enemy: " << enemyObj->GetObjectName() << std::endl;
             enemyObj->SetColor(sf::Color::White);
         }
     });
@@ -64,7 +62,6 @@ void ETG::Hero::Initialize()
 {
     GameObjectBase::Initialize();
     ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
-    
 }
 
 ETG::Hero::~Hero() = default;
@@ -112,7 +109,7 @@ void ETG::Hero::Draw()
     ReloadText->Draw();
     Hand->Draw();
 
-    if (CollisionComp) CollisionComp->DrawDebug(*GameState::GetInstance().GetRenderWindow());
+    if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
 ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const

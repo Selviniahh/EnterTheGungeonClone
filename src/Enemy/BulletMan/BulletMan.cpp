@@ -26,7 +26,7 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
     {
        if (auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
        {
-           std::cout << "enemy collided with Hero!";
+           //Really works
        }
     });
 
@@ -77,5 +77,5 @@ void ETG::BulletMan::Draw()
 {
     EnemyBase::Draw();
     SpriteBatch::Draw(GetDrawProperties());
-    if (CollisionComp) CollisionComp->DrawDebug(*GameState::GetInstance().GetRenderWindow());
+    if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }

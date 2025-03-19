@@ -50,12 +50,10 @@ namespace ETG
             //NOTE: IMPORTANT!!! Mouse position relative to view. This is so important because when hero rotating around mouse, if view zoomed or moved, we need to take View into account
             DrawDebugText("View Relative Mouse world Position: " + std::to_string(InputManager::ViewLocalMousePos.x) + " " + std::to_string(InputManager::ViewLocalMousePos.y), window);
 
-            const sf::Vector2f diff = InputManager::WorldMousePos - HeroPtr->GetPosition();
-            DrawDebugText(" Hero - Mouse pos: " + std::to_string(diff.x) + " " + std::to_string(diff.y), window);
             DrawDebugText(" Mouse angle: " + std::to_string(Hero::MouseAngle), window);
 
             //Represents the mouse position as if the View were neither zoomed nor moved
-            DrawDebugText("View ignored relative Mouse world Position: " + std::to_string(InputManager::WorldMousePos.x) + " " + std::to_string(InputManager::WorldMousePos.y), window);
+            DrawDebugText("View ignored relative Mouse world Position AKA World Mouse Pos: " + std::to_string(InputManager::WorldMousePos.x) + " " + std::to_string(InputManager::WorldMousePos.y), window);
 
             //Mouse Relative to hero
             DrawDebugText("Mouse Relative to Hero: " + std::to_string(sf::Mouse::getPosition().x - HeroPtr->GetPosition().x) + ", " + std::to_string(sf::Mouse::getPosition().y - HeroPtr->GetPosition().y), window);
