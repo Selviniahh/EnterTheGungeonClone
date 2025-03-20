@@ -18,9 +18,10 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
-        static void Perk(const Hero* hero);
+        void Perk(const Hero* hero) const;
 
         std::unique_ptr<CollisionComponent> CollisionComp;
+        float FireRateIncreasePerc = 20;
 
     private:
         

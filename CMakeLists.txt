@@ -83,6 +83,7 @@ add_executable(ETG main.cpp
         src/Items/Passive/PassiveItemBase.h
         src/Items/Passive/PlatinumBullets.cpp
         src/Items/Passive/PlatinumBullets.h
+        src/UI/UIObjects/FrameBar.h
 )
 
 # Easiest and fastest way is VCPKG 

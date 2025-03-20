@@ -35,6 +35,9 @@ void ETG::PlatinumBullets::Initialize()
 
             //Apply the perk
             Perk(heroObj);
+
+            //Add self to equipped passive items list
+            GameState::GetInstance().GetEquippedPassiveItems().push_back(this);
         }
     });
 }
@@ -51,8 +54,8 @@ void ETG::PlatinumBullets::Draw()
     CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
-void ETG::PlatinumBullets::Perk(const Hero* hero)
+void ETG::PlatinumBullets::Perk(const Hero* hero) const
 {
     //Decrease the Fire rate by %20
-    hero->GetCurrentHoldingGun()->FireRate = hero->GetCurrentHoldingGun()->FireRate * 0.8;
+    hero->GetCurrentHoldingGun()->FireRate = hero->GetCurrentHoldingGun()->FireRate * (1.f - FireRateIncreasePerc / 100.f);
 }

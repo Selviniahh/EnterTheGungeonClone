@@ -1,4 +1,8 @@
 #pragma once
+#include <filesystem>
+#include <random>
+#include <array>
+#include <iostream>
 #include "SFML/Audio.hpp"
 #include "../../Core/GameObjectBase.h"
 

@@ -69,7 +69,6 @@ namespace ETG
         void IncrementName();
 
     public:
-        //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
         bool DrawBound = false;
         bool DrawOriginPoint = true;

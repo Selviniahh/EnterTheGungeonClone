@@ -1,7 +1,6 @@
 #pragma once
 #include "../../Core/GameObjectBase.h"
 #include <SFML/Graphics/Texture.hpp>
-#include <vector>
 
 namespace ETG
 {
