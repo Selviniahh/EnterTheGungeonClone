@@ -25,6 +25,16 @@ public:
     {
         return radians * (180.0f / std::numbers::pi);
     }
+    
+    static float AngleToRadian(const float angle)
+    {
+        return (angle * std::numbers::pi) / 180.f;
+    }
+
+    static sf::Vector2f RadianToDirection(const float rad)
+    {
+        return {std::cos(rad), std::sin(rad)};
+    }
 
     template <typename T>
     static inline T VectorSizeSquared(const sf::Vector2<T>& Vector)
@@ -66,6 +76,17 @@ public:
         return static_cast<T>(std::lerp(a,b,t));
     }
 
+    [[nodiscard]] static sf::Vector2f RotateVector(const float rotation, const sf::Vector2f scale, const sf::Vector2f& offset)
+    {
+        const float angleRad = rotation * (std::numbers::pi / 180.f);
+        sf::Vector2f scaledOffset(offset.x * scale.x, offset.y * scale.y);
+
+        return {
+            scaledOffset.x * std::cos(angleRad) - scaledOffset.y * std::sin(angleRad),
+            scaledOffset.x * std::sin(angleRad) + scaledOffset.y * std::cos(angleRad)
+        };
+    }
+
     struct FourCorner
     {
         sf::Vector2f TopLeft{};
@@ -95,14 +116,5 @@ public:
         Corners.BottomRight -= scaledOrigin;
         return Corners;
     }
-    [[nodiscard]] static sf::Vector2f RotateVector(const float rotation, const sf::Vector2f scale, const sf::Vector2f& offset)
-    {
-        const float angleRad = rotation * (std::numbers::pi / 180.f);
-        sf::Vector2f scaledOffset(offset.x * scale.x, offset.y * scale.y);
-
-        return {
-            scaledOffset.x * std::cos(angleRad) - scaledOffset.y * std::sin(angleRad),
-            scaledOffset.x * std::sin(angleRad) + scaledOffset.y * std::cos(angleRad)
-        };
-    };
+    ;
 };

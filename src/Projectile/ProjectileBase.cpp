@@ -2,13 +2,15 @@
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h" // <-- Add this include
 
-ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spawnPos, const sf::Vector2f projVelocity, const float maxProjectileRange, const float rotation)
+ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spawnPos, const sf::Vector2f velocity, const float range, const float rotation, const float damage, const float force)
 {
     Position = spawnPos;
-    ProjVelocity = projVelocity;
-    MaxProjectileRang = maxProjectileRange;
+    ProjVelocity = velocity;
+    Range = range;
     Texture = std::make_shared<sf::Texture>(texture);
     Rotation = rotation;
+    Damage = damage;
+    Force = force;
 }
 
 void ProjectileBase::Initialize()

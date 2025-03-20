@@ -51,7 +51,7 @@ namespace ETG
 
             // Update all ammo UI components with current gun
             ammoIndicators->SetGun(CurrentGun);
-            ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->AmmoSize);
+            ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->MaxAmmo);
         }
 
         // Update UI components

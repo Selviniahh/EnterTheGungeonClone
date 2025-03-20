@@ -2,7 +2,8 @@
 #include "../../Core/Factory.h"
 #include <filesystem>
 
-ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position, 0.35f, 200.f, 5000.f, 0.f,2,300,10, 3.0f)
+ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position,
+    0.35f, 200.f, 5000.f, 0.f,2,300,10, 3.0f, 3.5f, 2.f, 10.f)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
 
@@ -26,6 +27,14 @@ void ETG::RogueSpecial::Initialize()
         throw std::runtime_error("Failed to load Projectile_RogueSpecial.png from path: " + projPath);
 
     GunBase::Initialize();
+}
+
+void ETG::RogueSpecial::Update()
+{
+    GunBase::Update();
+
+    //Muzzle flash animation needs to be FireRate / 3
+    MuzzleFlash->Animation.EachFrameSpeed = FireRate / 3;
 }
 
 ETG::RogueSpecialAnimComp::RogueSpecialAnimComp()

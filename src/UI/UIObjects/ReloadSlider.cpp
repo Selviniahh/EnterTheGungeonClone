@@ -99,7 +99,7 @@ void ETG::ReloadSlider::FinishAnimation()
 {
         // Animation complete - set gun state
         Gun->IsReloading = false;
-        Gun->AmmoSize -= Gun->MagazineSize - Gun->MagazineAmmo;
+        Gun->MaxAmmo -= Gun->MagazineSize - Gun->MagazineAmmo;
         Gun->MagazineAmmo = Gun->MagazineSize;
         Gun->CurrentGunState = GunStateEnum::Idle;
 

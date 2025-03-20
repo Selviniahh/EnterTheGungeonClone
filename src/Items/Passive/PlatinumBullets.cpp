@@ -27,7 +27,7 @@ void ETG::PlatinumBullets::Initialize()
         {
             if (!IsVisible) return;
 
-            //Play a random pick up sound when collision occurs
+            //Play a random pickup sound when collision occurs
             std::uniform_int_distribution<int> dist(0, Sounds.size() -1);
             const int soundIndex = dist(rng);
             Sounds[soundIndex].play();
@@ -53,5 +53,6 @@ void ETG::PlatinumBullets::Draw()
 
 void ETG::PlatinumBullets::Perk(const Hero* hero)
 {
-    hero->GetCurrentHoldingGun()->FireRate = 0.1f;
+    //Decrease the Fire rate by %20
+    hero->GetCurrentHoldingGun()->FireRate = hero->GetCurrentHoldingGun()->FireRate * 0.8;
 }
