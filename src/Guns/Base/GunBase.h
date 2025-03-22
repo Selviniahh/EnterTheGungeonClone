@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <queue>
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "GunBase.h"
@@ -11,12 +12,14 @@
 #include "../../Core/Components/BaseAnimComp.h"
 #include "../../Core/Events/EventDelegate.h"
 #include "../VFX/MuzzleFlash.h"
+#include "GunModifiers.h"
 
-class ProjectileBase;
 
 namespace ETG
 {
     class ReloadSlider;
+    class ProjectileBase;
+    struct QueuedBullet;
     enum class GunStateEnum;
 
     class GunBase : public GameObjectBase
@@ -28,10 +31,27 @@ namespace ETG
         ~GunBase() override;
         void Initialize() override;
         void Update() override;
-        double AngleToRadian(float angle);
         void Draw() override;
         virtual void Shoot();
         virtual void Reload();
+
+        //Modifier system methods
+        void AddModifier(const std::shared_ptr<GunModifier>& modifier);
+        void RemoveModifier(const std::string& modifierName);
+        bool HasModifier(const std::string& modifierName) const;
+
+        template <typename T>
+        std::shared_ptr<T> GetModifier() const
+        {
+            return modifierManager.GetModifier<T>();
+        }
+
+        //Fire an individual bullet
+        void FireBullet(float projectileAngle);
+        
+        GunModifierManager modifierManager; //NOTE: modifier
+        std::vector<QueuedBullet> bulletQueue; //Queue of bullets waiting to be fired
+        static constexpr float MULTI_SHOT_DELAY = 0.1f;  // Delay between bullets in seconds
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
 
@@ -69,7 +89,6 @@ namespace ETG
         //Gun needs to have custom Origin offset cuz, it needs to be attached to Hero's hand
         sf::Vector2f OriginOffset;
 
-    protected:
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
 
@@ -78,5 +97,11 @@ namespace ETG
                                  FireRate, ShotSpeed, Range, Damage, Force, Spread),
                              (ProjTexture, OriginOffset),
                              ())
+    };
+
+    struct QueuedBullet
+    {
+        float timeToFire;
+        float angle;
     };
 }

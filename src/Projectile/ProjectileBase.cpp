@@ -2,7 +2,7 @@
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h" // <-- Add this include
 
-ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spawnPos, const sf::Vector2f velocity, const float range, const float rotation, const float damage, const float force)
+ETG::ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spawnPos, const sf::Vector2f velocity, const float range, const float rotation, const float damage, const float force)
 {
     Position = spawnPos;
     ProjVelocity = velocity;
@@ -13,18 +13,18 @@ ProjectileBase::ProjectileBase(const sf::Texture& texture,const sf::Vector2f spa
     Force = force;
 }
 
-void ProjectileBase::Initialize()
+void ETG::ProjectileBase::Initialize()
 {
     
 }
 
-void ProjectileBase::Update()
+void ETG::ProjectileBase::Update()
 {
     Position += ETG::Globals::FrameTick * ProjVelocity;
     GameObjectBase::Update();
 }
 
-void ProjectileBase::Draw()
+void ETG::ProjectileBase::Draw()
 {
     //Calling this is necessary. When the projectiles are spawned, Update Function called After Draw. Somehow Update needs to be called before Draw. Calling this function instead is just a temp solution. 
     // ComputeDrawProperties();

@@ -3,40 +3,36 @@
 
 namespace ETG
 {
+    class GunBase;
+
+    enum class BarType
+    {
+        GunBar,
+        ActiveItemBar
+    };
+
     class FrameBar : public GameObjectBase
     {
     public:
-        explicit FrameBar(const std::string& texturePath);
+        explicit FrameBar(const std::string& texturePath, BarType type = BarType::GunBar);
         ~FrameBar() override = default;
         void Initialize() override;
+        void SetDrawPropsOrientation();
         void Draw() override;
         void Update() override;
+
+        // Set content to display
+        void SetGun(GunBase* gun);
+        void SetActiveItem(GameObjectBase* item);
+
+        // Getters
+        BarType GetBarType() const { return barType; }
+
+    private:
+        BarType barType;
+        GunBase* gunContent = nullptr;
+        GameObjectBase* itemContent = nullptr;
+        DrawProperties contentDrawProps;
+        float contentScale = 3.0f; // Default scale factor for contents
     };
-
-    inline FrameBar::FrameBar(const std::string& texturePath)
-    {
-        Texture = std::make_shared<sf::Texture>();
-
-        if (!Texture->loadFromFile(texturePath))
-            throw std::runtime_error("Failed to load Frame.png");
-
-        Origin = {Texture->getSize().x / 2.f, Texture->getSize().y / 2.f};
-
-        FrameBar::Initialize();
-    }
-
-    inline void FrameBar::Initialize()
-    {
-        GameObjectBase::Initialize();
-    }
-
-    inline void FrameBar::Draw()
-    {
-        GameObjectBase::Draw();
-    }
-
-    inline void FrameBar::Update()
-    {
-        GameObjectBase::Update();
-    }
 }

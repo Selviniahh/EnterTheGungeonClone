@@ -13,12 +13,12 @@ namespace ETG
     class PassiveItemBase : public GameObjectBase
     {
     public:
-        PassiveItemBase()
+        explicit PassiveItemBase(const std::string& resourcePath)
         {
             //Load the texture
             Texture = std::make_shared<sf::Texture>();
 
-            if (!Texture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Items" / "Passive" / "platinum_bullets_001.png").generic_string()))
+            if (!Texture->loadFromFile(resourcePath))
                 std::cerr << "Failed to load hand texture" << std::endl;
 
             // Load sound effects

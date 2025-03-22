@@ -39,12 +39,15 @@ namespace ETG
     void UserInterface::Update()
     {
         GameObjectBase::Update();
+        UpdateGunUIProperties();
+        
         RightGunFrame->Update();
+        LeftActiveItemFrame->Update();
 
         // Get current gun and update properties
         if ((CurrentGun = hero->GetCurrentHoldingGun()))
         {
-            UpdateGunUIProperties();
+            RightGunFrame->SetGun(CurrentGun);
 
             // Update all ammo UI components with current gun
             ammoIndicators->SetGun(CurrentGun);
@@ -61,18 +64,13 @@ namespace ETG
     {
         // Draw the frame
         RightGunFrame->Draw();
-
-        // Draw the gun if available
-        if (CurrentGun && CurrentGun->Texture)
-        {
-            SpriteBatch::Draw(gunDrawProps);
-            ammoCounter->Draw();
-        }
+        LeftActiveItemFrame->Draw();
 
         // Draw ammo bars and indicators
         ammoBarBottom->Draw();
         ammoIndicators->Draw(); // Draw indicators between bars
         ammoBarTop->Draw();
+        ammoCounter->Draw();
 
         DrawEquippedPassiveItemsAtLeftUI();
     }
@@ -81,16 +79,35 @@ namespace ETG
     {
         // Load textures
         const std::string ResPath = RESOURCE_PATH;
-        RightGunFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/Frame.png");
 
-        const float RightFrameOffsetX = GameScreenSize.x * (FrameOffsetPerc.x / 100);
-        const float RightFrameOffsetY = GameScreenSize.y * (FrameOffsetPerc.y / 100);
+        //NOTE: Right gun frame
+        // Create right frame for gun display
+        RightGunFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/Frame.png", BarType::GunBar);
+
+        const float RightFrameOffsetX = GameScreenSize.x * (RightFrameOffsetPerc.x / 100);
+        const float RightFrameOffsetY = GameScreenSize.y * (RightFrameOffsetPerc.y / 100);
 
         const sf::Vector2f RightFramePosition = {
             (GameScreenSize.x - RightFrameOffsetX - RightGunFrame->Texture->getSize().x / 2),
             (GameScreenSize.y - RightFrameOffsetY - RightGunFrame->Texture->getSize().y / 2)
         };
         RightGunFrame->SetPosition(RightFramePosition);
+
+        // Set the current gun to the frame
+        RightGunFrame->SetGun(CurrentGun);
+
+        //NOTE: Left item frame 
+        // Create left frame for active item display (positioned on left side)
+        LeftActiveItemFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/Frame.png", BarType::ActiveItemBar);
+
+        const float LeftFrameOffsetX = GameScreenSize.x * (LeftFrameOffsetPerc.x / 100);
+        const float LeftFrameOffsetY = GameScreenSize.y * (LeftFrameOffsetPerc.y / 100);
+        
+        const sf::Vector2f LeftFramePosition = {
+            (LeftFrameOffsetX + LeftActiveItemFrame->Texture->getSize().x / 2),
+            (GameScreenSize.y - LeftFrameOffsetY - LeftActiveItemFrame->Texture->getSize().y / 2)
+        };
+        LeftActiveItemFrame->SetPosition(LeftFramePosition);
     }
 
     void UserInterface::InitializeAmmoBar()
@@ -126,13 +143,7 @@ namespace ETG
     void UserInterface::UpdateGunUIProperties()
     {
         CurrentGun = hero->GetCurrentHoldingGun();
-        gunDrawProps.Texture = CurrentGun->Texture.get();
-        gunDrawProps.Position = RightGunFrame->GetPosition();
-        gunDrawProps.Scale = {3.0f, 3.0f}; // UI gun scale factor
-        gunDrawProps.Origin = {
-            static_cast<float>(CurrentGun->Texture->getSize().x) / 2.0f,
-            static_cast<float>(CurrentGun->Texture->getSize().y) / 2.0f
-        };
+        RightGunFrame->SetGun(CurrentGun);
     }
 
     void UserInterface::DrawEquippedPassiveItemsAtLeftUI() const
@@ -147,7 +158,7 @@ namespace ETG
 
             DrawProperties DrawProps{};
             DrawProps.Position = pos;
-            DrawProps.Scale = {2, 2};
+            DrawProps.Scale = {1.5, 1.5};
             DrawProps.Texture = items->Texture.get();
             DrawProps.Origin = {(float)DrawProps.Texture->getSize().x / 2, (float)DrawProps.Texture->getSize().y / 2};
             SpriteBatch::Draw(DrawProps);

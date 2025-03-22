@@ -1,5 +1,6 @@
 #include "RogueSpecial.h"
 #include "../../Core/Factory.h"
+#include "../../Items/Active/DoubleShoot.h"
 #include <filesystem>
 
 ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position,
@@ -33,8 +34,16 @@ void ETG::RogueSpecial::Update()
 {
     GunBase::Update();
 
-    //Muzzle flash animation needs to be FireRate / 3
-    MuzzleFlash->Animation.EachFrameSpeed = FireRate / 3;
+    if (GetModifier<MultiShotModifier>())
+    {
+        // When multishot is active, make flash animation match bullet frequency
+        MuzzleFlash->Animation.EachFrameSpeed = MULTI_SHOT_DELAY / 2;
+    }
+    else
+    {
+        // Normal animation speed for single shots
+        MuzzleFlash->Animation.EachFrameSpeed = FireRate / 3;
+    }
 }
 
 ETG::RogueSpecialAnimComp::RogueSpecialAnimComp()

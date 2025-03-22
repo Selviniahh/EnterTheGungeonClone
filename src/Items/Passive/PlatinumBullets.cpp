@@ -6,13 +6,13 @@
 #include "../../Core/Factory.h"
 #include "../../Guns/Base/GunBase.h"
 
-ETG::PlatinumBullets::PlatinumBullets()
+ETG::PlatinumBullets::PlatinumBullets(): PassiveItemBase((std::filesystem::path(RESOURCE_PATH) / "Items" / "Passive" / "platinum_bullets_001.png").generic_string())
 {
     ItemDescription = "Increase the fire rate %20";
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 15.f;
     CollisionComp->SetCollisionEnabled(true);
-    Position = {100,-10};
+    Position = {100, +30};
 
     PlatinumBullets::Initialize();
 }

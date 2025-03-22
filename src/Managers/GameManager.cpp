@@ -9,6 +9,7 @@
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
 #include "../Enemy/BulletMan/BulletMan.h"
+#include "../Items/Active/DoubleShoot.h"
 #include "../Items/Passive/PlatinumBullets.h"
 
 sf::Event ETG::GameManager::GameEvent{};
@@ -58,6 +59,7 @@ void ETG::GameManager::Initialize()
     DebugText = std::make_unique<class DebugText>();
 
     PlatinumBullets = ETG::CreateGameObjectDefault<class PlatinumBullets>();
+    DoubleShoot = ETG::CreateGameObjectDefault<class DoubleShoot>();
     
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
     // DestroyGameObject(Hero);
@@ -76,6 +78,7 @@ void ETG::GameManager::Update()
         UI->Update();
         BulletMan->Update();
         PlatinumBullets->Update();
+        DoubleShoot->Update();
     }
 
 }
@@ -92,6 +95,7 @@ void ETG::GameManager::Draw()
     Hero->Draw();
     BulletMan->Draw();
     PlatinumBullets->Draw();
+    DoubleShoot->Draw();
     GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.

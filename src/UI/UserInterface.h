@@ -16,16 +16,9 @@ namespace ETG
 
     class UserInterface : public GameObjectBase
     {
-    private:
-        // Textures
-        // std::shared_ptr<sf::Texture> frameTexture;
-
         // Draw properties
         // DrawProperties RightFrameDrawProps;
         DrawProperties gunDrawProps;
-
-        // Positions
-        // sf::Vector2f RightFramePosition;
 
         // References
         GunBase* CurrentGun = nullptr;
@@ -40,8 +33,8 @@ namespace ETG
         std::unique_ptr<AmmoCounter> ammoCounter;
 
         // Configuration
-        sf::Vector2f FrameOffsetPerc{4, 3.5};
-        // sf::Vector2u RightFrameSize;
+        sf::Vector2f RightFrameOffsetPerc{4, 3.5};
+        sf::Vector2f LeftFrameOffsetPerc{1, 3.5};
 
         //Ammo display at right UI
         float AmmoBarOffsetPercX = 2.f;
@@ -49,8 +42,8 @@ namespace ETG
 
         //Left passive item UI
         float LeftXOffsetPerItem = 10.f;
-        float InitialLeftOffsetX = 10.f;
-        float InitialLeftOffsetY = 30.f;
+        float InitialLeftOffsetX = 35.f;
+        float InitialLeftOffsetY = 18.f;
 
         //Get WindowSize - EngineUISize to calculate GameScreen
         sf::Vector2f GameScreenSize;
@@ -66,6 +59,6 @@ namespace ETG
         void Draw() override;
 
         BOOST_DESCRIBE_CLASS(UserInterface, (GameObjectBase),
-                             (), (), (CurrentGun, FrameOffsetPerc, AmmoBarOffsetPercX, InitialAmmoBarOffsetY, GameScreenSize))
+                             (), (), (CurrentGun, RightFrameOffsetPerc, AmmoBarOffsetPercX, InitialAmmoBarOffsetY, GameScreenSize))
     };
 }
