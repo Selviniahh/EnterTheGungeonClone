@@ -32,7 +32,7 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
-        virtual void Shoot();
+        virtual void PrepareShooting(); //queue the bulletQueue
         virtual void Reload();
 
         //Modifier system methods

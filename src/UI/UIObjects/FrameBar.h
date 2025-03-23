@@ -3,6 +3,7 @@
 
 namespace ETG
 {
+    class ActiveItemBase;
     class GunBase;
 
     enum class BarType
@@ -23,7 +24,7 @@ namespace ETG
 
         // Set content to display
         void SetGun(GunBase* gun);
-        void SetActiveItem(GameObjectBase* item);
+        void SetActiveItem(ActiveItemBase* item);
 
         // Getters
         BarType GetBarType() const { return barType; }

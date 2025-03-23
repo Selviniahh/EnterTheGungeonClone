@@ -45,7 +45,7 @@ void Animation::Draw(const sf::Vector2f position, const float layerDepth, const 
     frame.setOrigin(Origin);
     frame.setScale(ETG::Globals::DefaultScale * flipX, ETG::Globals::DefaultScale);
 
-    ETG::GlobSpriteBatch.draw(frame, layerDepth);
+    ETG::GlobSpriteBatch.Draw(frame, layerDepth);
 }
 
 void Animation::Draw(const std::shared_ptr<sf::Texture>& texture, const sf::Vector2f position, const sf::Color color, const float rotation, const sf::Vector2f origin, const sf::Vector2f scale, const float depth) const
@@ -61,7 +61,7 @@ void Animation::Draw(const std::shared_ptr<sf::Texture>& texture, const sf::Vect
     frame.setOrigin(origin);
     frame.setScale(scale);
 
-    ETG::GlobSpriteBatch.draw(frame, depth);
+    ETG::GlobSpriteBatch.Draw(frame, depth);
 }
 
 void Animation::Restart()

@@ -27,7 +27,7 @@ namespace ETG
         [[nodiscard]] Scene* GetSceneObj() const { return SceneObj; }
         [[nodiscard]] sf::RenderWindow* GetRenderWindow() const { return Window; }
         [[nodiscard]] std::vector<PassiveItemBase*>& GetEquippedPassiveItems() { return EquippedPassiveItems; }
-        [[nodiscard]] std::vector<ActiveItemBase*> GetEquippedActiveItems() { return EquippedActiveItems; }
+        [[nodiscard]] std::vector<ActiveItemBase*>& GetEquippedActiveItems() { return EquippedActiveItems; }
 
         void SetHero(Hero* hero) { MainHero = hero; }
         void SetSceneObjs(std::unordered_map<std::string, GameObjectBase*>& sceneObj) { SceneObjs = &sceneObj; }

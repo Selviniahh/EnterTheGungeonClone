@@ -5,10 +5,12 @@
 #include "UIObjects/AmmoBarUI.h"
 #include "UIObjects/AmmoCounter.h"
 #include "UIObjects/AmmoIndicatorsUI.h"
+#include "UIObjects/FrameLeftProgressBar.h"
 #include "UIObjects/FrameBar.h"
 
 namespace ETG
 {
+    class FrameLeftProgressBar;
     class GunBase;
     class Hero;
     class FrameBar;
@@ -22,6 +24,7 @@ namespace ETG
 
         // References
         GunBase* CurrentGun = nullptr;
+        ActiveItemBase* CurrActiveItem = nullptr;
         Hero* hero = nullptr;
 
         // UI Components
@@ -31,6 +34,8 @@ namespace ETG
         std::unique_ptr<AmmoBarUI> ammoBarTop;
         std::unique_ptr<AmmoIndicatorsUI> ammoIndicators;
         std::unique_ptr<AmmoCounter> ammoCounter;
+        std::unique_ptr<FrameLeftProgressBar> LeftProgressBar;  // ← Add this member
+
 
         // Configuration
         sf::Vector2f RightFrameOffsetPerc{4, 3.5};

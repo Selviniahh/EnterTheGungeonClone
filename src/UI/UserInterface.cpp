@@ -40,9 +40,6 @@ namespace ETG
     {
         GameObjectBase::Update();
         UpdateGunUIProperties();
-        
-        RightGunFrame->Update();
-        LeftActiveItemFrame->Update();
 
         // Get current gun and update properties
         if ((CurrentGun = hero->GetCurrentHoldingGun()))
@@ -53,6 +50,17 @@ namespace ETG
             ammoIndicators->SetGun(CurrentGun);
             ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->MaxAmmo);
         }
+        RightGunFrame->Update();
+
+        //Get current Active item and update propetries
+        if (!GameState::GetInstance().GetEquippedActiveItems().empty())
+        {
+            CurrActiveItem = GameState::GetInstance().GetEquippedActiveItems()[0];
+            LeftActiveItemFrame->SetActiveItem(CurrActiveItem);
+            LeftProgressBar->SetActiveItem(CurrActiveItem);
+        }
+        LeftActiveItemFrame->Update();
+        LeftProgressBar->Update();
 
         // Update UI components
         ammoBarBottom->Update(); //For now this update not doing anyhting
@@ -71,6 +79,8 @@ namespace ETG
         ammoIndicators->Draw(); // Draw indicators between bars
         ammoBarTop->Draw();
         ammoCounter->Draw();
+        LeftProgressBar->Draw();
+
 
         DrawEquippedPassiveItemsAtLeftUI();
     }
@@ -82,7 +92,7 @@ namespace ETG
 
         //NOTE: Right gun frame
         // Create right frame for gun display
-        RightGunFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/Frame.png", BarType::GunBar);
+        RightGunFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/FrameRight.png", BarType::GunBar);
 
         const float RightFrameOffsetX = GameScreenSize.x * (RightFrameOffsetPerc.x / 100);
         const float RightFrameOffsetY = GameScreenSize.y * (RightFrameOffsetPerc.y / 100);
@@ -98,16 +108,26 @@ namespace ETG
 
         //NOTE: Left item frame 
         // Create left frame for active item display (positioned on left side)
-        LeftActiveItemFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/Frame.png", BarType::ActiveItemBar);
+        LeftActiveItemFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/FrameLeft.png", BarType::ActiveItemBar);
 
         const float LeftFrameOffsetX = GameScreenSize.x * (LeftFrameOffsetPerc.x / 100);
         const float LeftFrameOffsetY = GameScreenSize.y * (LeftFrameOffsetPerc.y / 100);
-        
+
         const sf::Vector2f LeftFramePosition = {
             (LeftFrameOffsetX + LeftActiveItemFrame->Texture->getSize().x / 2),
             (GameScreenSize.y - LeftFrameOffsetY - LeftActiveItemFrame->Texture->getSize().y / 2)
         };
         LeftActiveItemFrame->SetPosition(LeftFramePosition);
+
+        //Create a progress bar to the right of the left frame
+        LeftProgressBar = CreateGameObjectAttached<FrameLeftProgressBar>(this);
+    
+        // Position the progress bar at the right edge of the left frame
+        const float progressBarX = LeftFramePosition.x + (LeftActiveItemFrame->Texture->getSize().x / 2);
+        LeftProgressBar->SetPosition({
+            progressBarX,
+            LeftFramePosition.y
+        });
     }
 
     void UserInterface::InitializeAmmoBar()

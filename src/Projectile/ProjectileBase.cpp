@@ -35,5 +35,5 @@ void ETG::ProjectileBase::Draw()
     frame.setOrigin(frame.getTexture()->getSize().x /2,frame.getTexture()->getSize().y /2);
     frame.setPosition(DrawableProps.Position);
     frame.setRotation(DrawableProps.Rotation);
-    ETG::GlobSpriteBatch.draw(frame,0);
+    ETG::GlobSpriteBatch.Draw(frame,0);
 }

@@ -87,7 +87,7 @@ void ETG::ReloadSlider::StartAnimation()
         const sf::Vector2f RightMidPos = sf::Vector2f{TopRight.x / 2, TopRight.y / 2} + sf::Vector2f{BottomRight.x / 2, BottomRight.y / 2};
         SliderValProps.Position.x = Math::SinWaveLerp(LeftMidPos.x, RightMidPos.x, Gun->ReloadTime, reloadTimer);
 
-        //Set necessary values when animation is finished
+        //Finish animation when (SliderX reached at RightMidPos.x) I could've done (reloadTimer >= 0.5) instead. This will also do the same 
         if (std::abs(SliderValProps.Position.x - RightMidPos.x) < PositionTolerance)
         {
             FinishAnimation();

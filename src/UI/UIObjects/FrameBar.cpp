@@ -1,5 +1,6 @@
 #include "FrameBar.h"
 #include "../../Guns/Base/GunBase.h"
+#include "../../Items/Active/ActiveItemBase.h"
 #include "../../Managers/SpriteBatch.h"
 
 namespace ETG
@@ -28,11 +29,13 @@ namespace ETG
         if (barType == BarType::GunBar && gunContent)
         {
             contentDrawProps.Texture = gunContent->Texture.get();
+            contentDrawProps.Color = gunContent->GetColor();
             SetDrawPropsOrientation();
         }
         else if (barType == BarType::ActiveItemBar && itemContent)
         {
             contentDrawProps.Texture = itemContent->Texture.get();
+            contentDrawProps.Color = itemContent->GetColor();
             SetDrawPropsOrientation();
         }
     }
@@ -71,7 +74,7 @@ namespace ETG
             barType = BarType::GunBar;
     }
 
-    void FrameBar::SetActiveItem(GameObjectBase* item)
+    void FrameBar::SetActiveItem(ActiveItemBase* item)
     {
         itemContent = item;
         // Reset the other content type

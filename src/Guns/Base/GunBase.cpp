@@ -139,7 +139,7 @@ namespace ETG
         ReloadSlider->Draw();
     }
 
-    void GunBase::Shoot()
+    void GunBase::PrepareShooting()
     {
         if (Timer >= FireRate)
         {
@@ -148,9 +148,10 @@ namespace ETG
 
             //NOTE: Apply modifiers if present. Later on when all of these modifiers will get complex. A new class that will only handle modifiers should be created. 
             int shotCount = 1;
-            if (const auto multiMod = GetModifier<MultiShotModifier>())
+            if (const auto& multiMod = GetModifier<MultiShotModifier>())
             {
                 shotCount = multiMod->GetShotCount();
+                Spread = multiMod->GetSpread();
             }
 
             //Consume ammo only once per shot group

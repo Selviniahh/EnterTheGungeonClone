@@ -72,7 +72,7 @@ namespace ETG::Globals
         frame.setRotation(rotation);
 
         // Draw the sprite
-        GlobSpriteBatch.draw(frame, -1);
+        GlobSpriteBatch.Draw(frame, -1);
         return false;
     }
 }

@@ -9,39 +9,26 @@
 //TODO: is active item base class necessary or I should remove it and rename PassiveItemBase to ItemBase and use it as base class for both active and passive classes 
 namespace ETG
 {
+    enum class ActiveItemState;
+
     class ComponentBase;
 
     class ActiveItemBase : public GameObjectBase
     {
     public:
-        explicit ActiveItemBase(const std::string& resourcePath)
-        {
-            //Load the texture
-            Texture = std::make_shared<sf::Texture>();
+        explicit ActiveItemBase(const std::string& resourcePath, const float& cooldownTime, const float& activeTime);
 
-            if (!Texture->loadFromFile(resourcePath))
-                std::cerr << "Failed to load hand texture" << std::endl;
+        float TotalCooldownTime;
+        float TotalConsumeTime;
+        float ConsumeTimer; //Will be increased when the item is consuming
+        float CoolDownTimer; //Will be increased when the item is in cooldown
+        ActiveItemState ActiveItemState{};
 
-            // Load sound effects
-            if (!PickupSoundBuffers[0].loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Pickup1.wav").generic_string()))
-                std::cerr << "Failed to load Pickup1.wav sound" << std::endl;
-
-            if (!PickupSoundBuffers[1].loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Pickup2.wav").generic_string()))
-                std::cerr << "Failed to load Pickup2.wav sound" << std::endl;
-
-            // Connect sounds to their buffers
-            Sounds[0].setBuffer(PickupSoundBuffers[0]);
-            Sounds[1].setBuffer(PickupSoundBuffers[1]);
-        }
+        virtual void RequestUsage();
+        void Update() override;
 
     protected:
-        void PlayRandomPickupSound()
-        {
-            std::uniform_int_distribution<int> dist(0, Sounds.size() - 1);
-            const int soundIndex = dist(rng);
-            Sounds[soundIndex].play();
-            IsVisible = false;
-        }
+        void PlayRandomPickupSound();
 
         std::string ItemDescription{};
 
@@ -52,5 +39,12 @@ namespace ETG
         std::mt19937 rng{std::random_device{}()};
 
         BOOST_DESCRIBE_CLASS(ActiveItemBase, (GameObjectBase), (), (), ())
+    };
+
+    enum class ActiveItemState
+    {
+        Ready, //Item is ready to be consumed
+        Consuming, //Item is currently being consumed
+        Cooldown //Item is in Cooldown state
     };
 }

@@ -88,6 +88,9 @@ add_executable(ETG main.cpp
         src/Items/Active/DoubleShoot.cpp
         src/Items/Active/DoubleShoot.h
         src/Guns/Base/GunModifiers.h
+        src/UI/UIObjects/FrameLeftProgressBar.cpp
+        src/UI/UIObjects/FrameLeftProgressBar.h
+        src/Items/Active/ActiveItemBase.cpp
 )
 
 # Easiest and fastest way is VCPKG 
