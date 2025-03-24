@@ -42,7 +42,6 @@ namespace ETG
 
         ActiveItemBase* CurrActiveItem;
 
-
     private:
         std::unique_ptr<HeroAnimComp> AnimationComp;
         std::unique_ptr<InputComponent> InputComp;

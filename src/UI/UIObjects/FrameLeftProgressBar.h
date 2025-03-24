@@ -32,6 +32,7 @@ namespace ETG
         float maxHeight = 0.0f;
 
         float CurrProgressY{}; //This will change in tick
+        float TotalProgressLength{}; //ProgTopCenter.y - ProgBottomCenter.y For now it's always 120
 
         sf::Vector2f ProgTopCenter; //Progress bar's top center position
         sf::Vector2f ProgBottomCenter; //Progress bar's bottom center position

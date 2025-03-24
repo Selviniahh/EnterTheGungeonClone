@@ -8,6 +8,7 @@
 #include "../../UI/UIObjects/ReloadSlider.h"
 #include "../../Utils/Math.h"
 #include "../../Items/Active/DoubleShoot.h"
+#include "../../Modifiers/Gun/MultiShotModifier.h"
 
 namespace ETG
 {
@@ -146,15 +147,16 @@ namespace ETG
             //Reset firing timer
             Timer = 0;
 
-            //NOTE: Apply modifiers if present. Later on when all of these modifiers will get complex. A new class that will only handle modifiers should be created. 
+            //NOTE: DO NOT MISS HERE!!!!!!! Apply modifiers if present. Later on when all of these modifiers will get complex, a new class that will only handle modifiers should be created. 
             int shotCount = 1;
-            if (const auto& multiMod = GetModifier<MultiShotModifier>())
+            float EffectiveSpread = Spread; //Because Spread needs to be reverted back, when modifier overs, in place temp local variable required 
+            if (const auto& multiMod = modifierManager.GetModifier<MultiShotModifier>())
             {
                 shotCount = multiMod->GetShotCount();
-                Spread = multiMod->GetSpread();
+                EffectiveSpread = multiMod->GetSpread();
             }
 
-            //Consume ammo only once per shot group
+            //Consume ammo only once per shot group regardless of MultiShotModifier
             MagazineAmmo--;
 
             //Queue any additional bullets with delay
@@ -163,10 +165,10 @@ namespace ETG
                 float projectileAngle = Rotation;
 
                 //Apply spread variation
-                if (Spread > 0)
+                if (EffectiveSpread > 0)
                 {
                     std::mt19937 engine(std::random_device{}());
-                    std::uniform_real_distribution<float> dist(-Spread, Spread);
+                    std::uniform_real_distribution<float> dist(-EffectiveSpread, EffectiveSpread);
                     projectileAngle += dist(engine);
                 }
 
@@ -186,6 +188,8 @@ namespace ETG
     {
         //Restart muzzle flash animation and shoot animation
         MuzzleFlash->Restart();
+        ShootSound.play();
+
         AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();
 
         //Set animation state
@@ -207,23 +211,28 @@ namespace ETG
 
     void GunBase::Reload()
     {
+        //IF already reloading or magazine is full do not invoke again
+        if (IsReloading || MagazineAmmo == MagazineSize) return;
+        
         IsReloading = true;
+        ReloadSound.play();
         OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
         OnReloadInvoke.Broadcast(true);
     }
 
-    void GunBase::AddModifier(const std::shared_ptr<GunModifier>& modifier)
+    void GunBase::SetShootSound(const std::string& soundPath)
     {
-        modifierManager.AddModifier(modifier);
+        if (!ShootSoundBuffer.loadFromFile(soundPath))
+            throw std::runtime_error("Failed to load gun sound");
+
+        ShootSound.setBuffer(ShootSoundBuffer);
     }
 
-    void GunBase::RemoveModifier(const std::string& modifierName)
+    void GunBase::SetReloadSound(const std::string& soundPath)
     {
-        modifierManager.RemoveModifier(modifierName);
-    }
+        if (!ReloadSoundBuffer.loadFromFile(soundPath))
+            throw std::runtime_error("Failed to load Reload sound");
 
-    bool GunBase::HasModifier(const std::string& modifierName) const
-    {
-        return modifierManager.HasModifier(modifierName);
+        ReloadSound.setBuffer(ReloadSoundBuffer);
     }
 }

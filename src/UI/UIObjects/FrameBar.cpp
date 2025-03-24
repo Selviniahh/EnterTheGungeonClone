@@ -8,8 +8,16 @@ namespace ETG
     FrameBar::FrameBar(const std::string& texturePath, const BarType type) : barType(type)
     {
         Texture = std::make_shared<sf::Texture>();
-
+        FullFrameTexture = std::make_shared<sf::Texture>();
+        FrameWithProgBarTexture = std::make_shared<sf::Texture>();
+        
         if (!Texture->loadFromFile(texturePath))
+            throw std::runtime_error("Failed to load Frame texture from: " + texturePath);
+
+        if (!FullFrameTexture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "UI" / "FrameRight.png").generic_string()))
+            throw std::runtime_error("Failed to load Frame texture from: " + texturePath);
+
+        if (!FrameWithProgBarTexture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "UI" / "FrameLeft.png").generic_string()))
             throw std::runtime_error("Failed to load Frame texture from: " + texturePath);
 
         Origin = {Texture->getSize().x / 2.f, Texture->getSize().y / 2.f};
@@ -36,6 +44,13 @@ namespace ETG
         {
             contentDrawProps.Texture = itemContent->Texture.get();
             contentDrawProps.Color = itemContent->GetColor();
+
+            //Set current frame texture based on the active item state 
+            if (itemContent->ActiveItemState == ActiveItemState::Ready)
+                Texture = FullFrameTexture;
+            else
+                Texture = FrameWithProgBarTexture;
+
             SetDrawPropsOrientation();
         }
     }

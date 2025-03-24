@@ -22,11 +22,11 @@ namespace ETG
                 std::cerr << "Failed to load hand texture" << std::endl;
 
             // Load sound effects
-            if (!PickupSoundBuffers[0].loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Pickup1.wav").generic_string()))
-                std::cerr << "Failed to load Pickup1.wav sound" << std::endl;
+            if (!PickupSoundBuffers[0].loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Pickup1.ogg").generic_string()))
+                std::cerr << "Failed to load Pickup1.ogg sound" << std::endl;
 
-            if (!PickupSoundBuffers[1].loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Pickup2.wav").generic_string()))
-                std::cerr << "Failed to load Pickup2.wav sound" << std::endl;
+            if (!PickupSoundBuffers[1].loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Pickup2.ogg").generic_string()))
+                std::cerr << "Failed to load Pickup2.ogg sound" << std::endl;
 
             // Connect sounds to their buffers
             Sounds[0].setBuffer(PickupSoundBuffers[0]);

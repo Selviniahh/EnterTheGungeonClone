@@ -2,7 +2,6 @@
 #include "../../Guns/Base/GunBase.h"
 #include "../../Characters/Hero.h"
 #include "../../Managers/SpriteBatch.h"
-#include "../../Managers/Globals.h"
 #include "../../Utils/Math.h"
 
 ETG::ReloadSlider::ReloadSlider()

@@ -40,34 +40,42 @@ void ETG::FrameLeftProgressBar::Update()
     //Calculate Top and Bottom center. Bcs progressRect is not GameObjectBase derived, we have to calculate center origin ourselves
     ProgTopCenter = {Position.x, Position.y - maxHeight / 2};
     ProgBottomCenter = {Position.x, Position.y + maxHeight / 2};
+    TotalProgressLength = std::abs(ProgTopCenter.y - ProgBottomCenter.y);
 
     if (activeItem)
         
-        //ACTIVE STATE: Progress decreases from top (100%) to bottom (0%)
+        //NOTE: Consuming state: Progress decreases from top (100%) to bottom (0%)
         if (activeItem->ActiveItemState == ActiveItemState::Consuming)
         {
             //Set active item color back to normal 
-            activeItem->SetColor(sf::Color::White);
+            activeItem->SetColor(sf::Color{94,94,94});
+            CurrProgressY = Math::IntervalLerp(TotalProgressLength, 0.f, activeItem->TotalConsumeTime, activeItem->ConsumeTimer);
             progressRect.setFillColor(sf::Color::White);
-            progressRect.setPosition(ProgTopCenter);
-            progressRect.setSize({maxWidth, CurrProgressY});
+            progressRect.setPosition(ProgBottomCenter);
+            progressRect.setSize({maxWidth, -CurrProgressY});
             progressRect.setOrigin(progressRect.getSize().x / 2, 0);
-            CurrProgressY = Math::IntervalLerp(0.f, ProgBottomCenter.y - ProgTopCenter.y, activeItem->TotalConsumeTime, activeItem->ConsumeTimer);
+            IsVisible = true;
         }
 
-        //Cooldown is over. Item is ready to be consumed. Set color back to normal.
+        //NOTE: Cooldown is over. Item is ready to be consumed. Set color back to normal.
         else if (activeItem->ActiveItemState == ActiveItemState::Ready)
         {
-            //Set item to 
+            //If the item is ready, do not draw the frame left progress bar UI
+            if (activeItem->ActiveItemState == ActiveItemState::Ready) IsVisible = false;
             activeItem->SetColor(sf::Color::White);
         }
 
-        // COOLDOWN STATE: Progress increases from bottom (0%) to top (100%)
+        //NOTE: COOLDOWN STATE: Progress increases from bottom (0%) to top (100%)
         else if (activeItem->ActiveItemState == ActiveItemState::Cooldown)
         {
-            std::cout << "Cooldown state: " << std::endl;
+            //During cooldown, both item and progress bar needs to be gray
             activeItem->SetColor(sf::Color{94,94,94});
-
+            CurrProgressY = Math::IntervalLerp(0.f, TotalProgressLength, activeItem->TotalCooldownTime, activeItem->CoolDownTimer);
+            progressRect.setPosition(ProgBottomCenter);
+            progressRect.setSize({maxWidth, -CurrProgressY});
+            IsVisible = true;
+            
+            std::cout << "Cooldown state: " << std::endl;
         }
 }
 
@@ -79,7 +87,7 @@ void ETG::FrameLeftProgressBar::Draw()
 
     // Draw rectangle with higher depth to ensure it appears on top
     sf::RenderWindow* window = GameState::GetInstance().GetRenderWindow();
-    if (window)
+    if (window && activeItem && activeItem->ActiveItemState != ActiveItemState::Ready)
     {
         // Fallback direct drawing in case SpriteBatch method fails
         window->draw(progressRect);

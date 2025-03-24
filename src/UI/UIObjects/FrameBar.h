@@ -32,8 +32,11 @@ namespace ETG
     private:
         BarType barType;
         GunBase* gunContent = nullptr;
-        GameObjectBase* itemContent = nullptr;
+        ActiveItemBase* itemContent = nullptr;
         DrawProperties contentDrawProps;
+        
+        std::shared_ptr<sf::Texture> FullFrameTexture;
+        std::shared_ptr<sf::Texture> FrameWithProgBarTexture;
         float contentScale = 3.0f; // Default scale factor for contents
     };
 }

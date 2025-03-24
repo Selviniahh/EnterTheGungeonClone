@@ -1,12 +1,13 @@
+#include "DoubleShoot.h"
 #include <filesystem>
 #include "../../Core/Components/CollisionComponent.h"
 #include "../../Characters/Hero.h"
 #include "../../Core/Factory.h"
 #include "../../Guns/Base/GunBase.h"
-
-#include "DoubleShoot.h"
+#include "../../Modifiers/Gun/MultiShotModifier.h"
 
 ETG::DoubleShoot::DoubleShoot() : ActiveItemBase((std::filesystem::path(RESOURCE_PATH) / "Items" / "Active" / "Potion_of_Gun_Friendship.png").generic_string(),
+(std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Consume.ogg").generic_string(),
     GetDefaultCooldown(), GetDefaultActiveTime())
 {
     ItemDescription = "Double shoot the item and set Spread 0";
@@ -14,6 +15,8 @@ ETG::DoubleShoot::DoubleShoot() : ActiveItemBase((std::filesystem::path(RESOURCE
     CollisionComp->CollisionRadius = 15.f;
     CollisionComp->SetCollisionEnabled(true);
     Position = {100, -70};
+
+    Origin = sf::Vector2f{(float)Texture->getSize().x / 2, (float)Texture->getSize().y / 2};
 
     DoubleShoot::Initialize();
 }
@@ -48,10 +51,13 @@ void ETG::DoubleShoot::Update()
         // Remove the modifier when effect ends
         const auto hero = GameState::GetInstance().GetHero();
         const auto gun = hero->GetCurrentHoldingGun();
-        gun->RemoveModifier("MultiShot");
+        if (gun->modifierManager.HasModifier("MultiShot"))
+        {
+            gun->modifierManager.RemoveModifier("MultiShot");
+        }
     }
 }
-
+    
 void ETG::DoubleShoot::Draw()
 {
     ActiveItemBase::Draw();
@@ -63,6 +69,7 @@ void ETG::DoubleShoot::RequestUsage()
     // Only allow usage if the cooldown is complete
     if (ActiveItemState == ActiveItemState::Ready)
     {
+        ActivateSound.play();
         std::cout << "Double shoot activated!" << std::endl;
 
         // Reset state
@@ -77,5 +84,6 @@ void ETG::DoubleShoot::RequestUsage()
 
 void ETG::DoubleShoot::ApplyPerk(const Hero* hero)
 {
-    hero->GetCurrentHoldingGun()->AddModifier(std::make_shared<MultiShotModifier>(2));
+    //Create the modifier and push back the array inside modifierManager 
+    hero->GetCurrentHoldingGun()->modifierManager.AddModifier(std::make_shared<MultiShotModifier>(GetShootCount(),GetSpread()));
 }

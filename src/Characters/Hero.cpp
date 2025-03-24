@@ -11,7 +11,6 @@
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "Hand/Hand.h"
-#include "../UI/UIObjects/ReloadSlider.h"
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -36,7 +35,7 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    
+
     Hero::Initialize();
 }
 

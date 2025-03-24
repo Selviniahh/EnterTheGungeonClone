@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
-#include <queue>
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "GunBase.h"
 #include <boost/describe.hpp>
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 #include "../../Animation/Animation.h"
 #include "../../Core/GameObjectBase.h"
 #include "../../Core/Components/ArrowComp.h"
@@ -12,7 +13,8 @@
 #include "../../Core/Components/BaseAnimComp.h"
 #include "../../Core/Events/EventDelegate.h"
 #include "../VFX/MuzzleFlash.h"
-#include "GunModifiers.h"
+#include "../../Modifiers/ModifierManager.h"
+#include "../../Utils/Interface/IGunModifier.h"
 
 
 namespace ETG
@@ -34,22 +36,13 @@ namespace ETG
         void Draw() override;
         virtual void PrepareShooting(); //queue the bulletQueue
         virtual void Reload();
+        void SetShootSound(const std::string& soundPath);
+        void SetReloadSound(const std::string& soundPath);
+        void FireBullet(float projectileAngle); //Fire an individual bullet
 
-        //Modifier system methods
-        void AddModifier(const std::shared_ptr<GunModifier>& modifier);
-        void RemoveModifier(const std::string& modifierName);
-        bool HasModifier(const std::string& modifierName) const;
-
-        template <typename T>
-        std::shared_ptr<T> GetModifier() const
-        {
-            return modifierManager.GetModifier<T>();
-        }
-
-        //Fire an individual bullet
-        void FireBullet(float projectileAngle);
+        //NOTE: only modifier we have so far. I didn't deem necessary to define this as smart pointer 
+        ModifierManager<IGunModifier> modifierManager; 
         
-        GunModifierManager modifierManager; //NOTE: modifier
         std::vector<QueuedBullet> bulletQueue; //Queue of bullets waiting to be fired
         static constexpr float MULTI_SHOT_DELAY = 0.1f;  // Delay between bullets in seconds
 
@@ -91,6 +84,14 @@ namespace ETG
 
         //Gun Animation
         std::unique_ptr<BaseAnimComp<GunStateEnum>> AnimationComp;
+
+    private:
+        //Sounds
+        sf::SoundBuffer ShootSoundBuffer;
+        sf::Sound ShootSound;
+
+        sf::SoundBuffer ReloadSoundBuffer;
+        sf::Sound ReloadSound;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase),
                              (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ReloadTime, IsReloading,

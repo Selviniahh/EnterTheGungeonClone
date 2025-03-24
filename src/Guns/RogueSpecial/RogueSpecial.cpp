@@ -1,12 +1,14 @@
 #include "RogueSpecial.h"
-#include "../../Core/Factory.h"
-#include "../../Items/Active/DoubleShoot.h"
 #include <filesystem>
+#include "../../Core/Factory.h"
+#include "../../Modifiers/Gun/MultiShotModifier.h"
 
 ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position,
-    0.35f, 200.f, 5000.f, 0.f,2,300,10, 3.0f, 3.5f, 2.f, 10.f)
+                                                                        0.35f, 200.f, 5000.f, 0.f,2,300,10, 3.0f, 3.5f, 2.f, 10.f)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
+    SetShootSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "RogueSpecialShoot.ogg").generic_string());
+    SetReloadSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Reload.ogg").generic_string());
 
     // call the common initialization.
     RogueSpecial::Initialize();
@@ -34,7 +36,7 @@ void ETG::RogueSpecial::Update()
 {
     GunBase::Update();
 
-    if (GetModifier<MultiShotModifier>())
+    if (modifierManager.GetModifier<MultiShotModifier>())
     {
         // When multishot is active, make flash animation match bullet frequency
         MuzzleFlash->Animation.EachFrameSpeed = MULTI_SHOT_DELAY / 2;
