@@ -3,6 +3,7 @@
 #include <complex>
 #include <numbers>
 #include "../Managers/Globals.h"
+#include <iostream>
 
 class Math
 {
@@ -25,6 +26,16 @@ public:
     {
         return radians * (180.0f / std::numbers::pi);
     }
+    
+    static float AngleToRadian(const float angle)
+    {
+        return (angle * std::numbers::pi) / 180.f;
+    }
+
+    static sf::Vector2f RadianToDirection(const float rad)
+    {
+        return {std::cos(rad), std::sin(rad)};
+    }
 
     template <typename T>
     static inline T VectorSizeSquared(const sf::Vector2<T>& Vector)
@@ -44,18 +55,41 @@ public:
         return value >= min && value <= max;
     }
 
+    //Used for non internally incremented timer
+    //look at ReloadSlider
     template <typename T>
     static T SinWaveLerp(T a, T b, T interval, float& timer)
     {
-        //Update the timer (0 to  and back) // Update timer
+        //Update the timer (0 to  and back)
         timer += ETG::Globals::FrameTick / interval;
         if (timer > 1.0f) timer = 0.0f;
 
-        //Generate sine wave (-1 to +1)
-        float sineValue = std::sin(timer * std::numbers::pi);
+        //Multiplying by π transforms this range into [0, π]
+        //When timer = 0.5: sin(π/2) = 1 → fully at position b
+        //When timer = 1.0: sin(π) = 0 → back to midpoint
+        float sineValue = std::sin(timer * std::numbers::pi); 
 
         //apply lerp
         return static_cast<T>(std::lerp(a, b, sineValue));
+    }
+
+    //Used for internally incremented timer
+    //Normally Timer needs 1 second to reach from 0 -> 1
+    //If interval is 10. reaching 0 -> 1 will take 10 seconds
+    //Look at FrameLeftProgressBar
+    template <typename T>
+    static T IntervalLerp(const T& a, const T& b, const T& interval, float timer)
+    {
+        std::cout << "Original Time: " << timer;
+        timer /= interval;
+        if (timer > 1.0f) timer = 0.0f;
+
+        //Only provide 0 -> 1 range
+        float sineValue = std::sin(timer * 0.5) + 0.5f; //NOTE: Just for printing purposes probably I wull delete this later on anyway I just don't wanna miss how I made sin 0 -> 1
+        std::cout << " Timer: " << timer << " Sin: " << sineValue << std::endl;
+
+        //apply lerp
+        return static_cast<T>(std::lerp(a, b, timer));
     }
 
     template<typename T>
@@ -64,6 +98,17 @@ public:
         //clamp progress to 0-1 range
         float t = std::max(0.0f, std::min(1.0f, progress));
         return static_cast<T>(std::lerp(a,b,t));
+    }
+
+    [[nodiscard]] static sf::Vector2f RotateVector(const float rotation, const sf::Vector2f scale, const sf::Vector2f& offset)
+    {
+        const float angleRad = rotation * (std::numbers::pi / 180.f);
+        sf::Vector2f scaledOffset(offset.x * scale.x, offset.y * scale.y);
+
+        return {
+            scaledOffset.x * std::cos(angleRad) - scaledOffset.y * std::sin(angleRad),
+            scaledOffset.x * std::sin(angleRad) + scaledOffset.y * std::cos(angleRad)
+        };
     }
 
     struct FourCorner
@@ -95,14 +140,5 @@ public:
         Corners.BottomRight -= scaledOrigin;
         return Corners;
     }
-    [[nodiscard]] static sf::Vector2f RotateVector(const float rotation, const sf::Vector2f scale, const sf::Vector2f& offset)
-    {
-        const float angleRad = rotation * (std::numbers::pi / 180.f);
-        sf::Vector2f scaledOffset(offset.x * scale.x, offset.y * scale.y);
-
-        return {
-            scaledOffset.x * std::cos(angleRad) - scaledOffset.y * std::sin(angleRad),
-            scaledOffset.x * std::sin(angleRad) + scaledOffset.y * std::cos(angleRad)
-        };
-    };
+    ;
 };

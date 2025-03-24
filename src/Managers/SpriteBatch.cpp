@@ -1,4 +1,6 @@
 #include "SpriteBatch.h"
+
+#include "Globals.h"
 #include "../Utils/TextureUtils.h"
 
 //A forward declaration I've never seen before
@@ -58,7 +60,7 @@ void ETG::SpriteBatch::SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const
     frame.setOrigin(origin);
     frame.setColor(sf::Color::White);
 
-    GlobSpriteBatch.draw(frame, depth);
+    GlobSpriteBatch.Draw(frame, depth);
 }
 
 void ETG::SpriteBatch::Draw(const GameObjectBase::DrawProperties& DrawProperties)
@@ -70,9 +72,20 @@ void ETG::SpriteBatch::Draw(const GameObjectBase::DrawProperties& DrawProperties
     frame.setRotation(DrawProperties.Rotation);
     frame.setOrigin(DrawProperties.Origin);
     frame.setColor(DrawProperties.Color);
-    GlobSpriteBatch.draw(frame, DrawProperties.Depth);
+    GlobSpriteBatch.Draw(frame, DrawProperties.Depth);
 
 }
+
+void ETG::SpriteBatch::AddDebugCircle(const sf::Vector2f& pos, const float radius, const sf::Color& color, const float thickness)
+{
+    sf::CircleShape circle{radius};
+    circle.setPosition(pos.x - radius, pos.y - radius);
+    circle.setFillColor(sf::Color::Transparent);
+    circle.setOutlineColor(color);
+    circle.setOutlineThickness(thickness);
+    Globals::Window->draw(circle);
+}
+
 
 void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Color& color, float thickness, float depth)
 {
@@ -85,7 +98,7 @@ void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Colo
     topEdge.setPosition(rect.left, rect.top);
     topEdge.setScale(rect.width, thickness);
     topEdge.setColor(color);
-    draw(topEdge, depth);
+    Draw(topEdge, depth);
     
     // Bottom edge
     sf::Sprite bottomEdge;
@@ -93,7 +106,7 @@ void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Colo
     bottomEdge.setPosition(rect.left, rect.top + rect.height - thickness);
     bottomEdge.setScale(rect.width, thickness);
     bottomEdge.setColor(color);
-    draw(bottomEdge, depth);
+    Draw(bottomEdge, depth);
     
     // Left edge
     sf::Sprite leftEdge;
@@ -101,7 +114,7 @@ void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Colo
     leftEdge.setPosition(rect.left, rect.top);
     leftEdge.setScale(thickness, rect.height);
     leftEdge.setColor(color);
-    draw(leftEdge, depth);
+    Draw(leftEdge, depth);
     
     // Right edge
     sf::Sprite rightEdge;
@@ -109,5 +122,5 @@ void ETG::SpriteBatch::drawRectOutline(const sf::FloatRect& rect, const sf::Colo
     rightEdge.setPosition(rect.left + rect.width - thickness, rect.top);
     rightEdge.setScale(thickness, rect.height);
     rightEdge.setColor(color);
-    draw(rightEdge, depth);
+    Draw(rightEdge, depth);
 }

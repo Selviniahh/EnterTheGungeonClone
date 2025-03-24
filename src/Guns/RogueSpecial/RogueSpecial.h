@@ -13,6 +13,7 @@ namespace ETG
         ~RogueSpecial() override = default;
 
         void Initialize() override;
+        void Update() override;
 
         BOOST_DESCRIBE_CLASS(RogueSpecial, (GunBase), (), (), ())
     };

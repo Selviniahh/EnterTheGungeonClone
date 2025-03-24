@@ -132,7 +132,7 @@ namespace ETG
 
     void CollisionComponent::Visualize(sf::RenderWindow& window)
     {
-        if (!ShowCollisionBounds || !CollisionEnabled || !Owner) return;
+        if (!ShowCollisionBounds || !CollisionEnabled || !Owner || !Owner->IsVisible) return;
 
         // Draw the original bounds and expanded bounds
         sf::FloatRect baseBounds = Owner->GetBounds();

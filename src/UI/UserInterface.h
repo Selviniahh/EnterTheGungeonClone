@@ -5,45 +5,50 @@
 #include "UIObjects/AmmoBarUI.h"
 #include "UIObjects/AmmoCounter.h"
 #include "UIObjects/AmmoIndicatorsUI.h"
+#include "UIObjects/FrameLeftProgressBar.h"
+#include "UIObjects/FrameBar.h"
 
 namespace ETG
 {
-    class ReloadSlider;
-}
-
-namespace ETG
-{
+    class FrameLeftProgressBar;
     class GunBase;
     class Hero;
+    class FrameBar;
+    class ReloadSlider;
 
     class UserInterface : public GameObjectBase
     {
-    private:
-        // Textures
-        std::shared_ptr<sf::Texture> frameTexture;
-
         // Draw properties
-        DrawProperties frameDrawProps;
+        // DrawProperties RightFrameDrawProps;
         DrawProperties gunDrawProps;
-
-        // Positions
-        sf::Vector2f framePosition;
 
         // References
         GunBase* CurrentGun = nullptr;
+        ActiveItemBase* CurrActiveItem = nullptr;
         Hero* hero = nullptr;
 
         // UI Components
+        std::unique_ptr<FrameBar> RightGunFrame;
+        std::unique_ptr<FrameBar> LeftActiveItemFrame;
         std::unique_ptr<AmmoBarUI> ammoBarBottom;
         std::unique_ptr<AmmoBarUI> ammoBarTop;
         std::unique_ptr<AmmoIndicatorsUI> ammoIndicators;
         std::unique_ptr<AmmoCounter> ammoCounter;
+        std::unique_ptr<FrameLeftProgressBar> LeftProgressBar;  // ← Add this member
+
 
         // Configuration
-        sf::Vector2f FrameOffsetPerc{4, 3.5};
+        sf::Vector2f RightFrameOffsetPerc{4, 3.5};
+        sf::Vector2f LeftFrameOffsetPerc{1, 3.5};
+
+        //Ammo display at right UI
         float AmmoBarOffsetPercX = 2.f;
         float InitialAmmoBarOffsetY = 50.f;
-        sf::Vector2u frameSize;
+
+        //Left passive item UI
+        float LeftXOffsetPerItem = 10.f;
+        float InitialLeftOffsetX = 35.f;
+        float InitialLeftOffsetY = 18.f;
 
         //Get WindowSize - EngineUISize to calculate GameScreen
         sf::Vector2f GameScreenSize;
@@ -55,9 +60,10 @@ namespace ETG
         void Initialize() override;
         void UpdateGunUIProperties();
         void Update() override;
+        void DrawEquippedPassiveItemsAtLeftUI() const;
         void Draw() override;
 
         BOOST_DESCRIBE_CLASS(UserInterface, (GameObjectBase),
-                             (), (frameTexture), (CurrentGun, framePosition, FrameOffsetPerc, AmmoBarOffsetPercX, InitialAmmoBarOffsetY, frameSize, GameScreenSize))
+                             (), (), (CurrentGun, RightFrameOffsetPerc, AmmoBarOffsetPercX, InitialAmmoBarOffsetY, GameScreenSize))
     };
 }

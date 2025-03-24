@@ -30,8 +30,9 @@ namespace ETG
         // Set parent object to follow
         void SetParent(GameObjectBase* parent) { parentObject = parent; }
         
-    private:
         Animation Animation;
+
+    private:
         bool isActive = false;
         sf::Vector2f attachmentOffset = {0.0f, 0.0f};
         GameObjectBase* parentObject = nullptr;

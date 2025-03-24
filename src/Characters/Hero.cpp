@@ -11,7 +11,6 @@
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "Hand/Hand.h"
-#include "../UI/UIObjects/ReloadSlider.h"
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -34,9 +33,9 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 
     //Collision comp:
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
-    CollisionComp->CollisionRadius = 15.f;
+    CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    
+
     Hero::Initialize();
 }
 
@@ -48,10 +47,17 @@ void ETG::Hero::Initialize()
     //Set up collision delegates. Move these to initialize after it works well. 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
+        //If the collision is with enemy, just change the color of the enemy for now 
        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
        {
            enemyObj->SetColor(sf::Color::Blue);
        }
+
+        //If it's ActiveItem, assign our pointer
+        if (auto* activeItem = dynamic_cast<ActiveItemBase*>(eventData.Other))
+        {
+            CurrActiveItem = activeItem;
+        }
     });
 
     CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
@@ -89,10 +95,16 @@ void ETG::Hero::Update()
     RogueSpecial->Rotation = MouseAngle;
     RogueSpecial->Update();
 
-    //Shoot only if 
+    //Shoot only if these conditions are met 
     if (IsShooting && RogueSpecial->MagazineAmmo != 0 && !RogueSpecial->IsReloading)
     {
-        RogueSpecial->Shoot();
+        RogueSpecial->PrepareShooting();
+    }
+
+    //Try to use Active item
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+        CurrActiveItem->RequestUsage();
     }
 
     //Will run only if reload needed 

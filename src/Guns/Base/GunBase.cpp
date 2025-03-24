@@ -1,29 +1,44 @@
-#include <complex>
 #include <filesystem>
 #include "GunBase.h"
-#include <numbers>
+#include <random>
 #include "../../Projectile/ProjectileBase.h"
 #include "../../Managers/Globals.h"
 #include "../../Managers/SpriteBatch.h"
 #include "../../Core/Factory.h"
 #include "../../UI/UIObjects/ReloadSlider.h"
 #include "../../Utils/Math.h"
+#include "../../Items/Active/DoubleShoot.h"
+#include "../../Modifiers/Gun/MultiShotModifier.h"
 
 namespace ETG
 {
-    GunBase::GunBase(const sf::Vector2f Position, const float pressTime, const float velocity, const float maxProjectileRange, const float timerForVelocity, int Depth, const int ammoSize, const int magazineSize, const float reloadTime)
-        : AmmoSize(ammoSize), MagazineSize(magazineSize), pressTime(pressTime), velocity(velocity), maxProjectileRange(maxProjectileRange), timerForVelocity(timerForVelocity), ReloadTime(reloadTime)
+    GunBase::GunBase(const sf::Vector2f Position,
+                     const float fireRate,
+                     const float shotSpeed,
+                     const float range,
+                     const float timerForVelocity,
+                     float depth,
+                     const int maxAmmo,
+                     const int magazineSize,
+                     const float reloadTime,
+                     const float damage,
+                     const float force,
+                     const float spread)
+        : FireRate(fireRate), ShotSpeed(shotSpeed),
+          Range(range), ReloadTime(reloadTime), Damage(damage),
+          Force(force), Spread(spread),
+          MaxAmmo(maxAmmo), MagazineSize(magazineSize), Timer(timerForVelocity)
     {
         // Initialize common position and textures
         this->Position = Position;
-        this->Depth = Depth;
+        this->Depth = depth;
         this->MagazineAmmo = MagazineSize;
 
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ProjTexture) ProjTexture = std::make_shared<sf::Texture>();
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ArrowComp) ArrowComp = CreateGameObjectAttached<class ArrowComp>(this, (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "Arrow.png").string());
-        if (!MuzzleFlash) MuzzleFlash = CreateGameObjectAttached<class MuzzleFlash>(this, "Guns/RogueSpecial/MuzzleFlash/", "RS_muzzleflash_001", "png");
+        if (!MuzzleFlash) MuzzleFlash = CreateGameObjectAttached<class MuzzleFlash>(this, "Guns/RogueSpecial/MuzzleFlash/", "RS_muzzleflash_001", "png", 0.10f);
         ReloadSlider = ETG::CreateGameObjectAttached<class ReloadSlider>(this);
 
         GunBase::Initialize();
@@ -51,10 +66,29 @@ namespace ETG
     {
         GameObjectBase::Update();
 
-        timerForVelocity += Globals::FrameTick;
+        Timer += Globals::FrameTick;
 
-        // If the shoot animation finished, revert to idle.
-        if (AnimationComp->CurrentState == GunStateEnum::Shoot && AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
+        //Fire all the bullets inside bulletQueue and remove them from the vector
+        if (!bulletQueue.empty())
+        {
+            for (auto it = bulletQueue.begin(); it != bulletQueue.end();)
+            {
+                it->timeToFire -= Globals::FrameTick;
+                if (it->timeToFire <= 0)
+                {
+                    //Time to fie this bullet
+                    FireBullet(it->angle);
+
+                    it = bulletQueue.erase(it);
+                }
+                else
+                    ++it;
+            }
+        }
+
+        // After shooting, reset back to idle
+        if (AnimationComp->CurrentState == GunStateEnum::Shoot &&
+            AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
         {
             CurrentGunState = GunStateEnum::Idle;
         }
@@ -85,48 +119,6 @@ namespace ETG
         ReloadSlider->Update();
     }
 
-    void GunBase::Shoot()
-    {
-        if (timerForVelocity >= pressTime)
-        {
-            MagazineAmmo--;
-
-            // Restart muzzle flash animation.
-            MuzzleFlash->Restart();
-
-            //Set animation to Shoot
-            CurrentGunState = GunStateEnum::Shoot;
-            timerForVelocity = 0;
-
-            // Restart shoot animation. //TODO: How can I fix this weird double map? Hero, enemies all needs double dictionary. In the future, more complex guns will also require to have complex animations as well. 
-            AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();
-
-            // Calculate projectile velocity.
-            const sf::Vector2f spawnPos = ArrowComp->GetPosition();
-            const float angle = Rotation;
-            const float rad = angle * std::numbers::pi / 180.f;
-            const sf::Vector2f direction(std::cos(rad), std::sin(rad));
-            const sf::Vector2f projVelocity = direction * velocity;
-
-            // Spawn projectile.
-            std::unique_ptr<ProjectileBase> proj = ETG::CreateGameObjectDefault<ProjectileBase>(*ProjTexture, spawnPos, projVelocity, maxProjectileRange, Rotation);
-            proj->Update(); //Necessary to set initial position
-            projectiles.push_back(std::move(proj));
-        }
-
-        if (MagazineAmmo == 0)
-        {
-            OnAmmoRunOut.Broadcast(true);
-        }
-    }
-
-    void GunBase::Reload()
-    {
-        IsReloading = true;
-        OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
-        OnReloadInvoke.Broadcast(true);
-    }
-
     void GunBase::Draw()
     {
         GameObjectBase::Draw();
@@ -146,5 +138,101 @@ namespace ETG
         // Draw the muzzle flash.
         MuzzleFlash->Draw();
         ReloadSlider->Draw();
+    }
+
+    void GunBase::PrepareShooting()
+    {
+        if (Timer >= FireRate)
+        {
+            //Reset firing timer
+            Timer = 0;
+
+            //NOTE: DO NOT MISS HERE!!!!!!! Apply modifiers if present. Later on when all of these modifiers will get complex, a new class that will only handle modifiers should be created. 
+            int shotCount = 1;
+            float EffectiveSpread = Spread; //Because Spread needs to be reverted back, when modifier overs, in place temp local variable required 
+            if (const auto& multiMod = modifierManager.GetModifier<MultiShotModifier>())
+            {
+                shotCount = multiMod->GetShotCount();
+                EffectiveSpread = multiMod->GetSpread();
+            }
+
+            //Consume ammo only once per shot group regardless of MultiShotModifier
+            MagazineAmmo--;
+
+            //Queue any additional bullets with delay
+            for (int i = 0; i < shotCount; i++)
+            {
+                float projectileAngle = Rotation;
+
+                //Apply spread variation
+                if (EffectiveSpread > 0)
+                {
+                    std::mt19937 engine(std::random_device{}());
+                    std::uniform_real_distribution<float> dist(-EffectiveSpread, EffectiveSpread);
+                    projectileAngle += dist(engine);
+                }
+
+                //Queue the bullet
+                bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
+            }
+        }
+
+        //Handle ammo depletion
+        if (MagazineAmmo == 0)
+        {
+            OnAmmoRunOut.Broadcast(true);
+        }
+    }
+
+    void GunBase::FireBullet(float projectileAngle)
+    {
+        //Restart muzzle flash animation and shoot animation
+        MuzzleFlash->Restart();
+        ShootSound.play();
+
+        AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();
+
+        //Set animation state
+        CurrentGunState = GunStateEnum::Shoot;
+
+        //Calculate spawn position
+        const sf::Vector2f spawnPos = ArrowComp->GetPosition();
+
+        //Calculate velocity
+        const float rad = Math::AngleToRadian(projectileAngle);
+        const sf::Vector2f direction = Math::RadianToDirection(rad);
+        const sf::Vector2f projVelocity = direction * ShotSpeed;
+
+        //Spawn a projectile
+        std::unique_ptr<ProjectileBase> proj = CreateGameObjectDefault<ProjectileBase>(*ProjTexture, spawnPos, projVelocity, Range, projectileAngle, Damage, Force);
+        proj->Update();
+        projectiles.push_back(std::move(proj));
+    }
+
+    void GunBase::Reload()
+    {
+        //IF already reloading or magazine is full do not invoke again
+        if (IsReloading || MagazineAmmo == MagazineSize) return;
+        
+        IsReloading = true;
+        ReloadSound.play();
+        OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
+        OnReloadInvoke.Broadcast(true);
+    }
+
+    void GunBase::SetShootSound(const std::string& soundPath)
+    {
+        if (!ShootSoundBuffer.loadFromFile(soundPath))
+            throw std::runtime_error("Failed to load gun sound");
+
+        ShootSound.setBuffer(ShootSoundBuffer);
+    }
+
+    void GunBase::SetReloadSound(const std::string& soundPath)
+    {
+        if (!ReloadSoundBuffer.loadFromFile(soundPath))
+            throw std::runtime_error("Failed to load Reload sound");
+
+        ReloadSound.setBuffer(ReloadSoundBuffer);
     }
 }

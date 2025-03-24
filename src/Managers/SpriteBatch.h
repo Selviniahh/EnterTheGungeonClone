@@ -16,13 +16,15 @@ namespace ETG
 
         //NOTE: Sprites added to a batch are transformed based on the active view
         template <typename T>
-        void draw(const T& drawType, float depth);
+        void Draw(const T& drawType, float depth);
         void drawRectOutline(const sf::FloatRect& rect, const sf::Color& color, float thickness, float depth);
 
         void end(sf::RenderWindow& window);
 
         static void SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const sf::Vector2f& pos, float Rotation = 0, sf::Vector2f origin = {1, 1}, float Scale = 1, float depth = 1);
         static void Draw(const GameObjectBase::DrawProperties& DrawProperties);
+
+        static void AddDebugCircle(const sf::Vector2f& pos, float radius = 10.f, const sf::Color& color = sf::Color::Red, float thickness = 1.0f);
 
     private:
         struct SpriteQuad
@@ -47,7 +49,7 @@ namespace ETG
 
 
     template <typename T>
-    void SpriteBatch::draw(const T& drawType, float depth)
+    void SpriteBatch::Draw(const T& drawType, float depth)
     {
         const sf::Texture* texture = drawType.getTexture();
         if (!texture) return;
@@ -86,6 +88,6 @@ namespace ETG
         sprites.emplace_back(vertices[0], vertices[1], vertices[2], vertices[3], texture, depth, drawCounter++);
     }
 
-    
+
     extern SpriteBatch GlobSpriteBatch;
 }

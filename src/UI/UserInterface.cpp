@@ -22,37 +22,45 @@ namespace ETG
         CurrentGun = hero->GetCurrentHoldingGun();
         if (!CurrentGun) throw std::runtime_error("Current Gun not found");
 
+        // Calculate game screen size (accounting for engine UI)
+        GameScreenSize = {
+            static_cast<float>(Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize().x),
+            static_cast<float>(Globals::ScreenSize.y)
+        };
+
         InitializeFrameProperties();
         UpdateGunUIProperties();
         InitializeAmmoBar();
 
-        sf::Vector2f ammoCounterPos = sf::Vector2f{frameDrawProps.Position.x - 15, frameDrawProps.Position.y - 100};
+        auto ammoCounterPos = sf::Vector2f{RightGunFrame->GetPosition().x - 15, RightGunFrame->GetPosition().y - 100};
         ammoCounter = ETG::CreateGameObjectAttached<AmmoCounter>(this, ammoCounterPos);
-
-        // Ensure all attached objects are properly initialized and named
-        for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs()) {
-            if (sceneObj->Owner == this && sceneObj->GetObjectName() == "_NET_WM_USER_T") {
-                // Fix the problematic object by setting its name properly
-                sceneObj->SetObjectNameToSelfClassName();
-                std::cout << "Fixed object name: " << sceneObj->GetObjectName() << std::endl;
-            }
-        }
     }
-
 
     void UserInterface::Update()
     {
         GameObjectBase::Update();
+        UpdateGunUIProperties();
 
         // Get current gun and update properties
         if ((CurrentGun = hero->GetCurrentHoldingGun()))
         {
-            UpdateGunUIProperties();
+            RightGunFrame->SetGun(CurrentGun);
 
             // Update all ammo UI components with current gun
             ammoIndicators->SetGun(CurrentGun);
-            ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->AmmoSize);
+            ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->MaxAmmo);
         }
+        RightGunFrame->Update();
+
+        //Get current Active item and update propetries
+        if (!GameState::GetInstance().GetEquippedActiveItems().empty())
+        {
+            CurrActiveItem = GameState::GetInstance().GetEquippedActiveItems()[0];
+            LeftActiveItemFrame->SetActiveItem(CurrActiveItem);
+            LeftProgressBar->SetActiveItem(CurrActiveItem);
+        }
+        LeftActiveItemFrame->Update();
+        LeftProgressBar->Update();
 
         // Update UI components
         ammoBarBottom->Update(); //For now this update not doing anyhting
@@ -63,75 +71,84 @@ namespace ETG
     void UserInterface::Draw()
     {
         // Draw the frame
-        SpriteBatch::Draw(frameDrawProps);
-
-        // Draw the gun if available
-        if (CurrentGun && CurrentGun->Texture)
-        {
-            SpriteBatch::Draw(gunDrawProps);
-            ammoCounter->Draw();
-        }
+        RightGunFrame->Draw();
+        LeftActiveItemFrame->Draw();
 
         // Draw ammo bars and indicators
         ammoBarBottom->Draw();
         ammoIndicators->Draw(); // Draw indicators between bars
         ammoBarTop->Draw();
+        ammoCounter->Draw();
+        LeftProgressBar->Draw();
+
+
+        DrawEquippedPassiveItemsAtLeftUI();
     }
 
     void UserInterface::InitializeFrameProperties()
     {
+        // Load textures
         const std::string ResPath = RESOURCE_PATH;
 
-        // Load textures
-        frameTexture = std::make_shared<sf::Texture>();
-        if (!frameTexture->loadFromFile(ResPath + "/UI/Frame.png"))
-            throw std::runtime_error("Failed to load Frame.png");
+        //NOTE: Right gun frame
+        // Create right frame for gun display
+        RightGunFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/FrameRight.png", BarType::GunBar);
 
-        // Calculate game screen size (accounting for engine UI)
-        GameScreenSize = {
-            static_cast<float>(Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize().x),
-            static_cast<float>(Globals::ScreenSize.y)
-        };
+        const float RightFrameOffsetX = GameScreenSize.x * (RightFrameOffsetPerc.x / 100);
+        const float RightFrameOffsetY = GameScreenSize.y * (RightFrameOffsetPerc.y / 100);
 
-        frameSize = frameTexture->getSize();
-        const float FrameOffsetX = GameScreenSize.x * (FrameOffsetPerc.x / 100);
-        const float FrameOffsetY = GameScreenSize.y * (FrameOffsetPerc.y / 100);
-        framePosition = {
-            (GameScreenSize.x - FrameOffsetX - frameSize.x / 2),
-            (GameScreenSize.y - FrameOffsetY - frameSize.y / 2)
+        const sf::Vector2f RightFramePosition = {
+            (GameScreenSize.x - RightFrameOffsetX - RightGunFrame->Texture->getSize().x / 2),
+            (GameScreenSize.y - RightFrameOffsetY - RightGunFrame->Texture->getSize().y / 2)
         };
+        RightGunFrame->SetPosition(RightFramePosition);
 
-        // Set up frame draw properties
-        frameDrawProps.Texture = frameTexture.get();
-        frameDrawProps.Position = framePosition;
-        frameDrawProps.Scale = {1.0f, 1.0f};
-        frameDrawProps.Origin = {
-            static_cast<float>(frameSize.x) / 2.0f,
-            static_cast<float>(frameSize.y) / 2.0f
+        // Set the current gun to the frame
+        RightGunFrame->SetGun(CurrentGun);
+
+        //NOTE: Left item frame 
+        // Create left frame for active item display (positioned on left side)
+        LeftActiveItemFrame = CreateGameObjectAttached<FrameBar>(this, ResPath + "/UI/FrameLeft.png", BarType::ActiveItemBar);
+
+        const float LeftFrameOffsetX = GameScreenSize.x * (LeftFrameOffsetPerc.x / 100);
+        const float LeftFrameOffsetY = GameScreenSize.y * (LeftFrameOffsetPerc.y / 100);
+
+        const sf::Vector2f LeftFramePosition = {
+            (LeftFrameOffsetX + LeftActiveItemFrame->Texture->getSize().x / 2),
+            (GameScreenSize.y - LeftFrameOffsetY - LeftActiveItemFrame->Texture->getSize().y / 2)
         };
-    }
+        LeftActiveItemFrame->SetPosition(LeftFramePosition);
+
+        //Create a progress bar to the right of the left frame
+        LeftProgressBar = CreateGameObjectAttached<FrameLeftProgressBar>(this);
     
-    // Update the Update method
+        // Position the progress bar at the right edge of the left frame
+        const float progressBarX = LeftFramePosition.x + (LeftActiveItemFrame->Texture->getSize().x / 2);
+        LeftProgressBar->SetPosition({
+            progressBarX,
+            LeftFramePosition.y
+        });
+    }
 
     void UserInterface::InitializeAmmoBar()
     {
         // Calculate base X position for ammo bars
-        float ammoBarX = framePosition.x + (frameSize.x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100);
+        float ammoBarX = RightGunFrame->GetPosition().x + (RightGunFrame->Texture->getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100);
 
         // Create and position bottom ammo bar
         ammoBarBottom = CreateGameObjectAttached<AmmoBarUI>(this);
-        ammoBarBottom->SetPosition({ammoBarX, framePosition.y + InitialAmmoBarOffsetY});
+        ammoBarBottom->SetPosition({ammoBarX, RightGunFrame->GetPosition().y + InitialAmmoBarOffsetY});
         ammoBarBottom->FlipTexture(false, true);
 
         // Create top ammo bar with an initial position (will be updated by indicators)
         ammoBarTop = CreateGameObjectAttached<AmmoBarUI>(this);
-        ammoBarTop->SetPosition({ammoBarX, framePosition.y - InitialAmmoBarOffsetY});
+        ammoBarTop->SetPosition({ammoBarX, RightGunFrame->GetPosition().y - InitialAmmoBarOffsetY});
 
         // Create ammo indicators
         ammoIndicators = CreateGameObjectAttached<AmmoIndicatorsUI>(this);
         ammoIndicators->SetGun(CurrentGun);
         ammoIndicators->SetBottomBar(ammoBarBottom.get());
-        ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing } }); //TODO: Not sure to remove this line or not
+        ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing}}); //TODO: Not sure to remove this line or not
 
         // Set callback for updating the top bar position
         ammoIndicators->SetTopBarPositionCallback([this](float topY)
@@ -146,12 +163,25 @@ namespace ETG
     void UserInterface::UpdateGunUIProperties()
     {
         CurrentGun = hero->GetCurrentHoldingGun();
-        gunDrawProps.Texture = CurrentGun->Texture.get();
-        gunDrawProps.Position = framePosition;
-        gunDrawProps.Scale = {3.0f, 3.0f}; // UI gun scale factor
-        gunDrawProps.Origin = {
-            static_cast<float>(CurrentGun->Texture->getSize().x) / 2.0f,
-            static_cast<float>(CurrentGun->Texture->getSize().y) / 2.0f
-        };
+        RightGunFrame->SetGun(CurrentGun);
+    }
+
+    void UserInterface::DrawEquippedPassiveItemsAtLeftUI() const
+    {
+        int counter = 1;
+        for (const auto& items : GameState::GetInstance().GetEquippedPassiveItems())
+        {
+            const sf::Vector2f pos = {
+                InitialLeftOffsetX + (LeftXOffsetPerItem * counter++),
+                GameScreenSize.y - InitialLeftOffsetY
+            };
+
+            DrawProperties DrawProps{};
+            DrawProps.Position = pos;
+            DrawProps.Scale = {1.5, 1.5};
+            DrawProps.Texture = items->Texture.get();
+            DrawProps.Origin = {(float)DrawProps.Texture->getSize().x / 2, (float)DrawProps.Texture->getSize().y / 2};
+            SpriteBatch::Draw(DrawProps);
+        }
     }
 }

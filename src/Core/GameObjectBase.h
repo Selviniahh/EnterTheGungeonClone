@@ -69,13 +69,13 @@ namespace ETG
         void IncrementName();
 
     public:
-        //Owner //TODO: So tired to make this shit private, give friend bullshits and write getter setter
         GameObjectBase* Owner = nullptr;
         bool DrawBound = false;
         bool DrawOriginPoint = true;
         bool IsGameObjectUISpecified = false;
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;
+        bool IsVisible{true}; //For now I will only use this for Passive and Active item pick up. 
 
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }

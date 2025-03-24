@@ -1,13 +1,16 @@
 #pragma once
 #include <unordered_map>
-
 #include "../Core/Scene/Scene.h"
-
+#include "../Items/Active/ActiveItemBase.h"
+#include "../Items/Passive/PassiveItemBase.h"
 
 namespace ETG
 {
     class Hero;
     class Scene;
+    class GameObjectBase;
+    class PassiveItemBase;
+
 
     class GameState
     {
@@ -18,36 +21,35 @@ namespace ETG
             return instance;
         }
 
-        //TODO: The way getter and setters are completely incorrect. Getter should always return const reference whereas Set should allow object to be modified not set. The object's reference should never change.
-        //TODO: But Set always only used once to set the reference which is always in GameManager. All these objects in this class has to be singleton but I don't know effectively how to handle making them singleton when declaration is nullptr.
-        //TODO: I have to handle this after what I'm trying to do now. 
+        [[nodiscard]] Hero* GetHero() const { return MainHero; }
+        [[nodiscard]] std::unordered_map<std::string, GameObjectBase*>& GetSceneObjs() const { return *SceneObjs; }
+        [[nodiscard]] sf::Vector2f& GetEngineUISize() { return EngineUISize; }
+        [[nodiscard]] Scene* GetSceneObj() const { return SceneObj; }
+        [[nodiscard]] sf::RenderWindow* GetRenderWindow() const { return Window; }
+        [[nodiscard]] std::vector<PassiveItemBase*>& GetEquippedPassiveItems() { return EquippedPassiveItems; }
+        [[nodiscard]] std::vector<ActiveItemBase*>& GetEquippedActiveItems() { return EquippedActiveItems; }
 
         void SetHero(Hero* hero) { MainHero = hero; }
-        [[nodiscard]] Hero* GetHero() const { return MainHero; }
-
-        [[nodiscard]] std::unordered_map<std::string, GameObjectBase*>& GetSceneObjs() { return *SceneObjs; }
         void SetSceneObjs(std::unordered_map<std::string, GameObjectBase*>& sceneObj) { SceneObjs = &sceneObj; }
-
         void SetEngineUISize(sf::Vector2f& size) { EngineUISize = std::ref(size); }
-        [[nodiscard]] sf::Vector2f& GetEngineUISize() const { return EngineUISize.get(); }
-
         void SetSceneObj(Scene* sceneObj) { SceneObj = sceneObj; }
-        [[nodiscard]] Scene* GetSceneObj() const { return SceneObj; }
-
         void SetRenderWindow(sf::RenderWindow* window) { Window = window; }
-        [[nodiscard]] sf::RenderWindow* GetRenderWindow() const { return Window; }
+
+        //TODO: Who should own equipped items class? Hero cannot because hero also don't know which item it's interacted. UI or GameManager might but for now I will let this class to own equipped items.
+        // void SetEquippedPassiveItems(const std::vector<PassiveItemBase*>& eqPassiveItem) { EquippedPassiveItems = eqPassiveItem; }
 
     private:
         GameState() = default;
         Hero* MainHero = nullptr;
 
-        //The object itself is at GameManager with the name SceneObjects
-        //I am so sure this is extremely bad practice. Somehow I have to dictate singleton pattern that automatically initializes for the first time calling probably with static. Implement this later on. 
+        //Game objects (non-owning pointers)
         std::unordered_map<std::string, GameObjectBase*>* SceneObjs = nullptr;
         Scene* SceneObj = nullptr;
-
-        sf::Vector2f dummyEngineUISize{};
-        std::reference_wrapper<sf::Vector2f> EngineUISize{dummyEngineUISize};
         sf::RenderWindow* Window;
+        
+        //Owned objects
+        sf::Vector2f EngineUISize{};
+        std::vector<PassiveItemBase*> EquippedPassiveItems{};
+        std::vector<ActiveItemBase*> EquippedActiveItems{};
     };
 }

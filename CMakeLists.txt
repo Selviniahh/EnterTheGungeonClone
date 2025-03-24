@@ -79,6 +79,20 @@ add_executable(ETG main.cpp
         src/UI/UIObjects/ReloadSlider.h
         src/Core/Components/CollisionComponent.cpp
         src/Core/Components/CollisionComponent.h
+        src/Items/Active/ActiveItemBase.h
+        src/Items/Passive/PassiveItemBase.h
+        src/Items/Passive/PlatinumBullets.cpp
+        src/Items/Passive/PlatinumBullets.h
+        src/UI/UIObjects/FrameBar.h
+        src/UI/UIObjects/FrameBar.cpp
+        src/Items/Active/DoubleShoot.cpp
+        src/Items/Active/DoubleShoot.h
+        src/Modifiers/ModifierManager.h
+        src/UI/UIObjects/FrameLeftProgressBar.cpp
+        src/UI/UIObjects/FrameLeftProgressBar.h
+        src/Items/Active/ActiveItemBase.cpp
+        src/Utils/Interface/IGunModifier.h
+        src/Modifiers/Gun/MultiShotModifier.h
 )
 
 # Easiest and fastest way is VCPKG 

@@ -12,7 +12,7 @@ namespace ETG
         // Load the animation from the sprite sheet
         Animation = Animation::CreateSpriteSheet(relativePath, fileName, extension, frameSpeed);
         isActive = false; //Make sure animation not playing at the start
-
+        
         if (Animation.Texture)
         {
             Origin = {
