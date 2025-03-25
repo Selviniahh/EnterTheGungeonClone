@@ -14,7 +14,8 @@ namespace ETG
         //Add a modifier to the gun
         void AddModifier(const std::shared_ptr<ModType>& modifier)
         {
-            //Remove any existing modifier of same type firstly
+            //Remove any existing modifier of same type
+            //Probably I will remove all the modifiers when adding one, bcs only 1 Modifier can exist only and none of modifier can exist at the same time 
             RemoveModifier(modifier->GetModifierName());
             modifiers.push_back(modifier);
         }

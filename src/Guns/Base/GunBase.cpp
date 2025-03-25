@@ -7,7 +7,7 @@
 #include "../../Core/Factory.h"
 #include "../../UI/UIObjects/ReloadSlider.h"
 #include "../../Utils/Math.h"
-#include "../../Items/Active/DoubleShoot.h"
+#include "../../Items/Passive/PlatinumBullets.h"
 #include "../../Modifiers/Gun/MultiShotModifier.h"
 
 namespace ETG
@@ -17,22 +17,34 @@ namespace ETG
                      const float shotSpeed,
                      const float range,
                      const float timerForVelocity,
-                     float depth,
+                     const float depth,
                      const int maxAmmo,
                      const int magazineSize,
                      const float reloadTime,
                      const float damage,
                      const float force,
                      const float spread)
-        : FireRate(fireRate), ShotSpeed(shotSpeed),
-          Range(range), ReloadTime(reloadTime), Damage(damage),
-          Force(force), Spread(spread),
-          MaxAmmo(maxAmmo), MagazineSize(magazineSize), Timer(timerForVelocity)
+        : BaseFireRate(fireRate), BaseShotSpeed(shotSpeed),
+          BaseRange(range), BaseReloadTime(reloadTime), BaseDamage(damage),
+          BaseForce(force), BaseSpread(spread),
+          BaseMaxAmmo(maxAmmo), BaseMagazineSize(magazineSize), Timer(timerForVelocity)
     {
         // Initialize common position and textures
         this->Position = Position;
         this->Depth = depth;
         this->MagazineAmmo = MagazineSize;
+
+        //Initially base and current states are same
+        FireRate = BaseFireRate;
+        ShotSpeed = BaseShotSpeed;
+        Range = BaseRange;
+        ReloadTime = BaseReloadTime;
+        Damage = BaseDamage;
+        Force = BaseForce;
+        Spread = BaseSpread;
+        MaxAmmo = BaseMaxAmmo;
+        MagazineSize = BaseMagazineSize;
+        MagazineAmmo = MagazineSize; //Magazine needs to start with Magazine Ammo
 
         if (!Texture) Texture = std::make_shared<sf::Texture>();
         if (!ProjTexture) ProjTexture = std::make_shared<sf::Texture>();
@@ -226,6 +238,7 @@ namespace ETG
             throw std::runtime_error("Failed to load gun sound");
 
         ShootSound.setBuffer(ShootSoundBuffer);
+        ShootSound.setVolume(ShootSoundVolume);
     }
 
     void GunBase::SetReloadSound(const std::string& soundPath)
@@ -234,5 +247,6 @@ namespace ETG
             throw std::runtime_error("Failed to load Reload sound");
 
         ReloadSound.setBuffer(ReloadSoundBuffer);
+        ReloadSound.setVolume(ReloadSoundVolume);
     }
 }

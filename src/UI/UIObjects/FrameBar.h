@@ -33,7 +33,7 @@ namespace ETG
         BarType barType;
         GunBase* gunContent = nullptr;
         ActiveItemBase* itemContent = nullptr;
-        DrawProperties contentDrawProps;
+        DrawProperties contentDrawProps{};
         
         std::shared_ptr<sf::Texture> FullFrameTexture;
         std::shared_ptr<sf::Texture> FrameWithProgBarTexture;

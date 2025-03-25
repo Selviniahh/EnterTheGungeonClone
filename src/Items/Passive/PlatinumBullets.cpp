@@ -20,21 +20,21 @@ ETG::PlatinumBullets::PlatinumBullets(): PassiveItemBase((std::filesystem::path(
 void ETG::PlatinumBullets::Initialize()
 {
     PassiveItemBase::Initialize();
+    Hero = GameState::GetInstance().GetHero();
 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
-        if (const auto* heroObj = dynamic_cast<Hero*>(eventData.Other))
+        if (auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
         {
+            Owner = dynamic_cast<GameObjectBase*>(heroObj); //In UI move from scene to Hero
             if (!IsVisible) return;
+            Perk(heroObj);
 
             //Play a random pickup sound when collision occurs
-            std::uniform_int_distribution<int> dist(0, Sounds.size() -1);
+            std::uniform_int_distribution<int> dist(0, Sounds.size() - 1);
             const int soundIndex = dist(rng);
             Sounds[soundIndex].play();
             IsVisible = false;
-
-            //Apply the perk
-            Perk(heroObj);
 
             //Add self to equipped passive items list
             GameState::GetInstance().GetEquippedPassiveItems().push_back(this);
@@ -46,6 +46,11 @@ void ETG::PlatinumBullets::Update()
 {
     PassiveItemBase::Update();
     CollisionComp->Update();
+
+    //Check if the FireRateIncreasePerc has changed (with only through UI)
+    if (FireRateIncreasePerc != PreviousFireRatePerc)
+        if (Hero) Perk(Hero);
+    PreviousFireRatePerc = FireRateIncreasePerc;
 }
 
 void ETG::PlatinumBullets::Draw()
@@ -54,8 +59,8 @@ void ETG::PlatinumBullets::Draw()
     CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
-void ETG::PlatinumBullets::Perk(const Hero* hero) const
+void ETG::PlatinumBullets::Perk(const class Hero* hero) const
 {
-    //Decrease the Fire rate by %20
-    hero->GetCurrentHoldingGun()->FireRate = hero->GetCurrentHoldingGun()->FireRate * (1.f - FireRateIncreasePerc / 100.f);
+    //Modify the FireRate based on the FireRateIncreasePerc 
+    hero->GetCurrentHoldingGun()->FireRate = hero->GetCurrentHoldingGun()->BaseFireRate * (1.f - FireRateIncreasePerc / 100.f);
 }

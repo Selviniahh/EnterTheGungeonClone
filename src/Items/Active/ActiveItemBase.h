@@ -44,7 +44,8 @@ namespace ETG
         //Random number generator
         std::mt19937 rng{std::random_device{}()};
 
-        BOOST_DESCRIBE_CLASS(ActiveItemBase, (GameObjectBase), (), (), ())
+        BOOST_DESCRIBE_CLASS(ActiveItemBase, (GameObjectBase), (TotalCooldownTime, TotalConsumeTime, ConsumeTimer, CoolDownTimer, ActiveItemState), (ItemDescription), ())
+
     };
 
     enum class ActiveItemState
@@ -53,4 +54,7 @@ namespace ETG
         Consuming, //Item is currently being consumed
         Cooldown //Item is in Cooldown state
     };
+    BOOST_DESCRIBE_ENUM(ActiveItemState, Ready, Consuming, Cooldown)
+
+
 }
