@@ -6,6 +6,7 @@
 #include "../Managers/GameManager.h"
 #include "../Managers/InputManager.h"
 #include "../Managers/TypeRegistry.h"
+#include "../Utils/Math.h"
 #include "UI/EngineUI.h"
 
 bool Engine::CurrentGameFocus = false;
@@ -91,9 +92,17 @@ void Engine::UpdateDetailsPanel()
     //Game object pane
     if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_None))
     {
-        // Assuming Scene is the root object.
+        const float hierarchyHeight = Math::CalculatePercentageOfValue((float)ScreenSize.y, 25); 
+        // constexpr float hierarchyHeight = 300;
+        
+        // Create a child window with scrolling enabled
+        ImGui::BeginChild("HierarchyScrollingRegion", ImVec2(0, hierarchyHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
+        
+        // Assuming Scene is the root object
         GameObjectBase* sceneObj = GameState::GetInstance().GetSceneObj();
         DisplayHierarchy(sceneObj);
+        
+        ImGui::EndChild(); // End the scrollable region
     }
 
     //NOTE: Open the details pane by default

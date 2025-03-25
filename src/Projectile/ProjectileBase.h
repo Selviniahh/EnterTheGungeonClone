@@ -18,6 +18,9 @@ namespace ETG
         float Damage;
         float Force; //knockback amount
 
+    private:
+        float DistanceTraveled = 0.0f; //Track the total distance traveled
+
         BOOST_DESCRIBE_CLASS(ProjectileBase, (GameObjectBase), (ProjVelocity, Range, Damage, Force), (), ())
     };
     

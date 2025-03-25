@@ -140,5 +140,12 @@ public:
         Corners.BottomRight -= scaledOrigin;
         return Corners;
     }
-    ;
+
+    template<typename T>
+    static T CalculatePercentageOfValue(const T& value, const float& percentage)
+    {
+        return value * (percentage / 100);
+    }
+
+    
 };

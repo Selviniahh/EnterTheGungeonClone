@@ -31,6 +31,7 @@ namespace ETG
 
         ~GunBase() override;
         void Initialize() override;
+        void UpdateProjectiles(); //If projectile needs to be removed, remove and update
         void Update() override;
         void Draw() override;
         virtual void PrepareShooting(); //queue the bulletQueue

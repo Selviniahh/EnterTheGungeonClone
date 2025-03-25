@@ -5,6 +5,7 @@
 #include "../../Characters/Hero.h"
 #include "../../Core/Factory.h"
 #include "../../Guns/Base/GunBase.h"
+#include "../../Utils/Math.h"
 
 ETG::PlatinumBullets::PlatinumBullets(): PassiveItemBase((std::filesystem::path(RESOURCE_PATH) / "Items" / "Passive" / "platinum_bullets_001.png").generic_string())
 {
@@ -61,6 +62,7 @@ void ETG::PlatinumBullets::Draw()
 
 void ETG::PlatinumBullets::Perk(const class Hero* hero) const
 {
-    //Modify the FireRate based on the FireRateIncreasePerc 
-    hero->GetCurrentHoldingGun()->FireRate = hero->GetCurrentHoldingGun()->BaseFireRate * (1.f - FireRateIncreasePerc / 100.f);
+    //Modify the FireRate based on the FireRateIncreasePerc
+    auto* currGun = hero->GetCurrentHoldingGun(); 
+    currGun->FireRate = currGun->BaseFireRate - Math::CalculatePercentageOfValue(currGun->BaseFireRate,FireRateIncreasePerc);
 }

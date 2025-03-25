@@ -117,10 +117,7 @@ namespace ETG
         MuzzleFlash->Update();
 
         // Update projectiles.
-        for (const auto& proj : projectiles)
-        {
-            proj->Update();
-        }
+        UpdateProjectiles();
 
         //If R pressed, reload
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
@@ -150,6 +147,26 @@ namespace ETG
         // Draw the muzzle flash.
         MuzzleFlash->Draw();
         ReloadSlider->Draw();
+    }
+
+    void GunBase::UpdateProjectiles()
+    {
+        for (auto it = projectiles.begin(); it != projectiles.end();)
+        {
+            (*it)->Update();
+            if ((*it)->IsPendingDestroy())
+            {
+                GameState::GetInstance().GetSceneObjs().erase((*it)->GetObjectName());
+
+                //Because initialized projectile moved to this container with std::move, owner of the object is this container. Simply removing the element from the vector will invoke
+                //unique_ptr's destructor because unique_ptr requires 1 owner and since owner is gone, it'll automatically call destructor right away after this erase call.
+                it = projectiles.erase(it); //After erase, set iterator to next iterator after the one removed
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 
     void GunBase::PrepareShooting()
