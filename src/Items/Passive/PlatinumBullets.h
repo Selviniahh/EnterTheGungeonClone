@@ -22,9 +22,11 @@ namespace ETG
 
         std::unique_ptr<CollisionComponent> CollisionComp;
         float FireRateIncreasePerc = 20;
+        Hero* Hero{};
 
+        BOOST_DESCRIBE_CLASS(PlatinumBullets, (PassiveItemBase), (FireRateIncreasePerc), (), ())
     private:
-        
+        float PreviousFireRatePerc = 20; // Store previous value to detect changes
     };    
 }
 

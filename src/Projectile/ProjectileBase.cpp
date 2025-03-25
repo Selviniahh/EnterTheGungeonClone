@@ -1,4 +1,8 @@
 #include "ProjectileBase.h"
+
+#include <valarray>
+
+#include "../Core/Factory.h"
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h" // <-- Add this include
 
@@ -20,7 +24,22 @@ void ETG::ProjectileBase::Initialize()
 
 void ETG::ProjectileBase::Update()
 {
-    Position += ETG::Globals::FrameTick * ProjVelocity;
+    if (PendingDestroy) return;
+
+    const sf::Vector2f movement = Globals::FrameTick * ProjVelocity;
+    Position += movement;
+
+    //Calculate distance traveled so far
+    const float frameDistance = std::sqrt(movement.x * movement.x + movement.y * movement.y);
+    DistanceTraveled += frameDistance;
+
+    //If projectile has exceeded it's range destroy
+    if (DistanceTraveled >= Range)
+    {
+        MarkForDestroy();
+        return;
+    }
+    
     GameObjectBase::Update();
 }
 

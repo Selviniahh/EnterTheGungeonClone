@@ -16,7 +16,6 @@
 #include "../../Modifiers/ModifierManager.h"
 #include "../../Utils/Interface/IGunModifier.h"
 
-
 namespace ETG
 {
     class ReloadSlider;
@@ -32,6 +31,7 @@ namespace ETG
 
         ~GunBase() override;
         void Initialize() override;
+        void UpdateProjectiles(); //If projectile needs to be removed, remove and update
         void Update() override;
         void Draw() override;
         virtual void PrepareShooting(); //queue the bulletQueue
@@ -53,6 +53,19 @@ namespace ETG
 
         bool IsReloading{};
 
+        //Base stat values (never modified, used as reference)
+        float BaseFireRate;
+        float BaseShotSpeed;;
+        float BaseRange;
+        float BaseReloadTime; //Time to reload
+        float BaseDamage;
+        float BaseForce;
+        float BaseSpread;
+        
+        int BaseMaxAmmo{}; //Total ammo capacity 
+        int BaseMagazineSize{}; //Bullets per magazine
+        
+        //Current effective stats (modified by items/ perks)
         float FireRate; //Time between shots (seconds)
         float ShotSpeed; //How fast bullets travel
         float Range; //How far bullets travel
@@ -63,7 +76,7 @@ namespace ETG
 
         //Ammo stats
         int MaxAmmo{}; //Total ammo capacity 
-        int MagazineSize{}; //Bullets per magazine
+        int MagazineSize{}; //Total bullets per magazine
         int MagazineAmmo{}; //Current magazine ammo count (this will be subtracted and reset)
 
         std::shared_ptr<sf::Texture> ProjTexture;
@@ -92,6 +105,9 @@ namespace ETG
 
         sf::SoundBuffer ReloadSoundBuffer;
         sf::Sound ReloadSound;
+
+        float ShootSoundVolume = 30;
+        float ReloadSoundVolume = 30;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase),
                              (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ReloadTime, IsReloading,

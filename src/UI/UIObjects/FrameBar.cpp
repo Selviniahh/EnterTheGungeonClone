@@ -98,5 +98,7 @@ namespace ETG
         // If bar type doesn't match the content, update it
         if (barType != BarType::ActiveItemBar)
             barType = BarType::ActiveItemBar;
+
+        Update();
     }
 }

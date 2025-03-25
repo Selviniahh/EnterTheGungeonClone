@@ -91,8 +91,7 @@ void ETG::FrameLeftProgressBar::Draw()
     {
         // Fallback direct drawing in case SpriteBatch method fails
         window->draw(progressRect);
-
-
+        
         // Try SpriteBatch method as well
         SpriteBatch::AddDebugCircle(ProgTopCenter, 15);
         SpriteBatch::AddDebugCircle(ProgBottomCenter, 15);

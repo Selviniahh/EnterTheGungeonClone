@@ -41,7 +41,8 @@ namespace ETG
         sf::Color Color{sf::Color::White};
         float Depth{};
 
-        //This will be true for drawable game objects. False for components
+        //Destroy
+        bool PendingDestroy = false;
 
         //NOTE: Pointer to animation component interface. This is my first time using interface logic
         IAnimationComponent* AnimInterface = nullptr;
@@ -105,7 +106,10 @@ namespace ETG
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
         void SetColor(const sf::Color& color) { this->Color = color; }
-
+        
+        //Mark this object to be destroyed
+        virtual void MarkForDestroy() {PendingDestroy = true;}
+        [[nodiscard]] bool IsPendingDestroy() const {return PendingDestroy;}
 
         // Animation component management
         void SetAnimationInterface(IAnimationComponent* animComp) { AnimInterface = animComp; }

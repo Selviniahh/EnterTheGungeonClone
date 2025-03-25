@@ -16,16 +16,19 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
-        static void ApplyPerk(const Hero* hero);
+        void ApplyPerk(const Hero* hero);
 
         std::unique_ptr<CollisionComponent> CollisionComp;
-        
-        static float GetDefaultCooldown() { return 15.f; }
-        static float GetDefaultActiveTime() { return 10.f; }
 
-        static int GetShootCount() {return 2;}
-        static float GetSpread() {return 1;}
-        
+        static constexpr float DEFAULT_COOLDOWN = 15.0f;
+        static constexpr float DEFAULT_ACTIVE_TIME = 10.0f;
+
+        int ShootCount = 2;
+        float SpreadAmount = 1.0f;
+
+
+        BOOST_DESCRIBE_CLASS(DoubleShoot, (ActiveItemBase),(TotalCooldownTime, TotalConsumeTime, ConsumeTimer,CoolDownTimer, ActiveItemState, ShootCount, SpreadAmount),
+                             (ItemDescription),
+                             ())
     };
 }
-

@@ -35,19 +35,14 @@ namespace ETG
     template <typename T>
     void DestroyGameObject(std::unique_ptr<T>& obj)
     {
-        auto& scene = GameState::GetInstance().GetSceneObjs();
-
-        //Remove the pointer from the scene container
-        auto it = std::find(scene.begin(), scene.end(), obj.get());
-        if (it != scene.end())
-        {
-            scene.erase(it);
-        }
-        else
-        {
-            throw std::runtime_error("The object: not found");
-        }
-
+        if (!obj) return; // Safety check
+    
+        auto& sceneObjs = GameState::GetInstance().GetSceneObjs();
+    
+        // Remove from scene objects by object name (key)
+        sceneObjs.erase(obj->GetObjectName());
+    
+        // Reset the unique_ptr to release memory
         obj.reset();
     }
 }

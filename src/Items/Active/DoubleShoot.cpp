@@ -8,7 +8,7 @@
 
 ETG::DoubleShoot::DoubleShoot() : ActiveItemBase((std::filesystem::path(RESOURCE_PATH) / "Items" / "Active" / "Potion_of_Gun_Friendship.png").generic_string(),
 (std::filesystem::path(RESOURCE_PATH) / "Sounds" / "Consume.ogg").generic_string(),
-    GetDefaultCooldown(), GetDefaultActiveTime())
+    DEFAULT_COOLDOWN, DEFAULT_ACTIVE_TIME)
 {
     ItemDescription = "Double shoot the item and set Spread 0";
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
@@ -26,8 +26,10 @@ void ETG::DoubleShoot::Initialize()
     ActiveItemBase::Initialize();
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
-        if (const auto* heroObj = dynamic_cast<Hero*>(eventData.Other))
+        //If collided object is hero:  
+        if (auto* heroObj = dynamic_cast<Hero*>(eventData.Other))
         {
+            Owner = dynamic_cast<GameObjectBase*>(heroObj); //In UI move from scene to Hero
             if (!IsVisible) return;
 
             PlayRandomPickupSound();
@@ -84,6 +86,6 @@ void ETG::DoubleShoot::RequestUsage()
 
 void ETG::DoubleShoot::ApplyPerk(const Hero* hero)
 {
-    //Create the modifier and push back the array inside modifierManager 
-    hero->GetCurrentHoldingGun()->modifierManager.AddModifier(std::make_shared<MultiShotModifier>(GetShootCount(),GetSpread()));
+    //Create the modifier and push back the array inside modifierManager
+    hero->GetCurrentHoldingGun()->modifierManager.AddModifier(std::make_shared<MultiShotModifier>(ShootCount,SpreadAmount));
 }

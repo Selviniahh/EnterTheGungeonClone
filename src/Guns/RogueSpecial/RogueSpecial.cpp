@@ -4,7 +4,7 @@
 #include "../../Modifiers/Gun/MultiShotModifier.h"
 
 ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position,
-                                                                        0.35f, 200.f, 5000.f, 0.f,2,300,10, 3.0f, 3.5f, 2.f, 10.f)
+0.35f, 200.f, 300.f, 0.f,2,300,10, 3.0f, 3.5f, 2.f, 10.f)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
     SetShootSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "RogueSpecialShoot.ogg").generic_string());
