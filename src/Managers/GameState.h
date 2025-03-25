@@ -22,7 +22,8 @@ namespace ETG
         }
 
         [[nodiscard]] Hero* GetHero() const { return MainHero; }
-        [[nodiscard]] std::unordered_map<std::string, GameObjectBase*>& GetSceneObjs() const { return *SceneObjs; }
+        [[nodiscard]] std::unordered_map<std::string, GameObjectBase*>& GetSceneObjs() const { return *SceneObjs; } //Original method for fast lookups
+        [[nodiscard]] std::vector<GameObjectBase*>& GetOrderedSceneObjs() {return OrderedSceneObjs;} //New, for ordered hierarchy pane 
         [[nodiscard]] sf::Vector2f& GetEngineUISize() { return EngineUISize; }
         [[nodiscard]] Scene* GetSceneObj() const { return SceneObj; }
         [[nodiscard]] sf::RenderWindow* GetRenderWindow() const { return Window; }
@@ -36,6 +37,7 @@ namespace ETG
         void SetRenderWindow(sf::RenderWindow* window) { Window = window; }
 
         //TODO: Who should own equipped items class? Hero cannot because hero also don't know which item it's interacted. UI or GameManager might but for now I will let this class to own equipped items.
+        //NOTE: For now since equipped items at least knows hero, I set owner from scene to Hero when collided with hero. For now setting equipped item's owner to hero makes sense but we'll see in the future 
         // void SetEquippedPassiveItems(const std::vector<PassiveItemBase*>& eqPassiveItem) { EquippedPassiveItems = eqPassiveItem; }
 
     private:
@@ -44,6 +46,8 @@ namespace ETG
 
         //Game objects (non-owning pointers)
         std::unordered_map<std::string, GameObjectBase*>* SceneObjs = nullptr;
+        std::vector<GameObjectBase*> OrderedSceneObjs; //Ordered for display
+
         Scene* SceneObj = nullptr;
         sf::RenderWindow* Window;
         
