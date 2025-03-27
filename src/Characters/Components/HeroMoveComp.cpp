@@ -1,8 +1,11 @@
 #include "HeroMoveComp.h"
+
+#include "HeroAnimComp.h"
 #include "../../Managers/InputManager.h"
 #include "../../Managers/GameState.h"
 #include "../../Utils/Math.h"
 #include "../Hero.h"  // For Hero
+#include "../../Utils/DirectionUtils.h"
 
 namespace ETG {
 
@@ -26,12 +29,12 @@ namespace ETG {
 
         // Determine input direction.
         sf::Vector2f inputDir(0.f, 0.f);
-        if (InputManager::IsMoving() && !HeroPtr->IsDashing)
+        if (InputManager::IsMoving() && !HeroPtr->AnimationComp->IsDashing)
         {
             inputDir = InputManager::direction;
             HeroPtr->CurrentHeroState = HeroStateEnum::Run;
         }
-        else if (HeroPtr->IsDashing)
+        else if (HeroPtr->MoveComp->HeroPtr->AnimationComp->IsDashing)
         {
             HeroPtr->CurrentHeroState = HeroStateEnum::Dash;
         }

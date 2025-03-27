@@ -131,7 +131,7 @@ namespace ETG
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
 
         BOOST_DESCRIBE_CLASS(GameObjectBase, (GameClass),
-                             (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound),
+                             (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound, IsVisible),
                              (Origin, Depth),
                              ())
     };

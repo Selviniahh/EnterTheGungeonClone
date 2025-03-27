@@ -1,11 +1,18 @@
 #include "Animation.h"
+
+#include <iostream>
+
 #include "../Managers/Globals.h"
 #include "../Managers/SpriteBatch.h"
 #include <memory>
 
 Animation::Animation(const std::shared_ptr<sf::Texture>& texture, const float eachFrameSpeed, const int frameX, const int frameY, const int row)
-    : EachFrameSpeed(eachFrameSpeed), AnimTimeLeft(EachFrameSpeed), FrameX(frameX), FrameY(frameY), Texture(texture)
+    : FrameX(frameX), FrameY(frameY), FrameInterval(eachFrameSpeed), Texture(texture)
 {
+    //This line fixed very very important bug. Since last month, sometimes just one animation frame not playing and sometimes all animation frames are working. The problem was just order of initialization in constructor
+    //I tried to assign `AnimTimeLeft` to `FrameInterval` when `FrameInterval`is not initialized yet. This causing all arbitrary number and somehow like %70 everything works and %30 almost always just Hero's Back_Diagonal animation is not playing. Instead assigning in Constructor body fixed it  
+    AnimTimeLeft = FrameInterval; 
+    
     const int frameXSize = Texture->getSize().x / frameX;
     const int frameYSize = Texture->getSize().y / frameY;
 
@@ -20,13 +27,15 @@ Animation::Animation(const std::shared_ptr<sf::Texture>& texture, const float ea
 
 void Animation::Update()
 {
-    if (!Active) return;
+    if (!Active || !Texture || Texture->getSize().x == 0) throw std::runtime_error("Something is wrong");
+    if (AnimTimeLeft > 1000.0f || AnimTimeLeft < -1000) throw std::runtime_error("Animation Time is so big");
+    
     AnimTimeLeft -= ETG::Globals::FrameTick;
     if (AnimTimeLeft <= 0)
     {
         CurrentFrame++;
         CurrentFrame = CurrentFrame >= FrameX ? 0 : CurrentFrame;
-        AnimTimeLeft = EachFrameSpeed;
+        AnimTimeLeft = FrameInterval;
     }
 
     CurrRect = FrameRects[CurrentFrame];
@@ -67,7 +76,7 @@ void Animation::Draw(const std::shared_ptr<sf::Texture>& texture, const sf::Vect
 void Animation::Restart()
 {
     CurrentFrame = 0;
-    AnimTimeLeft = EachFrameSpeed;
+    AnimTimeLeft = FrameInterval;
 }
 
 std::shared_ptr<sf::Texture> Animation::GetCurrentFrameAsTexture() const

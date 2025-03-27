@@ -70,6 +70,8 @@ namespace ETG
 
     void UserInterface::Draw()
     {
+        if (!IsVisible) return;
+
         // Draw the frame
         RightGunFrame->Draw();
         LeftActiveItemFrame->Draw();

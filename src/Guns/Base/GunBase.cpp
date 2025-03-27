@@ -130,6 +130,7 @@ namespace ETG
 
     void GunBase::Draw()
     {
+        if (!IsVisible) return;
         GameObjectBase::Draw();
 
         // Draw the gun.

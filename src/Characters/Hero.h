@@ -32,7 +32,6 @@ namespace ETG
         static bool IsShooting;
 
         HeroStateEnum CurrentHeroState{HeroStateEnum::Idle};
-        bool IsDashing = false;
         
         std::unique_ptr<RogueSpecial> RogueSpecial;
         std::unique_ptr<HeroMoveComp> MoveComp;
@@ -42,12 +41,11 @@ namespace ETG
 
         ActiveItemBase* CurrActiveItem;
 
-    private:
         std::unique_ptr<HeroAnimComp> AnimationComp;
         std::unique_ptr<InputComponent> InputComp;
         
         BOOST_DESCRIBE_CLASS(Hero,(GameObjectBase),
-            (MouseAngle, CurrentDirection, CurrentHeroState, IsDashing, IsShooting),
+            (MouseAngle, CurrentDirection, CurrentHeroState, IsShooting),
             (),
             ())
     };

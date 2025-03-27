@@ -5,6 +5,7 @@
 #include "../Managers/StateEnums.h"
 #include "../Characters/Hero.h"
 
+ETG::Direction ETG::DirectionUtils::LastDashDirection{};
 
 void ETG::DirectionUtils::PopulateDirectionRanges(DirectionMap mapToFill)
 {
@@ -17,6 +18,33 @@ void ETG::DirectionUtils::PopulateDirectionRanges(DirectionMap mapToFill)
     mapToFill[{247, 292}] = Direction::BackHandRight;
     mapToFill[{292, 337}] = Direction::BackDiagonalRight;
     mapToFill[{337, 360}] = Direction::Right;
+}
+
+ETG::Direction ETG::DirectionUtils::GetDirectionToHero(const Hero* Hero, sf::Vector2f SelfPosition)
+{
+    const sf::Vector2f dirVector = Math::Normalize(Hero->GetPosition() - SelfPosition);
+
+    // Calculate angle in degrees (0-360)
+    float angle = atan2(dirVector.y, dirVector.x) * 180.0f / std::numbers::pi;
+    if (angle < 0) angle += 360.0f;
+
+    // Map angle to direction (each direction covers 45 degrees) Right is 0 degrees, and we go counter-clockwise
+    if (angle >= 337.5f || angle < 22.5f)
+        return Direction::Right;
+    else if (angle >= 22.5f && angle < 67.5f)
+        return Direction::FrontHandRight;
+    else if (angle >= 67.5f && angle < 112.5f)
+        return Direction::FrontHandLeft;
+    else if (angle >= 112.5f && angle < 157.5f)
+        return Direction::Left;
+    else if (angle >= 157.5f && angle < 202.5f)
+        return Direction::BackDiagonalLeft;
+    else if (angle >= 202.5f && angle < 247.5f)
+        return Direction::BackHandLeft;
+    else if (angle >= 247.5f && angle < 292.5f)
+        return Direction::BackHandRight;
+    else
+        return Direction::BackDiagonalRight;
 }
 
 ETG::Direction ETG::DirectionUtils::GetHeroDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, const float angle)
@@ -51,63 +79,83 @@ ETG::HeroRunEnum ETG::DirectionUtils::GetHeroRunEnum(Direction currDir)
     return HeroRunEnum::Run_Forward; // Default case
 }
 
-ETG::Direction ETG::DirectionUtils::GetDirectionToHero(const Hero* Hero, sf::Vector2f SelfPosition)
+//Do not put any breakpoint at this function otherwise Key presses that captured in above GetDashDirectionEnum won't be captured during debugging. 
+ETG::HeroDashEnum ETG::DirectionUtils::GetDashDirectionEnum()
 {
-    const sf::Vector2f dirVector = Math::Normalize(Hero->GetPosition() - SelfPosition);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    {
+        LastDashDirection = Direction::BackDiagonalRight;
+        return HeroDashEnum::Dash_BackWard;
+    }
 
-    // Calculate angle in degrees (0-360)
-    float angle = atan2(dirVector.y, dirVector.x) * 180.0f / std::numbers::pi;
-    if (angle < 0) angle += 360.0f;
-
-    // Map angle to direction (each direction covers 45 degrees) Right is 0 degrees, and we go counter-clockwise
-    if (angle >= 337.5f || angle < 22.5f)
-        return Direction::Right;
-    else if (angle >= 22.5f && angle < 67.5f)
-        return Direction::FrontHandRight;
-    else if (angle >= 67.5f && angle < 112.5f)
-        return Direction::FrontHandLeft;
-    else if (angle >= 112.5f && angle < 157.5f)
-        return Direction::Left;
-    else if (angle >= 157.5f && angle < 202.5f)
-        return Direction::BackDiagonalLeft;
-    else if (angle >= 202.5f && angle < 247.5f)
-        return Direction::BackHandLeft;
-    else if (angle >= 247.5f && angle < 292.5f)
-        return Direction::BackHandRight;
-    else
-        return Direction::BackDiagonalRight;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    {
+        LastDashDirection = Direction::BackDiagonalLeft;
+        return HeroDashEnum::Dash_BackWard;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    {
+        LastDashDirection = Direction::FrontHandLeft;
+        
+        return HeroDashEnum::Dash_Right;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    {
+        LastDashDirection = Direction::FrontHandRight;
+        return HeroDashEnum::Dash_Right;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    {
+        LastDashDirection = Direction::Left;
+        return HeroDashEnum::Dash_Left;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    {
+        LastDashDirection = Direction::Right;
+        return HeroDashEnum::Dash_Right;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    {
+        LastDashDirection = Direction::BackHandRight;
+        return HeroDashEnum::Dash_Back;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    {
+        LastDashDirection = Direction::FrontHandRight;
+        return HeroDashEnum::Dash_Front;
+    }
+    return HeroDashEnum::Unknown;
 }
 
-// Add these implementations to your DirectionUtils.cpp file
 
 ETG::BulletManIdleEnum ETG::DirectionUtils::GetBulletManIdleEnum(Direction currDir)
 {
-    if (currDir == Direction::BackHandRight || currDir == Direction::BackHandLeft || 
-        currDir == Direction::BackDiagonalRight) 
+    if (currDir == Direction::BackHandRight || currDir == Direction::BackHandLeft ||
+        currDir == Direction::BackDiagonalRight)
         return BulletManIdleEnum::Idle_Back;
-    
-    if (currDir == Direction::Right || currDir == Direction::FrontHandRight) 
+
+    if (currDir == Direction::Right || currDir == Direction::FrontHandRight)
         return BulletManIdleEnum::Idle_Right;
-    
+
     if (currDir == Direction::Left || currDir == Direction::FrontHandLeft || currDir == Direction::BackDiagonalLeft)
         return BulletManIdleEnum::Idle_Left;
-        
+
     return BulletManIdleEnum::Idle_Back; // Default case
 }
 
 ETG::BulletManRunEnum ETG::DirectionUtils::GetBulletManRunEnum(Direction currDir)
 {
-    if (currDir == Direction::BackHandRight || currDir == Direction::BackDiagonalRight) 
+    if (currDir == Direction::BackHandRight || currDir == Direction::BackDiagonalRight)
         return BulletManRunEnum::Run_Right_Back;
-    
+
     if (currDir == Direction::BackHandLeft || currDir == Direction::BackDiagonalLeft)
         return BulletManRunEnum::Run_Left_Back;
-    
+
     if (currDir == Direction::Right || currDir == Direction::FrontHandRight)
         return BulletManRunEnum::Run_Right;
-    
+
     if (currDir == Direction::Left || currDir == Direction::FrontHandLeft)
         return BulletManRunEnum::Run_Left;
-        
+
     return BulletManRunEnum::Run_Left; // Default case
 }
