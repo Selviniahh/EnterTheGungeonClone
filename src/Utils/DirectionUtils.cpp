@@ -121,10 +121,27 @@ ETG::HeroDashEnum ETG::DirectionUtils::GetDashDirectionEnum()
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
     {
-        LastDashDirection = Direction::FrontHandRight;
+        LastDashDirection = Direction::Front_For_Dash;
         return HeroDashEnum::Dash_Front;
     }
     return HeroDashEnum::Unknown;
+}
+
+sf::Vector2f ETG::DirectionUtils::GetDashDirectionVector() //Normalized vectors will be 0.707113562
+{
+    switch (LastDashDirection) {
+    case Direction::Left: return {-1.0f, 0.0f};
+    case Direction::Right: return {1.0f, 0.0f};
+    case Direction::BackHandRight: return {0.0f, -1.0f};
+    case Direction::BackHandLeft: return {0.0f, -1.0f};
+    case Direction::FrontHandRight: return Math::Normalize(sf::Vector2f{1.0f, 1.0f});
+    case Direction::FrontHandLeft: return Math::Normalize(sf::Vector2f{-1.0f, 1.0f}); //-0.7071 + 0.7
+    case Direction::BackDiagonalRight: return Math::Normalize(sf::Vector2f{1.0f, -1.0f});; //0.7 -0.7
+    case Direction::BackDiagonalLeft: return Math::Normalize(sf::Vector2f{-1.0, -1.0f}); //-0.7 -0.7
+    case Direction::Front_For_Dash: return {0, 1};
+    default:
+        return {0.0f, 0.0f};
+    }
 }
 
 

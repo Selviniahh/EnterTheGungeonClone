@@ -45,6 +45,7 @@ public:
     void Restart();
     std::shared_ptr<sf::Texture> GetCurrentFrameAsTexture() const;
     bool IsAnimationFinished() const;
+    float GetTotalAnimationTime() const; //NOTE: If there are 5 frames and each frame interval is 0.1 then this will return (5 * 0.1 = 0.5)
 
     //Omit FileName's last number. If file's name is "SpriteSheet_001" Give "SpriteSheet_00"
     //There's no Y axis sprite sheet creation. Only X 

@@ -105,6 +105,11 @@ bool Animation::IsAnimationFinished() const
     return CurrentFrame == FrameX - 1;
 }
 
+float Animation::GetTotalAnimationTime() const
+{
+    return (float)FrameX * FrameInterval;
+}
+
 Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, const float eachFrameSpeed, bool IsSingleSprite)
 {
     // Initial setup

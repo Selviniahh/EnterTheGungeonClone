@@ -46,11 +46,11 @@ namespace ETG
         
         //NOTE: Commented dash because dash not implemented yet.
         const auto dashAnims = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "png", DashAnimFrameInterval), //Dash_Back
-            Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "png", DashAnimFrameInterval), //Dash_Backward
-            Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "png", DashAnimFrameInterval), //Dash_Front
-            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", DashAnimFrameInterval), //Dash_Left
-            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", DashAnimFrameInterval), //Dash_Right
+            Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "png", DashAnimFrameInterval), //Dash_Back 0.62
+            Animation::CreateSpriteSheet("Player/Dash/BackWard", "rogue_dodge_left_back_001", "png", DashAnimFrameInterval), //Dash_Backward 0.62
+            Animation::CreateSpriteSheet("Player/Dash/Front", "rogue_dodge_front_001", "png", DashAnimFrameInterval), //Dash_Front will take 0.62
+            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", DashAnimFrameInterval), //Dash_Left  Will take: 0.466159 seconds
+            Animation::CreateSpriteSheet("Player/Dash/Right", "rogue_dodge_left_001", "png", DashAnimFrameInterval), //Dash_Right Will take: 0.466159 seconds
         };
         AddAnimationsForState<HeroDashEnum>(HeroStateEnum::Dash, dashAnims);
     }
@@ -58,18 +58,26 @@ namespace ETG
     void HeroAnimComp::StartDash(HeroDashEnum direction)
     {
         if (IsDashing) return;
+        
         IsDashing = true;
+        DashTimer = 0.f; //Reset the timer
         CurrentDashDirection = direction;
-        HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Dash].AnimationDict[CurrentDashDirection].FrameInterval = DashAnimFrameInterval;
+
+        //Explicitly restart the animation to ensure it plays fully
+        auto& anim = HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Dash].AnimationDict[direction];
+        anim.FrameInterval = DashAnimFrameInterval;
+        anim.Restart();
         HeroPtr->CurrentHeroState = HeroStateEnum::Dash;
+        OnDashStart.Broadcast(direction);
     }
 
+    //NOTE: IF we called this function in Update before the base Update, We would have to manually reset Dash animation at here
     void HeroAnimComp::EndDash()
     {
         if (!IsDashing) return;
         IsDashing = false;
-        HeroPtr->CurrentHeroState = HeroStateEnum::Idle;
-        //NOTE: We need to reset current dash animation from here as last resort
+        HeroPtr->MoveComp->StartDashCooldown();
+        OnDashEnd.Broadcast();
     }
 
     bool HeroAnimComp::IsDashAnimFinished() const
@@ -97,6 +105,7 @@ namespace ETG
         else if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
         {
             newKey = CurrentDashDirection;
+            DashTimer += Globals::FrameTick;
         }
         
         //NOTE: I know calling base here and then executing rest of the codes looks weird however, during state changes the base animation's `ChangeAnimStateIfRequired` will restart animation if state has ever changes
@@ -105,8 +114,9 @@ namespace ETG
         BaseAnimComp<HeroStateEnum>::Update(HeroPtr->CurrentHeroState, newKey);
 
         //If Dash animation is complete, Stop Dash and set Current state to idle
-        if (IsDashing)
-            if (IsDashAnimFinished())
-                EndDash();
+        if (IsDashing && DashTimer >= MinDashDuration && IsDashAnimFinished())
+        {
+            EndDash();
+        }
     }
 }

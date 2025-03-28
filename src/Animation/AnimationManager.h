@@ -65,7 +65,6 @@ public:
 
     // For storing whichever key was last used
     AnimationKey LastKey;
-
     Animation* CurrentAnim = nullptr;
 
     std::shared_ptr<sf::Texture> LastTexture;
@@ -90,6 +89,7 @@ public:
 
     // Return the current frame as a texture for the last key
     std::shared_ptr<sf::Texture> GetCurrentFrameAsTexture();
+    Animation* GetCurrentAnimation();
 
     // Check if the current animation has finished
     bool IsAnimationFinished();
@@ -125,6 +125,7 @@ void AnimationManager::Update(T key)
     {
         // If the key doesn't exist, restart the last animation
         AnimationDict[LastKey].Restart();
+        CurrentAnim = &AnimationDict[LastKey];
     }
 }
 
@@ -157,6 +158,16 @@ inline std::shared_ptr<sf::Texture> AnimationManager::GetCurrentFrameAsTexture()
     }
 
     throw std::runtime_error("Failed to find current frame's texture. Last Key: ");
+}
+
+inline Animation* AnimationManager::GetCurrentAnimation()
+{
+    const auto it = AnimationDict.find(LastKey);
+    if (it != AnimationDict.end())
+    {
+        return &it->second;
+    }
+    return nullptr;
 }
 
 inline bool AnimationManager::IsAnimationFinished()

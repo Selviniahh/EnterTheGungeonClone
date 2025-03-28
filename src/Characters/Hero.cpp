@@ -29,6 +29,7 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     AnimationComp->Initialize();
     AnimationComp->Update(); //Set the Texture during Initialization
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
+    MoveComp->Initialize();
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
 
     //Collision comp:
@@ -101,7 +102,7 @@ void ETG::Hero::Update()
     }
 
     //Try to use Active item
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && CurrActiveItem)
     {
         CurrActiveItem->RequestUsage();
     }

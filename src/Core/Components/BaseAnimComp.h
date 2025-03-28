@@ -54,6 +54,8 @@ namespace ETG
         //If the key has changed, change the animation state and restart
         void ChangeAnimStateIfRequired(const AnimationKey& newKey);
 
+        Animation* GetCurrentAnimation();
+
         //Animation properties
         std::unordered_map<StateEnum, AnimationManager> AnimManagerDict{};
         StateEnum CurrentState;
@@ -205,6 +207,12 @@ namespace ETG
                 animManager.AnimationDict[CurrentAnimStateKey].Restart();
             }
         }
+    }
+
+    template <typename StateEnum>
+    Animation* BaseAnimComp<StateEnum>::GetCurrentAnimation()
+    {
+        return AnimManagerDict[CurrentState].GetCurrentAnimation();
     }
 
 

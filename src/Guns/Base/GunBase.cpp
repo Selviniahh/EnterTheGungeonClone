@@ -130,7 +130,13 @@ namespace ETG
 
     void GunBase::Draw()
     {
-        if (!IsVisible) return;
+        // Draw projectiles.
+        for (const auto& proj : projectiles)
+        {
+            proj->Draw();
+        }
+
+        if (!IsVisible) return; //If dashing, this will be false and self gun shouldn't be drawn however projectiles should be. So we first draw projectiles then we draw self if visible 
         GameObjectBase::Draw();
 
         // Draw the gun.
@@ -138,12 +144,6 @@ namespace ETG
 
         // Draw the arrow representation.
         ArrowComp->Draw();
-
-        // Draw projectiles.
-        for (const auto& proj : projectiles)
-        {
-            proj->Draw();
-        }
 
         // Draw the muzzle flash.
         MuzzleFlash->Draw();

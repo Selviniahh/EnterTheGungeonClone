@@ -46,6 +46,7 @@ namespace ETG
         static HeroIdleEnum GetHeroIdleDirectionEnum(Direction currDir);
         static HeroRunEnum GetHeroRunEnum(Direction currDir);
         static HeroDashEnum GetDashDirectionEnum();
+        static sf::Vector2f GetDashDirectionVector();
 
         //Enemy BulletMan related 
         static Direction GetDirectionToHero(const Hero* Hero, sf::Vector2f SelfPosition);

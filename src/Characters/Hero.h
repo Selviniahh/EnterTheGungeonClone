@@ -39,7 +39,7 @@ namespace ETG
         std::unique_ptr<ReloadText> ReloadText;
         std::unique_ptr<CollisionComponent> CollisionComp;
 
-        ActiveItemBase* CurrActiveItem;
+        ActiveItemBase* CurrActiveItem{};
 
         std::unique_ptr<HeroAnimComp> AnimationComp;
         std::unique_ptr<InputComponent> InputComp;

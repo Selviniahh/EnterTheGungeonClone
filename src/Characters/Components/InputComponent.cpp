@@ -25,8 +25,8 @@ namespace ETG
     { 
         UpdateDirection(hero);
 
-        //If right-clicked, start dashing
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing)
+        //If right-clicked, start dashing if possible
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing && hero.MoveComp->IsDashAvailable())
         {
             const HeroDashEnum dashDirection = DirectionUtils::GetDashDirectionEnum(); //If you put breakpoint this line, direction enum will always be unknown so put breakpoint below this line to capture dash direction
             if (dashDirection != HeroDashEnum::Unknown)
