@@ -5,12 +5,15 @@
 #include "InputManager.h"
 #include "SpriteBatch.h"
 #include "Globals.h"
+#include "../Guns/AK-47/AK47.h"
+#include "../Core/Components/CollisionComponent.h"
 #include "../Core/Scene/Scene.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
 #include "../Enemy/BulletMan/BulletMan.h"
 #include "../Items/Active/DoubleShoot.h"
 #include "../Items/Passive/PlatinumBullets.h"
+
 
 sf::Event ETG::GameManager::GameEvent{};
 using namespace ETG::Globals;
@@ -60,6 +63,8 @@ void ETG::GameManager::Initialize()
 
     PlatinumBullets = ETG::CreateGameObjectDefault<class PlatinumBullets>();
     DoubleShoot = ETG::CreateGameObjectDefault<class DoubleShoot>();
+    Ak47Pickup = ETG::CreateGameObjectDefault<class AK47>(sf::Vector2f{-100,100});
+
     
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
     // DestroyGameObject(Hero);
@@ -76,6 +81,7 @@ void ETG::GameManager::Update()
         InputManager::Update();
         Hero->Update();
         UI->Update();
+        Ak47Pickup->Update();
         BulletMan->Update();
         PlatinumBullets->Update();
         DoubleShoot->Update();
@@ -96,6 +102,7 @@ void ETG::GameManager::Draw()
     BulletMan->Draw();
     PlatinumBullets->Draw();
     DoubleShoot->Draw();
+    Ak47Pickup->Draw();
     GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.

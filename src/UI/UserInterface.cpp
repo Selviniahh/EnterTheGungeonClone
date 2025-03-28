@@ -24,7 +24,7 @@ namespace ETG
 
         // Calculate game screen size (accounting for engine UI)
         GameScreenSize = {
-            static_cast<float>(Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize().x),
+            static_cast<float>(Globals::ScreenSize.x - GameState::GetInstance().GetEngineUISize()->x),
             static_cast<float>(Globals::ScreenSize.y)
         };
 

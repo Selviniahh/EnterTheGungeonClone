@@ -4,6 +4,7 @@
 #include "HeroAnimComp.h"
 #include "HeroMoveComp.h"
 #include "../Hero.h"
+#include "../../Managers/GameManager.h"
 #include "../../Managers/InputManager.h"
 #include "../../Utils/DirectionUtils.h"
 #include "../../Utils/Math.h"
@@ -22,8 +23,10 @@ namespace ETG
     }
 
     void InputComponent::Update(Hero& hero) const
-    { 
+    {
         UpdateDirection(hero);
+
+        HandleGunSwitch(hero);
 
         //If right-clicked, start dashing if possible
         if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing && hero.MoveComp->IsDashAvailable())
@@ -53,6 +56,21 @@ namespace ETG
         else //NOTE: If it's not Dash, Hero's set Hero's input based on Mouse Angle. 
         {
             hero.CurrentDirection = DirectionUtils::GetHeroDirectionFromAngle(DirectionMap, angle);
+        }
+    }
+
+    void InputComponent::HandleGunSwitch(Hero& hero) const
+    {
+        //If mouse wheel scrolled, switch back to default gun
+        if (const sf::Event event = GameManager::GameEvent; event.type == sf::Event::MouseWheelScrolled)
+        {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+            {
+                if (event.mouseWheelScroll.delta > 0)
+                    hero.SwitchToPreviousGun();
+                else if (event.mouseWheelScroll.delta < 0)
+                    hero.SwitchNextGun();
+            }
         }
     }
 

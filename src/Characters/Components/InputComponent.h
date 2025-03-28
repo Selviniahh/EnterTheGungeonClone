@@ -15,6 +15,7 @@ namespace ETG
     {
     public:
         InputComponent();
+        void HandleGunSwitch(Hero& hero) const;
 
         void Update(Hero& hero) const;
         
