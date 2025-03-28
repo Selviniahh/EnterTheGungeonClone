@@ -15,7 +15,7 @@ public:
     template <typename T>
     static inline sf::Vector2<T> Normalize(const sf::Vector2<T>& Vector)
     {
-        const float length = std::sqrt(Vector.x * Vector.x + Vector.y * Vector.y);
+        const float length = VectorLength(Vector);
         if (length == 0) throw std::runtime_error("length is 0. Vector is: " + std::to_string(Vector.x) + " " + std::to_string(Vector.y));
 
         return Vector / length;
@@ -26,7 +26,7 @@ public:
     {
         return radians * (180.0f / std::numbers::pi);
     }
-    
+
     static float AngleToRadian(const float angle)
     {
         return (angle * std::numbers::pi) / 180.f;
@@ -55,6 +55,8 @@ public:
         return value >= min && value <= max;
     }
 
+    //------------------------Trigonometry--------------------------------------------------------
+
     //Used for non internally incremented timer
     //look at ReloadSlider
     template <typename T>
@@ -67,7 +69,7 @@ public:
         //Multiplying by π transforms this range into [0, π]
         //When timer = 0.5: sin(π/2) = 1 → fully at position b
         //When timer = 1.0: sin(π) = 0 → back to midpoint
-        float sineValue = std::sin(timer * std::numbers::pi); 
+        float sineValue = std::sin(timer * std::numbers::pi);
 
         //apply lerp
         return static_cast<T>(std::lerp(a, b, sineValue));
@@ -92,13 +94,28 @@ public:
         return static_cast<T>(std::lerp(a, b, timer));
     }
 
-    template<typename T>
-    static T ProgressLerp(T a, T b, const float progress)
+    // Returns a bell curve value that starts at 0, peaks at progress=0.5, and returns to 0
+    // progress should be between 0 and 1
+    static float BellCurve(const float progress)
     {
-        //clamp progress to 0-1 range
-        float t = std::max(0.0f, std::min(1.0f, progress));
-        return static_cast<T>(std::lerp(a,b,t));
+        return std::sin(progress * std::numbers::pi);
     }
+
+    // Applies a bell curve force to create smooth dash movement
+    // progress: Current progress of the dash (0 to 1)
+    // direction: Normalized direction vector
+    // amount: Maximum force at peak
+    // returns: The velocity to apply for this frame
+    static sf::Vector2f ApplyBellCurveForce(const float progress, const sf::Vector2f& direction, const float amount, const float deltaTime)
+    {
+        // Calculate force using bell curve (peaks at 0.5 progress)
+        const float force = BellCurve(progress) * amount;
+
+        // Return velocity for this frame
+        return direction * force * deltaTime;
+    }
+
+    //-----------------------------Transformations-----------------------------------------------------
 
     [[nodiscard]] static sf::Vector2f RotateVector(const float rotation, const sf::Vector2f scale, const sf::Vector2f& offset)
     {
@@ -141,11 +158,9 @@ public:
         return Corners;
     }
 
-    template<typename T>
+    template <typename T>
     static T CalculatePercentageOfValue(const T& value, const float& percentage)
     {
         return value * (percentage / 100);
     }
-
-    
 };

@@ -39,12 +39,12 @@ void ETG::RogueSpecial::Update()
     if (modifierManager.GetModifier<MultiShotModifier>())
     {
         // When multishot is active, make flash animation match bullet frequency
-        MuzzleFlash->Animation.EachFrameSpeed = MULTI_SHOT_DELAY / 2;
+        MuzzleFlash->Animation.FrameInterval = MULTI_SHOT_DELAY / 2;
     }
     else
     {
         // Normal animation speed for single shots
-        MuzzleFlash->Animation.EachFrameSpeed = FireRate / 3;
+        MuzzleFlash->Animation.FrameInterval = FireRate / 3;
     }
 }
 

@@ -84,8 +84,9 @@ namespace ETG
         BackDiagonalLeft,
         BackHandLeft,
         BackHandRight,
-        BackDiagonalRight
+        BackDiagonalRight,
+        Front_For_Dash //This will only set when Dashing with S key other than this, this value will never be set again 
     };
-    BOOST_DESCRIBE_ENUM(Direction, Right, FrontHandRight, FrontHandLeft, Left, BackDiagonalLeft, BackHandLeft, BackHandRight, BackDiagonalRight)
+    BOOST_DESCRIBE_ENUM(Direction, Right, FrontHandRight, FrontHandLeft, Left, BackDiagonalLeft, BackHandLeft, BackHandRight, BackDiagonalRight, Front_For_Dash)
 
 }

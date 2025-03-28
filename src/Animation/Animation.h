@@ -8,7 +8,7 @@
 class Animation : public GameClass
 {
 private:
-    float AnimTimeLeft;
+    float AnimTimeLeft{};
     int CurrentFrame = 0;
     int FrameX;
     int FrameY;
@@ -16,7 +16,7 @@ private:
 
 public:
     std::string AnimPathName;
-    float EachFrameSpeed;
+    float FrameInterval{};
     sf::IntRect CurrRect;
     std::shared_ptr<sf::Texture> Texture;
     sf::Vector2f Origin;
@@ -45,10 +45,11 @@ public:
     void Restart();
     std::shared_ptr<sf::Texture> GetCurrentFrameAsTexture() const;
     bool IsAnimationFinished() const;
+    float GetTotalAnimationTime() const; //NOTE: If there are 5 frames and each frame interval is 0.1 then this will return (5 * 0.1 = 0.5)
 
     //Omit FileName's last number. If file's name is "SpriteSheet_001" Give "SpriteSheet_00"
     //There's no Y axis sprite sheet creation. Only X 
     static Animation CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, float eachFrameSpeed, bool IsSingleSprite = false);
 
-    BOOST_DESCRIBE_CLASS(Animation, (GameClass), (CurrRect, Texture, Origin, FrameRects, IsValid, flipX, Active), (), (EachFrameSpeed))
+    BOOST_DESCRIBE_CLASS(Animation, (GameClass), (CurrRect, Texture, Origin, FrameRects, IsValid, flipX, Active), (), (FrameInterval))
 };

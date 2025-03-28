@@ -39,9 +39,14 @@ namespace ETG
         //In Short, take the map and calculated angle, and return the Found Direction from angle. 
         static Direction GetHeroDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, float angle);
 
+        static Direction LastDashDirection;
+        static const Direction& GetDirectionFromDash() {return LastDashDirection;} //This will run instead of above GetHeroDirectionFromAngle if state is Dash
+
         //Hero enum related 
         static HeroIdleEnum GetHeroIdleDirectionEnum(Direction currDir);
         static HeroRunEnum GetHeroRunEnum(Direction currDir);
+        static HeroDashEnum GetDashDirectionEnum();
+        static sf::Vector2f GetDashDirectionVector();
 
         //Enemy BulletMan related 
         static Direction GetDirectionToHero(const Hero* Hero, sf::Vector2f SelfPosition);

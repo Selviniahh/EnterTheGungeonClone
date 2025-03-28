@@ -17,9 +17,7 @@ namespace ETG
         InputComponent();
 
         void Update(Hero& hero) const;
-
-        static HeroDashEnum GetDashDirectionEnum();
-
+        
         void PopulateSpecificWidgets() override;
 
     private:

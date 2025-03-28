@@ -130,6 +130,13 @@ namespace ETG
 
     void GunBase::Draw()
     {
+        // Draw projectiles.
+        for (const auto& proj : projectiles)
+        {
+            proj->Draw();
+        }
+
+        if (!IsVisible) return; //If dashing, this will be false and self gun shouldn't be drawn however projectiles should be. So we first draw projectiles then we draw self if visible 
         GameObjectBase::Draw();
 
         // Draw the gun.
@@ -137,12 +144,6 @@ namespace ETG
 
         // Draw the arrow representation.
         ArrowComp->Draw();
-
-        // Draw projectiles.
-        for (const auto& proj : projectiles)
-        {
-            proj->Draw();
-        }
 
         // Draw the muzzle flash.
         MuzzleFlash->Draw();
@@ -156,7 +157,7 @@ namespace ETG
             (*it)->Update();
             if ((*it)->IsPendingDestroy())
             {
-                GameState::GetInstance().GetSceneObjs().erase((*it)->GetObjectName());
+                UnregisterGameObject(it->get()->GetObjectName());
 
                 //Because initialized projectile moved to this container with std::move, owner of the object is this container. Simply removing the element from the vector will invoke
                 //unique_ptr's destructor because unique_ptr requires 1 owner and since owner is gone, it'll automatically call destructor right away after this erase call.

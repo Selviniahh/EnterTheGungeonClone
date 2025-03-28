@@ -49,7 +49,7 @@ void UIUtils::DisplayAnimation(const char* label, Animation& value)
 
         // Display input int:
         BeginProperty("Animation Speed ");
-        ImGui::InputFloat("Animation", &value.EachFrameSpeed);
+        ImGui::InputFloat("Animation", &value.FrameInterval);
         EndProperty();
 
         BeginProperty("Flip X");

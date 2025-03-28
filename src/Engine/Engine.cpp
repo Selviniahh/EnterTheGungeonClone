@@ -55,15 +55,22 @@ void Engine::Update()
 
 bool Engine::IsGameWindowFocused()
 {
-    // Check if the game has focus; if not, ignore input.
-    if (!CurrentGameFocus) return false;
+    // First check if ImGui wants to capture mouse input
+    const ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse)
+        return false;
 
-    // Determine if focus was just gained. The if block will return true when the game screen clicked but not released (Current is true, Previous was false)
+    // Check if the game has focus; if not, ignore input.
+    if (!CurrentGameFocus) 
+        return false;
+
+    // Determine if focus was just gained
     if (CurrentGameFocus && !Engine::PreviousGameFocus)
         InputManager::LeftClickRequired = true;
 
     // Process events to check for mouse release
-    if (InputManager::LeftClickRequired && GameManager::GameEvent.type == sf::Event::MouseButtonReleased && ETG::GameManager::GameEvent.mouseButton.button == sf::Mouse::Left)
+    if (InputManager::LeftClickRequired && GameManager::GameEvent.type == sf::Event::MouseButtonReleased && 
+        ETG::GameManager::GameEvent.mouseButton.button == sf::Mouse::Left)
     {
         InputManager::LeftClickRequired = false;
     }
@@ -123,7 +130,7 @@ void Engine::DisplayHierarchy(GameObjectBase* object)
 {
     ImGui::PushID(object);
 
-    //Is current object has any children
+    //Is current object has any children prepare to make it expandible node tree instead of just selectable. 
     bool currObjHasChildren = false;
     for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs())
     {
@@ -153,7 +160,7 @@ void Engine::DisplayHierarchy(GameObjectBase* object)
     //Find all the children of current object and Draw all of them
     if (isOpen)
     {
-        for (const auto& [name, sceneObj] : GameState::GetInstance().GetSceneObjs())
+        for (const auto& sceneObj : GameState::GetInstance().GetOrderedSceneObjs())
         {
             if (sceneObj->Owner == object)
             {

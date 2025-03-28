@@ -51,6 +51,11 @@ namespace ETG
         template <typename... TObjects>
         void FlipSpritesY(const Direction& currentDirection, TObjects&... objects);
 
+        //If the key has changed, change the animation state and restart
+        void ChangeAnimStateIfRequired(const AnimationKey& newKey);
+
+        Animation* GetCurrentAnimation();
+
         //Animation properties
         std::unordered_map<StateEnum, AnimationManager> AnimManagerDict{};
         StateEnum CurrentState;
@@ -78,6 +83,8 @@ namespace ETG
         CurrTexRect = animState.CurrRect;
         CurrentTex = animState.GetCurrentFrameAsTexture();
         Owner->Texture = CurrentTex;
+
+        ChangeAnimStateIfRequired(animKey);
     }
 
     template <typename StateEnum>
@@ -104,8 +111,7 @@ namespace ETG
         std::vector<DirectionEnum> enumKeys = ConstructEnumVector<DirectionEnum>();
 
         // Make sure we don't exceed the bounds of either array
-        if (enumKeys.size() != animations.size()) throw std::runtime_error("animation size and enumKeys size are not same. You have to ensure given enum type and animation sizes are equal");
-        const size_t count = enumKeys.size();
+        const size_t count = std::min(enumKeys.size(), animations.size());
 
         for (size_t i = 0; i < count; ++i)
         {
@@ -144,9 +150,7 @@ namespace ETG
     template <typename StateEnum>
     bool BaseAnimComp<StateEnum>::IsFacingRight(const Direction& currentDirection)
     {
-        return
-            currentDirection == Direction::Right || currentDirection == Direction::FrontHandRight ||
-            currentDirection == Direction::BackDiagonalRight || currentDirection == Direction::BackHandRight;
+        return std::string{EnumToString(currentDirection)}.contains("Right") || std::string{EnumToString(currentDirection)}.contains("right");
     }
 
     template <typename StateEnum>
@@ -186,6 +190,29 @@ namespace ETG
     void BaseAnimComp<StateEnum>::FlipSpritesY(const Direction& currentDirection, TObjects&... objects)
     {
         return FlipSprites(currentDirection, FlipAxis::Y, objects...);
+    }
+
+    template <typename StateEnum>
+    void BaseAnimComp<StateEnum>::ChangeAnimStateIfRequired(const AnimationKey& newKey)
+    {
+        //If previous animation state (ex: idle) and current (ex: run) is different, update key and restart the animation
+        if (newKey != CurrentAnimStateKey)
+        {
+            CurrentAnimStateKey = newKey;
+
+            //Restart the key
+            auto& animManager = AnimManagerDict[CurrentState];
+            if (animManager.AnimationDict.contains(CurrentAnimStateKey))
+            {
+                animManager.AnimationDict[CurrentAnimStateKey].Restart();
+            }
+        }
+    }
+
+    template <typename StateEnum>
+    Animation* BaseAnimComp<StateEnum>::GetCurrentAnimation()
+    {
+        return AnimManagerDict[CurrentState].GetCurrentAnimation();
     }
 
 

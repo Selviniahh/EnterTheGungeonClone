@@ -75,6 +75,7 @@ void ETG::BulletMan::Update()
 
 void ETG::BulletMan::Draw()
 {
+    if (!IsVisible) return;
     EnemyBase::Draw();
     SpriteBatch::Draw(GetDrawProperties());
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());

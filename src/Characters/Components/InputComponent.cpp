@@ -1,10 +1,16 @@
 #include "InputComponent.h"
 #include <imgui.h>
+
+#include "HeroAnimComp.h"
+#include "HeroMoveComp.h"
 #include "../Hero.h"
 #include "../../Managers/InputManager.h"
 #include "../../Utils/DirectionUtils.h"
 #include "../../Utils/Math.h"
 #include "../../Utils/StrManipulateUtil.h"
+
+//This class will set `HeroPtr->CurrentHeroState`
+//HeroAnimComp will set real animation based on HeroPtr->CurrentHeroState
 
 namespace ETG
 {
@@ -16,10 +22,19 @@ namespace ETG
     }
 
     void InputComponent::Update(Hero& hero) const
-    {
+    { 
         UpdateDirection(hero);
-    }
 
+        //If right-clicked, start dashing if possible
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing && hero.MoveComp->IsDashAvailable())
+        {
+            const HeroDashEnum dashDirection = DirectionUtils::GetDashDirectionEnum(); //If you put breakpoint this line, direction enum will always be unknown so put breakpoint below this line to capture dash direction
+            if (dashDirection != HeroDashEnum::Unknown)
+            {
+                hero.AnimationComp->StartDash(dashDirection);
+            }
+        }
+    }
 
     void InputComponent::UpdateDirection(Hero& hero) const
     {
@@ -29,20 +44,16 @@ namespace ETG
 
         // Store on the Hero (or handle in input component)
         hero.MouseAngle = angle;
-        hero.CurrentDirection = DirectionUtils::GetHeroDirectionFromAngle(DirectionMap, angle);
-    }
 
-    HeroDashEnum InputComponent::GetDashDirectionEnum()
-    {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) return HeroDashEnum::Dash_BackWard;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) return HeroDashEnum::Dash_BackWard;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::S)) return HeroDashEnum::Dash_BackWard;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::S)) return HeroDashEnum::Dash_BackWard;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) return HeroDashEnum::Dash_Left;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) return HeroDashEnum::Dash_Right;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) return HeroDashEnum::Dash_Back;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) return HeroDashEnum::Dash_Front;
-        return HeroDashEnum::Unknown;
+        //NOTE: If it's Dash Set Hero's Direction based on the Keyboard Key
+        if (hero.CurrentHeroState == HeroStateEnum::Dash)
+        {
+            hero.CurrentDirection = DirectionUtils::GetDirectionFromDash();
+        }
+        else //NOTE: If it's not Dash, Hero's set Hero's input based on Mouse Angle. 
+        {
+            hero.CurrentDirection = DirectionUtils::GetHeroDirectionFromAngle(DirectionMap, angle);
+        }
     }
 
     void InputComponent::PopulateSpecificWidgets()
