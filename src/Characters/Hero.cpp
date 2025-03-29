@@ -84,7 +84,7 @@ void ETG::Hero::Update()
     InputComp->Update(*this);
     MoveComp->Update(); //NOTE: When InputComp changes `HeroPtr->CurrentHeroState` new AnimState changes needs to be reflected in `AnimationComp` then `MoveComp` or I can move all dash to AnimationComp????  
 
-    AnimationComp->FlipSpritesY<class RogueSpecial>(CurrentDirection, *RogueSpecial);
+    AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
     AnimationComp->FlipSpritesX(CurrentDirection, *this);
 
     AnimationComp->Update();
@@ -95,14 +95,19 @@ void ETG::Hero::Update()
     Hand->Update();
 
     //Gun
-    RogueSpecial->SetPosition(Hand->GetPosition() + Hand->GunOffset);
-    RogueSpecial->Rotation = MouseAngle;
-    RogueSpecial->Update();
+    for (GunBase* gun : EquippedGuns)
+    {
+        if (gun != CurrentGun) gun->IsVisible = false;
+        else gun->IsVisible = true;
+    }
+    CurrentGun->SetPosition(Hand->GetPosition() + Hand->GunOffset);
+    CurrentGun->Rotation = MouseAngle;
+    CurrentGun->Update();
 
     //Shoot only if these conditions are met 
-    if (IsShooting && RogueSpecial->MagazineAmmo != 0 && !RogueSpecial->IsReloading)
+    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading)
     {
-        RogueSpecial->PrepareShooting();
+        CurrentGun->PrepareShooting();
     }
 
     //Try to use Active item
@@ -116,7 +121,7 @@ void ETG::Hero::Update()
 
     //If dashing do not draw gun and hand
      Hand->IsVisible = !(AnimationComp->IsDashing); 
-     RogueSpecial->IsVisible = !(AnimationComp->IsDashing); 
+     CurrentGun->IsVisible = !(AnimationComp->IsDashing); 
     GameObjectBase::Update();
 }
 
@@ -124,7 +129,7 @@ void ETG::Hero::Draw()
 {
     if (!IsVisible) return;
     GameObjectBase::Draw();
-    RogueSpecial->Draw();
+    CurrentGun->Draw();
     SpriteBatch::Draw(GetDrawProperties());
 
     ReloadText->Draw();
@@ -135,5 +140,5 @@ void ETG::Hero::Draw()
 
 ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const
 {
-    return dynamic_cast<GunBase*>(RogueSpecial.get());
+    return dynamic_cast<GunBase*>(CurrentGun);
 }

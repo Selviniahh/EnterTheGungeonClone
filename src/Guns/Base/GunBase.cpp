@@ -146,7 +146,7 @@ namespace ETG
         ArrowComp->Draw();
 
         // Draw the muzzle flash.
-        MuzzleFlash->Draw();
+        if (MuzzleFlash->IsVisible) MuzzleFlash->Draw();
         ReloadSlider->Draw();
     }
 
@@ -217,7 +217,7 @@ namespace ETG
     void GunBase::FireBullet(float projectileAngle)
     {
         //Restart muzzle flash animation and shoot animation
-        MuzzleFlash->Restart();
+        if (MuzzleFlash->IsVisible) MuzzleFlash->Restart();
         ShootSound.play();
 
         AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();

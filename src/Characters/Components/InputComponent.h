@@ -15,8 +15,6 @@ namespace ETG
     {
     public:
         InputComponent();
-        void HandleGunSwitch(Hero& hero) const;
-
         void Update(Hero& hero) const;
         
         void PopulateSpecificWidgets() override;
@@ -24,6 +22,8 @@ namespace ETG
     private:
         std::unordered_map<std::pair<int, int>, Direction, PairHash> DirectionMap{};
         void UpdateDirection(Hero& hero) const;
+        void HandleGunSwitch(Hero& hero) const;
+        mutable bool gunSwitchHandled = false; //Do it once
 
         BOOST_DESCRIBE_CLASS(InputComponent, (ComponentBase),
             (),

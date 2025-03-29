@@ -106,8 +106,8 @@ namespace ETG
         sf::SoundBuffer ReloadSoundBuffer;
         sf::Sound ReloadSound;
 
-        float ShootSoundVolume = 30;
-        float ReloadSoundVolume = 30;
+        float ShootSoundVolume = 10;
+        float ReloadSoundVolume = 10;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase),
                              (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ReloadTime, IsReloading,

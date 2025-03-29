@@ -56,6 +56,7 @@ namespace ETG
             EquippedGuns.push_back(newGun);
             CurrentGun = newGun; // Set the new gun as the current one by default
             currentGunIndex = EquippedGuns.size() - 1;
+            UpdateGunVisibility();
         }
 
         // When scrolling the mouse wheel, switch back to the default (index 0) gun.
@@ -68,6 +69,7 @@ namespace ETG
             // No need for additional bounds check - the modulo operation guarantees the index is valid if the vector is not empty
             currentGunIndex = (currentGunIndex - 1 + EquippedGuns.size()) % EquippedGuns.size();
             CurrentGun = EquippedGuns[currentGunIndex];
+            UpdateGunVisibility();
         }
         void SwitchNextGun()
         {
@@ -76,11 +78,20 @@ namespace ETG
             // Move index forwards with wraparound
             currentGunIndex = (currentGunIndex + 1) % EquippedGuns.size();
             CurrentGun = EquippedGuns[currentGunIndex];
+            UpdateGunVisibility();
         }
 
         BOOST_DESCRIBE_CLASS(Hero, (GameObjectBase),
                              (MouseAngle, CurrentDirection, CurrentHeroState, IsShooting),
                              (),
                              ())
+    private:
+        void UpdateGunVisibility()
+        {
+            for (GunBase* gun : EquippedGuns)
+            {
+                gun->IsVisible = (gun == CurrentGun);
+            }
+        }
     };
 }

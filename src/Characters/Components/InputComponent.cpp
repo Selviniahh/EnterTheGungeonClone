@@ -25,13 +25,12 @@ namespace ETG
     void InputComponent::Update(Hero& hero) const
     {
         UpdateDirection(hero);
-
         HandleGunSwitch(hero);
 
-        //If right-clicked, start dashing if possible
+        // If right-clicked, start dashing if possible
         if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing && hero.MoveComp->IsDashAvailable())
         {
-            const HeroDashEnum dashDirection = DirectionUtils::GetDashDirectionEnum(); //If you put breakpoint this line, direction enum will always be unknown so put breakpoint below this line to capture dash direction
+            const HeroDashEnum dashDirection = DirectionUtils::GetDashDirectionEnum(); // If you put breakpoint this line, direction enum will always be unknown so put breakpoint below this line to capture dash direction
             if (dashDirection != HeroDashEnum::Unknown)
             {
                 hero.AnimationComp->StartDash(dashDirection);
@@ -61,16 +60,22 @@ namespace ETG
 
     void InputComponent::HandleGunSwitch(Hero& hero) const
     {
-        //If mouse wheel scrolled, switch back to default gun
-        if (const sf::Event event = GameManager::GameEvent; event.type == sf::Event::MouseWheelScrolled)
+        // If mouse wheel scrolled, switch gun
+        if (!gunSwitchHandled && GameManager::GameEvent.type == sf::Event::MouseWheelScrolled)
         {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+            if (GameManager::GameEvent.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
             {
-                if (event.mouseWheelScroll.delta > 0)
+                if (GameManager::GameEvent.mouseWheelScroll.delta > 0)
                     hero.SwitchToPreviousGun();
-                else if (event.mouseWheelScroll.delta < 0)
+                else if (GameManager::GameEvent.mouseWheelScroll.delta < 0)
                     hero.SwitchNextGun();
+                
+                gunSwitchHandled = true; // Set flag to indicate the event has been handled
             }
+        }
+        else if (GameManager::GameEvent.type != sf::Event::MouseWheelScrolled)
+        {
+            gunSwitchHandled = false; // Reset flag when the event is no longer a mouse wheel scroll
         }
     }
 

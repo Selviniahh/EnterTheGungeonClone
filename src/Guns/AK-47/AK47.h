@@ -12,6 +12,8 @@ namespace ETG
 
         void Initialize() override;
         void Update() override;
+        void Draw() override;
+
 
         std::unique_ptr<CollisionComponent> CollisionComp;
 

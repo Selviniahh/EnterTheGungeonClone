@@ -6,17 +6,17 @@
 #include "../../Characters/Hero.h"
 
 ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
-    0.11f,     // FireRate
-    23.0f,     // ShotSpeed
-    2000.0f,    // Range (should be infinite but I will just give 2000)
+    0.27f,     // FireRate
+    250.0f,     // ShotSpeed
+    1000.0f,    // Range (should be infinite but I will just give 2000)
     0.0f,      // timerForVelocity
-    2.0f,      // depth
+    3.0f,      // depth
     500,       // MaxAmmo
     30,        // MagazineSize
-    0.5f,      // ReloadTime
+    2.0f,      // ReloadTime
     5.5f,      // Damage
     9.0f,      // Force
-    4.0f)      // Spread (in degrees)
+    5.0f)      // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<AK47AnimComp>(this);
     SetShootSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "AK47Shoot.ogg").generic_string());
@@ -25,6 +25,7 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
+    CollisionComp->ShowCollisionBounds = true;
 
     // Call the common initialization
     AK47::Initialize();
@@ -32,10 +33,12 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
 
 void ETG::AK47::Initialize()
 {
-    OriginOffset = {1.f, 10.f};
+    OriginOffset = {8.f, 5.f};
     ArrowComp->arrowOriginOffset = {-6.f, 0.f};
-    ArrowComp->arrowOffset = {25.f, -6.f};
+    ArrowComp->arrowOffset = {25.f, -2.f};
+    CollisionComp->Initialize();
 
+    
     // Load the projectile texture for AK-47
     const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "AK-47" / "Projectile_AK-47.png").string();
     if (!ProjTexture->loadFromFile(projPath))
@@ -56,9 +59,17 @@ void ETG::AK47::Initialize()
 
 void ETG::AK47::Update()
 {
+    MuzzleFlash->Deactivate();
+    MuzzleFlash->IsVisible = false;
+    CollisionComp->Update();
+    ArrowComp->Update();
     GunBase::Update();
+}
 
-    
+void ETG::AK47::Draw()
+{
+    GunBase::Draw();
+    if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
 ETG::AK47AnimComp::AK47AnimComp()
@@ -70,14 +81,14 @@ ETG::AK47AnimComp::AK47AnimComp()
 void ETG::AK47AnimComp::SetAnimations()
 {
     // Idle Animation
-    const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/AK47", "AK47_001", "png", 0.15f, true)};
+    const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/AK47", "AK47_Single001", "png", 0.15f, false)};
     AddGunAnimationForState(GunStateEnum::Idle, IdleAnim);
 
     // Shoot animations
-    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_shoot_001", "png", 0.08f)};
+    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_shoot_001", "png", 0.18f)};
     AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim);
 
     // Reload Animation
-    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_reload_001", "png", 0.10f, true)};
+    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_reload_001", "png", 0.10f, false)};
     AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim);
 }
