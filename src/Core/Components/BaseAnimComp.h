@@ -34,7 +34,7 @@ namespace ETG
         template <typename DirectionEnum>
         void AddAnimationsForState(StateEnum state, const std::vector<Animation>& animations);
 
-        void AddGunAnimationForState(StateEnum state, const Animation& animation);
+        void AddGunAnimationForState(StateEnum state, const Animation& animation, sf::Vector2f origin = {});
 
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
@@ -131,17 +131,25 @@ namespace ETG
     }
 
     template <typename StateEnum>
-    void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation)
+    void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation, sf::Vector2f origin)
     {
         auto animManager = AnimationManager{};
         animManager.AddAnimation(state, animation); // Using the state enum itself as the key
 
         if (!animation.FrameRects.empty())
         {
-            animManager.SetOrigin(state, sf::Vector2f{
-                                      (float)animation.FrameRects[0].width / 2,
-                                      (float)animation.FrameRects[0].height / 2
-                                  });
+            if (origin == sf::Vector2f{0,0})
+            {
+                animManager.SetOrigin(state, sf::Vector2f{
+                                          (float)animation.FrameRects[0].width / 2,
+                                          (float)animation.FrameRects[0].height / 2
+                                      });    
+            }
+            else
+            {
+                animManager.SetOrigin(state,origin);
+            }
+            
         }
 
         AnimManagerDict[state] = animManager;

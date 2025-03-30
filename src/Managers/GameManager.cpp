@@ -13,6 +13,7 @@
 #include "../Enemy/BulletMan/BulletMan.h"
 #include "../Items/Active/DoubleShoot.h"
 #include "../Items/Passive/PlatinumBullets.h"
+#include "../Guns/SawedOff/SawedOff.h"
 
 
 sf::Event ETG::GameManager::GameEvent{};
@@ -63,7 +64,8 @@ void ETG::GameManager::Initialize()
 
     PlatinumBullets = ETG::CreateGameObjectDefault<class PlatinumBullets>();
     DoubleShoot = ETG::CreateGameObjectDefault<class DoubleShoot>();
-    Ak47Pickup = ETG::CreateGameObjectDefault<class AK47>(sf::Vector2f{-100,100});
+    Ak47 = ETG::CreateGameObjectDefault<class AK47>(sf::Vector2f{-100,100});
+    SawedOff = ETG::CreateGameObjectDefault<class SawedOff>(sf::Vector2f{-150,100});
 
     
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
@@ -81,7 +83,8 @@ void ETG::GameManager::Update()
         InputManager::Update();
         Hero->Update();
         UI->Update();
-        Ak47Pickup->Update();
+        Ak47->Update();
+        SawedOff->Update();
         BulletMan->Update();
         PlatinumBullets->Update();
         DoubleShoot->Update();
@@ -102,7 +105,8 @@ void ETG::GameManager::Draw()
     BulletMan->Draw();
     PlatinumBullets->Draw();
     DoubleShoot->Draw();
-    Ak47Pickup->Draw();
+    Ak47->Draw();
+    SawedOff->Draw();
     GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.

@@ -35,16 +35,15 @@ void ETG::AK47::Initialize()
 {
     OriginOffset = {8.f, 5.f};
     ArrowComp->arrowOriginOffset = {-6.f, 0.f};
-    ArrowComp->arrowOffset = {25.f, -2.f};
+    ArrowComp->arrowOffset = {20.f, -3.f};
     CollisionComp->Initialize();
 
     
     // Load the projectile texture for AK-47
-    const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "AK-47" / "Projectile_AK-47.png").string();
+    const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles"  / "bullet_variant_002.png").string();
     if (!ProjTexture->loadFromFile(projPath))
         throw std::runtime_error("Failed to load Projectile_AK-47.png from path: " + projPath);
 
-    // --- NEW: Set up collision event to equip the gun on overlap ---
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
         if (auto* hero = dynamic_cast<Hero*>(eventData.Other))
@@ -80,6 +79,8 @@ ETG::AK47AnimComp::AK47AnimComp()
 
 void ETG::AK47AnimComp::SetAnimations()
 {
+    BaseAnimComp<GunStateEnum>::SetAnimations();
+
     // Idle Animation
     const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/AK47", "AK47_Single001", "png", 0.15f, false)};
     AddGunAnimationForState(GunStateEnum::Idle, IdleAnim);

@@ -19,7 +19,7 @@ public:
     float FrameInterval{};
     sf::IntRect CurrRect;
     std::shared_ptr<sf::Texture> Texture;
-    sf::Vector2f Origin;
+    mutable sf::Vector2f Origin;
     std::vector<sf::Rect<int>> FrameRects;
     bool IsValid = true;
     float flipX = 1.0f;

@@ -13,6 +13,7 @@ namespace ETG
     class BulletMan;
     class DoubleShoot;
     class AK47;
+    class SawedOff;
 
 
     class GameManager
@@ -37,7 +38,8 @@ namespace ETG
 
         std::unique_ptr<PlatinumBullets> PlatinumBullets; 
         std::unique_ptr<DoubleShoot> DoubleShoot; 
-        std::unique_ptr<AK47> Ak47Pickup;
+        std::unique_ptr<AK47> Ak47;
+        std::unique_ptr<SawedOff> SawedOff;
         
         Engine EngineUI{};
 
