@@ -15,6 +15,7 @@ namespace ETG
     {
     public:
         InputComponent();
+        void HandleDash(Hero& hero) const;
         void Update(Hero& hero) const;
         
         void PopulateSpecificWidgets() override;

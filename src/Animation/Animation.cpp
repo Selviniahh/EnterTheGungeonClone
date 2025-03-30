@@ -160,7 +160,7 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
 
     // Create the spritesheet as image
     sf::Image spriteImage;
-    spriteImage.create(totalWidth, maxHeight);
+    spriteImage.create(totalWidth, maxHeight, sf::Color::Transparent);
 
     // Copy images into the image
     unsigned int xOffset = 0;

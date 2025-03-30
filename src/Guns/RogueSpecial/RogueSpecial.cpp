@@ -8,7 +8,7 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 200.f,
 300.f,
 0.f,
-2,
+3.f,
 300,
 10,
 3.0f,

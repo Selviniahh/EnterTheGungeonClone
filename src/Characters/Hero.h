@@ -51,47 +51,17 @@ namespace ETG
         int currentGunIndex = 0; // Track the index of current gun
 
         //When equipping a new gun pickup
-        void EquipGun(GunBase* newGun)
-        {
-            EquippedGuns.push_back(newGun);
-            CurrentGun = newGun; // Set the new gun as the current one by default
-            currentGunIndex = EquippedGuns.size() - 1;
-            UpdateGunVisibility();
-        }
+        void EquipGun(GunBase* newGun);
 
         // When scrolling the mouse wheel, switch back to the default (index 0) gun.
-        void SwitchToPreviousGun()
-        {
-            // First check if we have any guns at all
-            if (EquippedGuns.empty()) return;
-    
-            // Move index backwards with wraparound
-            // No need for additional bounds check - the modulo operation guarantees the index is valid if the vector is not empty
-            currentGunIndex = (currentGunIndex - 1 + EquippedGuns.size()) % EquippedGuns.size();
-            CurrentGun = EquippedGuns[currentGunIndex];
-            UpdateGunVisibility();
-        }
-        void SwitchNextGun()
-        {
-            if (EquippedGuns.empty()) return;
-    
-            // Move index forwards with wraparound
-            currentGunIndex = (currentGunIndex + 1) % EquippedGuns.size();
-            CurrentGun = EquippedGuns[currentGunIndex];
-            UpdateGunVisibility();
-        }
+        void SwitchToPreviousGun();
+        void SwitchToNextGun();
 
         BOOST_DESCRIBE_CLASS(Hero, (GameObjectBase),
                              (MouseAngle, CurrentDirection, CurrentHeroState, IsShooting),
                              (),
                              ())
     private:
-        void UpdateGunVisibility()
-        {
-            for (GunBase* gun : EquippedGuns)
-            {
-                gun->IsVisible = (gun == CurrentGun);
-            }
-        }
+        void UpdateGunVisibility();
     };
 }

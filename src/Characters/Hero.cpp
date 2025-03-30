@@ -47,7 +47,8 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 void ETG::Hero::Initialize()
 {
     GameObjectBase::Initialize();
-    ReloadText->LinkToGun(dynamic_cast<GunBase*>(RogueSpecial.get()));
+    CurrentGun = RogueSpecial.get(); //Hero's default gun is RogueSpecial
+    ReloadText->LinkToGun(CurrentGun);
 
     //Set up collision delegates. Move these to initialize after it works well. 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
@@ -86,7 +87,6 @@ void ETG::Hero::Update()
 
     AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
     AnimationComp->FlipSpritesX(CurrentDirection, *this);
-
     AnimationComp->Update();
 
     //Set hand properties
@@ -94,18 +94,12 @@ void ETG::Hero::Update()
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
     Hand->Update();
 
-    //Gun
-    for (GunBase* gun : EquippedGuns)
-    {
-        if (gun != CurrentGun) gun->IsVisible = false;
-        else gun->IsVisible = true;
-    }
+    //Gun orientation
     CurrentGun->SetPosition(Hand->GetPosition() + Hand->GunOffset);
     CurrentGun->Rotation = MouseAngle;
-    CurrentGun->Update();
 
     //Shoot only if these conditions are met 
-    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading)
+    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading && !AnimationComp->IsDashing)
     {
         CurrentGun->PrepareShooting();
     }
@@ -120,8 +114,12 @@ void ETG::Hero::Update()
     ReloadText->Update();
 
     //If dashing do not draw gun and hand
-     Hand->IsVisible = !(AnimationComp->IsDashing); 
-     CurrentGun->IsVisible = !(AnimationComp->IsDashing); 
+    Hand->IsVisible = !(AnimationComp->IsDashing);
+    CurrentGun->IsVisible = !(AnimationComp->IsDashing);
+
+    //Update  all equipped guns (for their projectiles only)
+    for (const auto guns : EquippedGuns) guns->Update();
+    
     GameObjectBase::Update();
 }
 
@@ -135,10 +133,58 @@ void ETG::Hero::Draw()
     ReloadText->Draw();
     Hand->Draw();
 
+    //Draw all equipped guns (for their projectiles only)
+    for (const auto guns : EquippedGuns) guns->Draw();
+
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
+//----------------------------Gun Switch stuffs ----------------------------
 ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const
 {
-    return dynamic_cast<GunBase*>(CurrentGun);
+    return CurrentGun;
+}
+
+void ETG::Hero::EquipGun(GunBase* newGun)
+{
+    EquippedGuns.push_back(newGun);
+    CurrentGun = newGun; // Set the new gun as the current one by default
+    currentGunIndex = EquippedGuns.size() - 1;
+    ReloadText->LinkToGun(CurrentGun);
+    UpdateGunVisibility();
+}
+
+void ETG::Hero::SwitchToPreviousGun()
+{
+    // First check if we have any guns at all
+    if (EquippedGuns.empty()) return;
+
+    // Move index backwards (-1) with wraparound
+    // No need for additional bounds check - the modulo operation guarantees the index is valid if the vector is not empty
+    currentGunIndex = (currentGunIndex - 1 + EquippedGuns.size()) % EquippedGuns.size();
+    CurrentGun = EquippedGuns[currentGunIndex];
+    ReloadText->LinkToGun(CurrentGun);
+    ReloadText->SetNeedsReload(CurrentGun->IsMagazineEmpty());
+    UpdateGunVisibility();
+}
+
+//Gun switching
+void ETG::Hero::SwitchToNextGun()
+{
+    if (EquippedGuns.empty()) return;
+
+    // Move index forwards with wraparound
+    currentGunIndex = (currentGunIndex + 1) % EquippedGuns.size();
+    CurrentGun = EquippedGuns[currentGunIndex];
+    ReloadText->LinkToGun(CurrentGun);
+    ReloadText->SetNeedsReload(CurrentGun->IsMagazineEmpty());
+    UpdateGunVisibility();
+}
+
+void ETG::Hero::UpdateGunVisibility()
+{
+    for (GunBase* gun : EquippedGuns)
+    {
+        gun->IsVisible = (gun == CurrentGun);
+    }
 }

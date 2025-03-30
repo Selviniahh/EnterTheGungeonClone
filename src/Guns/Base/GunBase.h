@@ -39,6 +39,7 @@ namespace ETG
         void SetShootSound(const std::string& soundPath);
         void SetReloadSound(const std::string& soundPath);
         void FireBullet(float projectileAngle); //Fire an individual bullet
+        [[nodiscard]] bool IsMagazineEmpty() const {return MagazineAmmo == 0;}; //Check if the magazine is empty
 
         //NOTE: only modifier we have so far. I didn't deem necessary to define this as smart pointer 
         ModifierManager<IGunModifier> modifierManager; 

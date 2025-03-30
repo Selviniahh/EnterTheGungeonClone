@@ -6,8 +6,8 @@
 #include "../../Characters/Hero.h"
 
 ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
-    0.27f,     // FireRate
-    250.0f,     // ShotSpeed
+    0.4f,     // FireRate
+    150.0f,     // ShotSpeed
     1000.0f,    // Range (should be infinite but I will just give 2000)
     0.0f,      // timerForVelocity
     3.0f,      // depth
@@ -16,7 +16,7 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
     2.0f,      // ReloadTime
     5.5f,      // Damage
     9.0f,      // Force
-    5.0f)      // Spread (in degrees)
+    3.0f)      // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<AK47AnimComp>(this);
     SetShootSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "AK47Shoot.ogg").generic_string());
@@ -89,6 +89,6 @@ void ETG::AK47AnimComp::SetAnimations()
     AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim);
 
     // Reload Animation
-    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_reload_001", "png", 0.10f, false)};
+    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_reload_001", "png", 3.00f, false)};
     AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim);
 }

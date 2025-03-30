@@ -1,6 +1,8 @@
 #include <filesystem>
 #include "GunBase.h"
 #include <random>
+
+#include "../../Characters/Hero.h"
 #include "../../Projectile/ProjectileBase.h"
 #include "../../Managers/Globals.h"
 #include "../../Managers/SpriteBatch.h"
@@ -118,13 +120,7 @@ namespace ETG
 
         // Update projectiles.
         UpdateProjectiles();
-
-        //If R pressed, reload
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
-        {
-            CurrentGunState = GunStateEnum::Reload; //update animation
-            Reload();
-        }
+        
         ReloadSlider->Update();
     }
 
@@ -159,7 +155,8 @@ namespace ETG
             {
                 UnregisterGameObject(it->get()->GetObjectName());
 
-                //Because initialized projectile moved to this container with std::move, owner of the object is this container. Simply removing the element from the vector will invoke
+                //Because initialized projectile moved to this container with std::move: "projectiles.push_back(std::move(proj));", owner of the object is this container.
+                //Simply removing the element from the vector will invoke
                 //unique_ptr's destructor because unique_ptr requires 1 owner and since owner is gone, it'll automatically call destructor right away after this erase call.
                 it = projectiles.erase(it); //After erase, set iterator to next iterator after the one removed
             }
@@ -243,7 +240,8 @@ namespace ETG
     {
         //IF already reloading or magazine is full do not invoke again
         if (IsReloading || MagazineAmmo == MagazineSize) return;
-        
+
+        CurrentGunState = GunStateEnum::Reload; //update animation
         IsReloading = true;
         ReloadSound.play();
         OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
