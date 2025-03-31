@@ -78,6 +78,8 @@ void ETG::ShowImGuiWidget<bool>(const char* label, bool& value)
 # Possible errors
 1. `error: no matching function for call to 'PopulateReflection'`
     - `BOOST_DESCRIBE_CLASS` given for the type but not defined in `TypeRegistry.h` with `RegisterType`
+2. `error: no matching function for call to 'HasMembers'`
+   - Child class contains `BOOST_DESCRIBE_CLASS` but not the base class. The base class should also be defined with `BOOST_DESCRIBE_CLASS`
 Track the error output to find the class that is not registered. Example: `note: in instantiation of function template specialization 'ETG::TypeRegistry::RegisterType<ETG::AmmoCounter>' requested here`
 
 ___

@@ -11,8 +11,7 @@ class Math
     Math() = delete;
 
 public:
-
-    template<typename T>
+    template <typename T>
     static T GenRandomNumber(const T& min, const T& max)
     {
         static std::mt19937 gen(std::random_device{}());
@@ -21,16 +20,16 @@ public:
         if constexpr (std::is_integral_v<T>)
         {
             std::uniform_int_distribution<T> dis(min, max);
-            return dis(gen);            
+            return dis(gen);
         }
         //floating point specialization
-        else if constexpr (std::is_floating_point_v<T>) 
+        else if constexpr (std::is_floating_point_v<T>)
         {
             std::uniform_real_distribution<T> dis(min, max);
             return dis(gen);
         }
     }
-    
+
     //length: Compute the magnitude of the vector using the formula sqrt(x^2 + y^2)
     // Division: Divide the vector components by the magnitude to scale it to a unit vector (length 1).
     template <typename T>
@@ -62,6 +61,11 @@ public:
     static inline T VectorSizeSquared(const sf::Vector2<T>& Vector)
     {
         return Vector.x * Vector.x + Vector.y * Vector.y;
+    }
+
+    static float Length(const sf::Vector2f& vector)
+    {
+        return std::sqrt(vector.x * vector.x + vector.y * vector.y);
     }
 
     template <typename T>

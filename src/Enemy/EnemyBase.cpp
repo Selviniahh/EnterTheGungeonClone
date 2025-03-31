@@ -9,7 +9,7 @@
 namespace ETG
 {
     // Add constructor that initializes everything to nullptr
-    EnemyBase::EnemyBase(): RogueSpecial(nullptr) , HealthComp(nullptr) , Hand(nullptr), Hero(GameState::GetInstance().GetHero())
+    EnemyBase::EnemyBase() : HealthComp(nullptr), Hand(nullptr), Hero(GameState::GetInstance().GetHero())
     {
     }
 

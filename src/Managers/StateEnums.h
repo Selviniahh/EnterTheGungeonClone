@@ -46,7 +46,9 @@ namespace ETG
         Idle,
         Run,
         Dash,
-        Die
+        Die,
+        Shooting,
+        Hit
     };
     BOOST_DESCRIBE_ENUM(EnemyStateEnum, Idle, Run, Dash, Die)
 
@@ -66,6 +68,23 @@ namespace ETG
         Idle_Left
     };
     BOOST_DESCRIBE_ENUM(BulletManIdleEnum, Idle_Back, Idle_Left, Idle_Right)
+
+    enum class BulletManShootingEnum
+    {
+        Shoot_Left,
+        Shoot_Right,
+    };
+    BOOST_DESCRIBE_ENUM(BulletManShootingEnum, Shoot_Left, Shoot_Right)
+
+    enum class BulletManHitEnum
+    {
+        Hit_Back_Left,
+        Hit_Back_Right,
+        Hit_Left,
+        Hit_Right
+    };
+    
+    BOOST_DESCRIBE_ENUM(BulletManHitEnum, Hit_Back_Left, Hit_Back_Right, Hit_Left, Hit_Right)
     
     enum class GunStateEnum
     {
