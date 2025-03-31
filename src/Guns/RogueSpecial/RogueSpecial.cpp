@@ -26,7 +26,6 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 
 void ETG::RogueSpecial::Initialize()
 {
-    OriginOffset = {1.f, 10.f};
     ArrowComp->arrowOriginOffset = {-6.f, 0.f};
     ArrowComp->arrowOffset = {20.f, -6.f};
 
@@ -68,13 +67,13 @@ void ETG::RogueSpecialAnimComp::SetAnimations()
 {
     //Idle Animation
     const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/RogueSpecial", "RogueSpecial_Idle", "png", 0.15f, true)};
-    AddGunAnimationForState(GunStateEnum::Idle, IdleAnim);
+    AddGunAnimationForState(GunStateEnum::Idle, IdleAnim, true, sf::Vector2f{1,10});
 
     //Shoot animations
     const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/RogueSpecial/Fire", "knav3_fire_001", "png", 0.15f)};
-    AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim);
+    AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim, true, sf::Vector2f{1,10});
 
     //Reload Animation
     const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/RogueSpecial", "RogueSpecial_Reload", "png", 0.15f, true)};
-    AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim);
+    AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim, true, sf::Vector2f{1,10});
 }

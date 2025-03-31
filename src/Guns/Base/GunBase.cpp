@@ -66,6 +66,8 @@ namespace ETG
 
     void GunBase::Initialize()
     {
+        Timer = FireRate + 1; //Set timer to be greater than fire rate so that we can shoot immediately
+
         //The origin manually needs to be given because when gun rotating, it has to rotate around the attachment point which is the handle point of the gun. 
         this->Origin += OriginOffset;
         ArrowComp->SetOrigin(ArrowComp->GetOrigin() + ArrowComp->arrowOriginOffset);
@@ -106,8 +108,19 @@ namespace ETG
         {
             CurrentGunState = GunStateEnum::Idle;
         }
+        // Durin reload if reload animation has finished, we have to revert back to idle state
+        // else if (AnimationComp->CurrentState == GunStateEnum::Reload &&
+        //     AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
+        // {
+        //     // Reload is finished - refill magazine and return to idle
+        //     //TODO: Weirdly, I wrote reloading logic inside ReloadText UI class. I have to create delegates to fire one from here and then migrate reload logic to here
+        //     AnimationComp->AnimManagerDict[AnimationComp->CurrentState].CurrentAnim->Restart();
+        //     CurrentGunState = GunStateEnum::Idle;
+        //     IsReloading = false;
+        //     MagazineAmmo = MagazineSize; // Refill the magazine
+        // }
 
-        // Update arrow properties.
+        // Continue with the rest of the update logic
         ArrowComp->SetPosition(this->Position + Math::RotateVector(Rotation, Scale, ArrowComp->arrowOffset));
         ArrowComp->SetRotation(this->GetDrawProperties().Rotation);
         ArrowComp->Update();
@@ -120,7 +133,7 @@ namespace ETG
 
         // Update projectiles.
         UpdateProjectiles();
-        
+
         ReloadSlider->Update();
     }
 
@@ -186,28 +199,33 @@ namespace ETG
             //Consume ammo only once per shot group regardless of MultiShotModifier
             MagazineAmmo--;
 
-            //Queue any additional bullets with delay
-            for (int i = 0; i < shotCount; i++)
-            {
-                float projectileAngle = Rotation;
-
-                //Apply spread variation
-                if (EffectiveSpread > 0)
-                {
-                    std::mt19937 engine(std::random_device{}());
-                    std::uniform_real_distribution<float> dist(-EffectiveSpread, EffectiveSpread);
-                    projectileAngle += dist(engine);
-                }
-
-                //Queue the bullet
-                bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
-            }
+            EnqueueProjectiles(shotCount, EffectiveSpread);
         }
 
         //Handle ammo depletion
         if (MagazineAmmo == 0)
         {
             OnAmmoRunOut.Broadcast(true);
+        }
+    }
+
+    void GunBase::EnqueueProjectiles(const int shotCount, const float EffectiveSpread)
+    {
+        //Queue any additional bullets with delay
+        for (int i = 0; i < shotCount; i++)
+        {
+            float projectileAngle = GameObjectBase::Rotation;
+
+            //Apply spread variation
+            if (EffectiveSpread > 0)
+            {
+                std::mt19937 engine(std::random_device{}());
+                std::uniform_real_distribution<float> dist(-EffectiveSpread, EffectiveSpread);
+                projectileAngle += dist(engine);
+            }
+
+            //Queue the bullet
+            bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
         }
     }
 

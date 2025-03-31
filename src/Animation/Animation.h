@@ -51,5 +51,11 @@ public:
     //There's no Y axis sprite sheet creation. Only X 
     static Animation CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, float eachFrameSpeed, bool IsSingleSprite = false);
 
+    static Animation CreateVariableWidthSpriteSheet(const std::string& RelativePath, 
+                                               const std::string& FileName, 
+                                               const std::string& Extension, 
+                                               float eachFrameSpeed,
+                                               bool IsSingleSprite = false);
+
     BOOST_DESCRIBE_CLASS(Animation, (GameClass), (CurrRect, Texture, Origin, FrameRects, IsValid, flipX, Active), (), (FrameInterval))
 };

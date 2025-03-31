@@ -79,7 +79,6 @@ namespace ETG
         if (!hero.CurrentGun->IsReloading && GameManager::GameEvent.type == sf::Event::MouseWheelScrolled && GameManager::GameEvent.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
         {
             {
-                std::cout << "Scrolled " << std::endl;
                 if (GameManager::GameEvent.mouseWheelScroll.delta > 0)
                     hero.SwitchToPreviousGun();
                 else if (GameManager::GameEvent.mouseWheelScroll.delta < 0)

@@ -72,7 +72,6 @@ void ETG::DoubleShoot::RequestUsage()
     if (ActiveItemState == ActiveItemState::Ready)
     {
         ActivateSound.play();
-        std::cout << "Double shoot activated!" << std::endl;
 
         // Reset state
         ActiveItemState = ActiveItemState::Consuming;

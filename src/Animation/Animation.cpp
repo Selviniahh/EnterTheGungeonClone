@@ -112,7 +112,6 @@ float Animation::GetTotalAnimationTime() const
 
 Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, const float eachFrameSpeed, bool IsSingleSprite)
 {
-    // Initial setup
     std::vector<sf::Image> imageArr;
     int counter = 0;
     int totalWidth = 0, maxHeight = 0;
@@ -120,7 +119,6 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
     char LastChar = basePath[basePath.length() - 1];
     std::string filePath;
 
-    // If lastChar is number, it means it will be a spritesheet. If not the spritesheet will be single.
     if (static_cast<int>(LastChar) >= 48 && static_cast<int>(LastChar) <= 57)
     {
         counter = LastChar - '0';
@@ -140,21 +138,16 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
     while (true)
     {
         sf::Image singleImage;
-
-        // If the sprite is single, just load and exit the loop. If it's multiple sprites, load all 
-        IsSingleSprite ? filePath = basePath + "." + Extension : filePath = basePath + std::to_string(counter) + "." + Extension; 
-        
+        filePath = IsSingleSprite ? basePath + "." + Extension : basePath + std::to_string(counter) + "." + Extension;
         if (!std::filesystem::exists(filePath)) break;
 
         if (!singleImage.loadFromFile(filePath))
             throw std::runtime_error("Failed to load image: " + filePath);
 
         imageArr.push_back(singleImage);
-        counter++;
-
         totalWidth += int(singleImage.getSize().x);
         maxHeight = std::max(maxHeight, int(singleImage.getSize().y));
-
+        counter++;
         if (IsSingleSprite) break;
     }
 
@@ -164,17 +157,22 @@ Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const st
 
     // Copy images into the image
     unsigned int xOffset = 0;
+    std::vector<sf::Rect<int>> customFrameRects;
     for (auto& image : imageArr)
     {
         spriteImage.copy(image, xOffset, 0);
+        // Create frame rect based on the actual image size
+        sf::IntRect frameRect(xOffset, 0, image.getSize().x, image.getSize().y);
+        customFrameRects.push_back(frameRect);
         xOffset += image.getSize().x;
     }
 
-    // Convert image into texture and draw it
     auto spriteTex = std::make_shared<sf::Texture>();
     spriteTex->loadFromImage(spriteImage);
 
-    auto anim = Animation{spriteTex, eachFrameSpeed, int(imageArr.size()), 1};
+    Animation anim(spriteTex, eachFrameSpeed, int(imageArr.size()), 1);
+    // Overwrite the auto-generated frame rectangles with our custom ones
+    anim.FrameRects = customFrameRects;
     anim.AnimPathName = RelativePath + FileName;
     return anim;
 }

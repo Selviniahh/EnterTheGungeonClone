@@ -75,7 +75,6 @@ void ETG::FrameLeftProgressBar::Update()
             progressRect.setSize({maxWidth, -CurrProgressY});
             IsVisible = true;
             
-            std::cout << "Cooldown state: " << std::endl;
         }
 }
 

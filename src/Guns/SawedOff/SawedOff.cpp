@@ -4,24 +4,25 @@
 #include "../../Core/Components/CollisionComponent.h"
 #include "../../Characters/Hero.h"
 #include "SawedOff.h"
+#include "../../Utils/Math.h"
 
 ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
-1.5f,     // FireRate
-100.0f,     // ShotSpeed
-200.0f,    // Range (should be infinite but I will just give 2000)
-0.0f,      // timerForVelocity
-3.0f,      // depth
-165,       // MaxAmmo
-6,        // MagazineSize
-5.0f,      // ReloadTime
-5.5f,      // Damage
-0.f,      // Force
-3.0f)      // Spread (in degrees)
+                                                           1.8f, // FireRate
+                                                           100.0f, // ShotSpeed
+                                                           200.0f, // Range (should be infinite but I will just give 2000)
+                                                           0.0f, // timerForVelocity
+                                                           3.0f, // depth
+                                                           165, // MaxAmmo
+                                                           6, // MagazineSize
+                                                           5.0f, // ReloadTime
+                                                           5.5f, // Damage
+                                                           0.f, // Force
+                                                           3.0f) // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<SawedOffAnimComp>(this);
     SetShootSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "AK47Shoot.ogg").generic_string());
     SetReloadSound((std::filesystem::path(RESOURCE_PATH) / "Sounds" / "AK47Reload.ogg").generic_string());
-    
+
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
@@ -34,13 +35,12 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
 void ETG::SawedOff::Initialize()
 {
     GunBase::Initialize();
-    Timer = FireRate + 1; //Set timer to be greater than fire rate so that we can shoot immediately
-    OriginOffset = {1.f, 5.f};
+    // OriginOffset = {1.f, 5.f};
     ArrowComp->arrowOriginOffset = {-6.f, 0.f};
     ArrowComp->arrowOffset = {15.f, -4.f};
     CollisionComp->Initialize();
 
-    const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles"  / "bullet_variant_003.png").string();
+    const auto projPath = (std::filesystem::path(RESOURCE_PATH) / "Projectiles" / "bullet_variant_003.png").string();
     if (!ProjTexture->loadFromFile(projPath))
         throw std::runtime_error("Failed to load Projectile_SawedOff.png from path: " + projPath);
 
@@ -73,35 +73,26 @@ void ETG::SawedOff::Draw()
 }
 
 //Because we will do something different, we need to override this function without calling base function
-void ETG::SawedOff::PrepareShooting()
+void ETG::SawedOff::EnqueueProjectiles(const int shotCount, const float EffectiveSpread)
 {
-    if (Timer >= FireRate)
+    //Queue any additional bullets with delay
+    for (int i = 0; i < shotCount; i++)
     {
-        //Reset firing timer
-        Timer = 0;
-
-        //NOTE: DO NOT MISS HERE!!!!!!! Apply modifiers if present. Later on when all of these modifiers will get complex, a new class that will only handle modifiers should be created. 
-        int shotCount = 1;
-        float EffectiveSpread = Spread; //Because Spread needs to be reverted back, when modifier overs, in place temp local variable required 
-        if (const auto& multiMod = modifierManager.GetModifier<MultiShotModifier>())
+        float projectileAngle = Rotation;
+        float LastBulletSpread = 10;
+        //Apply spread variation
+        if (EffectiveSpread > 0)
         {
-            shotCount = multiMod->GetShotCount();
-            EffectiveSpread = multiMod->GetSpread();
+            LastBulletSpread += Math::GenRandomNumber(-LastBulletSpreadAmount, LastBulletSpreadAmount);
         }
+        
+        //Queue the bullet
+        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
+        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle - 15});
+        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle + 15});
 
-        //Consume ammo only once per shot group regardless of MultiShotModifier
-        MagazineAmmo--;
-
-        //Queue any additional bullets with delay
-        for (int i = 0; i < shotCount; i++)
-        {
-            float projectileAngle = Rotation;
-
-            //Queue the bullet
-            bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
-            bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle - 15});
-            bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle + 15});
-        }
+        //Last bullet should shoot with a bit of spread and delay
+        bulletQueue.push_back({i * MULTI_SHOT_DELAY + Math::GenRandomNumber(LastBulletDelayMin,LastBulletDelayMax), projectileAngle + Math::GenRandomNumber(-LastBulletSpread, LastBulletSpread)});
     }
 
     //Handle ammo depletion
@@ -109,6 +100,7 @@ void ETG::SawedOff::PrepareShooting()
     {
         OnAmmoRunOut.Broadcast(true);
     }
+    
 }
 
 ETG::SawedOffAnimComp::SawedOffAnimComp()
@@ -122,17 +114,16 @@ void ETG::SawedOffAnimComp::SetAnimations()
     BaseAnimComp<GunStateEnum>::SetAnimations();
     // Idle Animation
     const Animation IdleAnim = {Animation::CreateSpriteSheet("Guns/SawedOff", "sawed_off_shotgun_idle_001", "png", 0.15f, false)};
-    IdleAnim.Origin = {45.f, 5.f};
-    AddGunAnimationForState(GunStateEnum::Idle, IdleAnim, {45.f, 5.f});
+    IdleAnim.Origin = {1.f, 5.f};
+    AddGunAnimationForState(GunStateEnum::Idle, IdleAnim, true, IdleAnim.Origin);
 
     // Shoot Animations
-    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/SawedOff", "sawed_off_shotgun_fire_001", "png", 0.15f)};
+    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/SawedOff", "sawed_off_shotgun_fire_001", "png", ShootAnimInterval)};
     ShootAnim.Origin = {1.f, 5.f};
-    AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim, {1.f, 5.f});
+    AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim, true, ShootAnim.Origin);
 
     // Reload Animation
-    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/SawedOff", "sawed_off_shotgun_reload_001", "png", 0.25f, false)};
-    ReloadAnim.Origin = {45.f, 5.f};
-    AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim, {50.f, 5.f}); //IDK why origin not changing. 
-    
+    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/SawedOff", "sawed_off_shotgun_reload_001", "png", ReloadAnimInterval)};
+    ReloadAnim.Origin = {5.f, 5.f};
+    AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim, true, ReloadAnim.Origin);  
 }

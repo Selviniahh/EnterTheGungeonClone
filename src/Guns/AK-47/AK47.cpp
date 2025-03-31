@@ -33,9 +33,8 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
 
 void ETG::AK47::Initialize()
 {
-    OriginOffset = {8.f, 5.f};
     ArrowComp->arrowOriginOffset = {-6.f, 0.f};
-    ArrowComp->arrowOffset = {20.f, -3.f};
+    ArrowComp->arrowOffset = {15.f, -2.f};
     CollisionComp->Initialize();
 
     

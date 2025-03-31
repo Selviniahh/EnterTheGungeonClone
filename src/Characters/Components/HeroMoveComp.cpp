@@ -67,13 +67,11 @@ namespace ETG {
     {
         HeroPtr->AnimationComp->OnDashStart.AddListener([this](const HeroDashEnum direction)
         {
-            std::cout << "Dash started in direction: " << EnumToString(direction) << std::endl;
             ApplyDashImpulse();
         });
 
         HeroPtr->AnimationComp->OnDashEnd.AddListener([this]()
         {
-            std::cout << "Dash ended" << std::endl;
             HeroPtr->AnimationComp->IsDashing = false;
             DashTimer = 0.f;
         });
@@ -83,7 +81,6 @@ namespace ETG {
     {
         //Calculate dash progress (0 to DashDuration). For now DashDuration will only be 0.46 seconds for Right and Left dash. Rest will be 0.62 seconds
         const float dashProgress = DashTimer / DashDuration;
-        std::cout << DashTimer << std::endl;
 
         //Use bell curve to get velocity
         const sf::Vector2f dashVelocity = Math::ApplyBellCurveForce(dashProgress, DashDirection, DashAmount, Globals::FrameTick);

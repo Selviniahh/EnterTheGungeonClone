@@ -34,7 +34,7 @@ namespace ETG
         DrawProperties SliderValProps;
 
         float BarOffsetY = 20.0f;
-        float PositionTolerance = 1.0f;
+        float PositionTolerance = 0.10f;
 
         Hero* Hero = nullptr;
         GunBase* Gun = nullptr;
