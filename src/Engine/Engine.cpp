@@ -24,7 +24,7 @@ void Engine::Initialize()
     //Initialize Imgui-SFML after creating the window
     if (!ImGui::SFML::Init(*Window)) throw std::runtime_error("Cannot initialize ImGUI with the given Window");
 
-    GameState::GetInstance().SetEngineUISize(windowSize);
+    GameState::GetInstance().SetEngineUISize(&windowSize);
     windowSize = {400, (float)(Window->getSize().y)};
     std::cout << std::unitbuf;
 
@@ -44,6 +44,10 @@ void Engine::Update()
 
     // Use no flags to allow all default window behaviors (dragging, resizing)
     ImGui::Begin("Details Pane", nullptr);
+
+    //If window is updated, need to assign to this variable so Game UI can be updated
+    windowSize = ImGui::GetWindowSize();
+    
     UpdateDetailsPanel();
 
     PreviousGameFocus = CurrentGameFocus;

@@ -45,9 +45,7 @@ void ETG::ProjectileBase::Update()
 
 void ETG::ProjectileBase::Draw()
 {
-    //Calling this is necessary. When the projectiles are spawned, Update Function called After Draw. Somehow Update needs to be called before Draw. Calling this function instead is just a temp solution. 
-    // ComputeDrawProperties();
-    
+    IsVisible = true;
     auto& DrawableProps = GetDrawProperties();
     sf::Sprite frame;
     frame.setTexture(*Texture);

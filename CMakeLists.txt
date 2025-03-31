@@ -93,6 +93,12 @@ add_executable(ETG main.cpp
         src/Items/Active/ActiveItemBase.cpp
         src/Utils/Interface/IGunModifier.h
         src/Modifiers/Gun/MultiShotModifier.h
+        src/Guns/AK-47/AK47.cpp
+        src/Guns/AK-47/AK47.h
+        src/Guns/SawedOff/SawedOff.cpp
+        src/Guns/SawedOff/SawedOff.h
+        src/Guns/Magnum/Magnum.cpp
+        src/Guns/Magnum/Magnum.h
 )
 
 # Easiest and fastest way is VCPKG 

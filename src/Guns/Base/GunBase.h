@@ -31,14 +31,24 @@ namespace ETG
 
         ~GunBase() override;
         void Initialize() override;
-        void UpdateProjectiles(); //If projectile needs to be removed, remove and update
         void Update() override;
         void Draw() override;
+
+        //When left click pressed from hero, this will be called. Based on the timer and fire rate, will be called to fire the bullets.
+        //NOTE: This will handle every base gun should handle. They are: Check if shooting is possible, decrement magazine size, apply modifiers, broadcast event etc. NO SHOOTING LOGIC
         virtual void PrepareShooting(); //queue the bulletQueue
+
+        //NOTE: This is the actual projectile firing logic. Override this without calling base in child to implement custom shooting logic
+        virtual void EnqueueProjectiles(int shotCount, float EffectiveSpread);
+
+        //NOTE: EnqueueProjectiles will add projectiles to the queue, this function will fire them in tick.
+        void UpdateProjectiles(); //If projectile needs to be removed, remove and update
+
         virtual void Reload();
         void SetShootSound(const std::string& soundPath);
         void SetReloadSound(const std::string& soundPath);
         void FireBullet(float projectileAngle); //Fire an individual bullet
+        [[nodiscard]] bool IsMagazineEmpty() const {return MagazineAmmo == 0;}; //Check if the magazine is empty
 
         //NOTE: only modifier we have so far. I didn't deem necessary to define this as smart pointer 
         ModifierManager<IGunModifier> modifierManager; 
@@ -106,8 +116,8 @@ namespace ETG
         sf::SoundBuffer ReloadSoundBuffer;
         sf::Sound ReloadSound;
 
-        float ShootSoundVolume = 30;
-        float ReloadSoundVolume = 30;
+        float ShootSoundVolume = 10;
+        float ReloadSoundVolume = 10;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase),
                              (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ReloadTime, IsReloading,
@@ -116,6 +126,7 @@ namespace ETG
                              ())
     };
 
+    //A bullet for now only has time to fire and angle.
     struct QueuedBullet
     {
         float timeToFire;

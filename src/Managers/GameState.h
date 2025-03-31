@@ -24,7 +24,7 @@ namespace ETG
         [[nodiscard]] Hero* GetHero() const { return MainHero; }
         [[nodiscard]] std::unordered_map<std::string, GameObjectBase*>& GetSceneObjs() const { return *SceneObjs; } //Original method for fast lookups
         [[nodiscard]] std::vector<GameObjectBase*>& GetOrderedSceneObjs() {return OrderedSceneObjs;} //New, for ordered hierarchy pane 
-        [[nodiscard]] sf::Vector2f& GetEngineUISize() { return EngineUISize; }
+        [[nodiscard]] sf::Vector2f* GetEngineUISize() const { return EngineUISize; }
         [[nodiscard]] Scene* GetSceneObj() const { return SceneObj; }
         [[nodiscard]] sf::RenderWindow* GetRenderWindow() const { return Window; }
         [[nodiscard]] std::vector<PassiveItemBase*>& GetEquippedPassiveItems() { return EquippedPassiveItems; }
@@ -32,7 +32,7 @@ namespace ETG
 
         void SetHero(Hero* hero) { MainHero = hero; }
         void SetSceneObjs(std::unordered_map<std::string, GameObjectBase*>& sceneObj) { SceneObjs = &sceneObj; }
-        void SetEngineUISize(sf::Vector2f& size) { EngineUISize = std::ref(size); }
+        void SetEngineUISize(sf::Vector2f* size) { EngineUISize = size; }
         void SetSceneObj(Scene* sceneObj) { SceneObj = sceneObj; }
         void SetRenderWindow(sf::RenderWindow* window) { Window = window; }
 
@@ -52,7 +52,7 @@ namespace ETG
         sf::RenderWindow* Window;
         
         //Owned objects
-        sf::Vector2f EngineUISize{};
+        sf::Vector2f* EngineUISize{};
         std::vector<PassiveItemBase*> EquippedPassiveItems{};
         std::vector<ActiveItemBase*> EquippedActiveItems{};
     };

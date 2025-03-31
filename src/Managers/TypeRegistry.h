@@ -26,6 +26,9 @@
 #include "../Core/Components/CollisionComponent.h"
 #include "../Items/Active/DoubleShoot.h"
 #include "../Items/Passive/PlatinumBullets.h"
+#include "../Guns/AK-47/AK47.h"
+#include "../Guns/Magnum/Magnum.h"
+#include "../Guns/SawedOff/SawedOff.h"
 
 //TODO: This class should be completely automated. A script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
 //TODO: generate all the RegisterType<ClassName> automatically. All source should be gathered in build directory and every file should have suffix "Gen` For example "HeroGen" just like unreal engine
@@ -129,6 +132,10 @@ namespace ETG
             RegisterType<DoubleShoot>();
             RegisterType<PassiveItemBase>();
             RegisterType<PlatinumBullets>();
+            RegisterType<AK47>();
+            RegisterType<SawedOff>();
+            RegisterType<Magnum>();
+            RegisterType<SawedOffAnimComp>();
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;

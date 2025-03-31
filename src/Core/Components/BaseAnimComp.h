@@ -34,7 +34,7 @@ namespace ETG
         template <typename DirectionEnum>
         void AddAnimationsForState(StateEnum state, const std::vector<Animation>& animations);
 
-        void AddGunAnimationForState(StateEnum state, const Animation& animation);
+        void AddGunAnimationForState(StateEnum state, const Animation& animation, bool IsManualOrigin = false, sf::Vector2f origin = {});
 
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
@@ -83,6 +83,7 @@ namespace ETG
         CurrTexRect = animState.CurrRect;
         CurrentTex = animState.GetCurrentFrameAsTexture();
         Owner->Texture = CurrentTex;
+        Owner->SetOrigin(animManager.AnimationDict[CurrentAnimStateKey].Origin);
 
         ChangeAnimStateIfRequired(animKey);
     }
@@ -131,17 +132,26 @@ namespace ETG
     }
 
     template <typename StateEnum>
-    void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation)
+    void BaseAnimComp<StateEnum>::AddGunAnimationForState(StateEnum state, const Animation& animation, const bool IsManualOrigin, sf::Vector2f origin)
     {
         auto animManager = AnimationManager{};
         animManager.AddAnimation(state, animation); // Using the state enum itself as the key
 
         if (!animation.FrameRects.empty())
         {
-            animManager.SetOrigin(state, sf::Vector2f{
-                                      (float)animation.FrameRects[0].width / 2,
-                                      (float)animation.FrameRects[0].height / 2
-                                  });
+            //If manually origin is given, set the given origin for the current animation
+            if (IsManualOrigin)
+            {
+                animManager.SetOrigin(state, origin);
+            }
+            //IF manually origin is not given, by default set the origin to be the center of the first frame
+            else
+            {
+                animManager.SetOrigin(state, sf::Vector2f{
+                                          (float)animation.FrameRects[0].width / 2,
+                                          (float)animation.FrameRects[0].height / 2
+                                      });
+            }
         }
 
         AnimManagerDict[state] = animManager;

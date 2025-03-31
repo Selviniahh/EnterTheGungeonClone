@@ -21,6 +21,7 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
+        void SetNeedsReload(const bool needsReload) { NeedsReload = needsReload; }
 
         // Method to link to a gun's events
         void LinkToGun(GunBase* gun);
@@ -29,15 +30,16 @@ namespace ETG
         bool isVisible = true;
         float TextureYOffset = -20;
         Hero* Hero{nullptr};
+        GunBase* CurrentGun{nullptr};
         bool NeedsReload = false;
-        
+
         float BlinkInterval = 2.5f; //total time for fade cycle
-        float blinkTimer{}; 
+        float blinkTimer{};
 
         // Callback for the ammo state changed event
         void OnAmmoStateChanged(bool isEmpty);
 
-        BOOST_DESCRIBE_CLASS(ReloadText, (GameObjectBase),(),(),(isVisible,TextureYOffset, NeedsReload, BlinkInterval, blinkTimer))
+        BOOST_DESCRIBE_CLASS(ReloadText, (GameObjectBase), (), (), (isVisible,TextureYOffset, NeedsReload, BlinkInterval, blinkTimer))
     };
 
     inline ReloadText::ReloadText()
@@ -57,12 +59,15 @@ namespace ETG
         Color = sf::Color{255, 255, 255, 255};
     }
 
+    //We will relink the gun when we change the gun
     inline void ReloadText::LinkToGun(GunBase* gun)
     {
         if (gun)
         {
             // Register our callback with the gun's event
-            gun->OnAmmoRunOut.AddListener([this](const bool isEmpty)
+            CurrentGun = gun;
+            CurrentGun->OnAmmoRunOut.Clear();
+            CurrentGun->OnAmmoRunOut.AddListener([this](const bool isEmpty)
             {
                 this->OnAmmoStateChanged(isEmpty);
             });
@@ -83,7 +88,7 @@ namespace ETG
     {
         if (!NeedsReload) return;
         Position = Hero->GetPosition() + sf::Vector2f{0, TextureYOffset};
-        
+
         Color.a = Math::SinWaveLerp(25.f, 255.f, BlinkInterval, blinkTimer);
         GameObjectBase::Update();
     }

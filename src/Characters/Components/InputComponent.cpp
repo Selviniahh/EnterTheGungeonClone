@@ -4,6 +4,7 @@
 #include "HeroAnimComp.h"
 #include "HeroMoveComp.h"
 #include "../Hero.h"
+#include "../../Managers/GameManager.h"
 #include "../../Managers/InputManager.h"
 #include "../../Utils/DirectionUtils.h"
 #include "../../Utils/Math.h"
@@ -22,17 +23,15 @@ namespace ETG
     }
 
     void InputComponent::Update(Hero& hero) const
-    { 
+    {
         UpdateDirection(hero);
+        HandleGunSwitch(hero);
+        HandleDash(hero);
 
-        //If right-clicked, start dashing if possible
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing && hero.MoveComp->IsDashAvailable())
+        //Reload the gun if R pressed and hero is not dashing 
+        if (!hero.AnimationComp->IsDashing && sf::Keyboard::isKeyPressed(sf::Keyboard::R))
         {
-            const HeroDashEnum dashDirection = DirectionUtils::GetDashDirectionEnum(); //If you put breakpoint this line, direction enum will always be unknown so put breakpoint below this line to capture dash direction
-            if (dashDirection != HeroDashEnum::Unknown)
-            {
-                hero.AnimationComp->StartDash(dashDirection);
-            }
+            hero.CurrentGun->Reload();
         }
     }
 
@@ -53,6 +52,41 @@ namespace ETG
         else //NOTE: If it's not Dash, Hero's set Hero's input based on Mouse Angle. 
         {
             hero.CurrentDirection = DirectionUtils::GetHeroDirectionFromAngle(DirectionMap, angle);
+        }
+    }
+
+    void InputComponent::HandleDash(Hero& hero) const
+    {
+        // If right-clicked, start dashing if possible
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !hero.AnimationComp->IsDashing && hero.MoveComp->IsDashAvailable())
+        {
+            const HeroDashEnum dashDirection = DirectionUtils::GetDashDirectionEnum(); // If you put breakpoint this line, direction enum will always be unknown so put breakpoint below this line to capture dash direction
+            if (dashDirection != HeroDashEnum::Unknown)
+            {
+                hero.AnimationComp->StartDash(dashDirection);
+            }
+        }
+    }
+
+    void InputComponent::HandleGunSwitch(Hero& hero) const
+    {
+        Globals::Window->pollEvent(GameManager::GameEvent);
+        //If any imgui window hovered, return
+        const bool anyWindowHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+        if (anyWindowHovered) return;
+
+        // If gun is not reloading and mouse wheel scrolled, switch gun
+        if (!hero.CurrentGun->IsReloading && GameManager::GameEvent.type == sf::Event::MouseWheelScrolled && GameManager::GameEvent.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+        {
+            {
+                if (GameManager::GameEvent.mouseWheelScroll.delta > 0)
+                    hero.SwitchToPreviousGun();
+                else if (GameManager::GameEvent.mouseWheelScroll.delta < 0)
+                    hero.SwitchToNextGun();
+
+                gunSwitchHandled = true; // Set flag to indicate the event has been handled
+                GameManager::GameEvent = sf::Event(); // Clear the event to prevent it from being processed again
+            }
         }
     }
 
