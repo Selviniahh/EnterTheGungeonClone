@@ -6,6 +6,8 @@ namespace ETG
 {
     class BulletManAnimComp;
     class BulletManMoveComp;
+    class Magnum;
+
 
     class BulletMan : public EnemyBase
     {
@@ -14,24 +16,25 @@ namespace ETG
         ~BulletMan() override;
         void Initialize() override;
         void Update() override;
+        void BulletManShoot(); //Shoot if timer is up and attackDistance
         void Draw() override;
 
-        EnemyStateEnum BulletManState{EnemyStateEnum::Idle};\
+        EnemyStateEnum BulletManState{EnemyStateEnum::Idle};
         Direction BulletManDir{Direction::Right};
 
         std::unique_ptr<BulletManAnimComp> AnimationComp;
         std::unique_ptr<BulletManMoveComp> MoveComp;
         std::unique_ptr<CollisionComponent> CollisionComp;
-        
-        // Attack parameters
-        float attackDistance = 100.0f;   // Distance from which attack is possible
-        float attackCooldown = 2.0f;     // Time between attacks (seconds)
-        float attackCooldownTimer = 0.0f; // Current attack cooldown timer
-        
-        bool isInAttackRange = false;    // Set to true when colliding with hero
+
+        // Attack parameters...
+        float attackCooldown = 2.0f;
+        float attackCooldownTimer = 0.0f;
+        bool isInAttackRange = false; //For now 
+
+        std::unique_ptr<Magnum> Gun;
 
         BOOST_DESCRIBE_CLASS(BulletMan, (EnemyBase),
-                              (BulletManState, BulletManDir, attackDistance, attackCooldown, attackCooldownTimer, isInAttackRange),
-                              (), ())
+                             (BulletManState, BulletManDir, attackCooldown, attackCooldownTimer, isInAttackRange),
+                             (), ())
     };
 }

@@ -108,17 +108,6 @@ namespace ETG
         {
             CurrentGunState = GunStateEnum::Idle;
         }
-        // Durin reload if reload animation has finished, we have to revert back to idle state
-        // else if (AnimationComp->CurrentState == GunStateEnum::Reload &&
-        //     AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
-        // {
-        //     // Reload is finished - refill magazine and return to idle
-        //     //TODO: Weirdly, I wrote reloading logic inside ReloadText UI class. I have to create delegates to fire one from here and then migrate reload logic to here
-        //     AnimationComp->AnimManagerDict[AnimationComp->CurrentState].CurrentAnim->Restart();
-        //     CurrentGunState = GunStateEnum::Idle;
-        //     IsReloading = false;
-        //     MagazineAmmo = MagazineSize; // Refill the magazine
-        // }
 
         // Continue with the rest of the update logic
         ArrowComp->SetPosition(this->Position + Math::RotateVector(Rotation, Scale, ArrowComp->arrowOffset));
@@ -211,7 +200,7 @@ namespace ETG
 
     void GunBase::EnqueueProjectiles(const int shotCount, const float EffectiveSpread)
     {
-        //Queue any additional bullets with delay
+        //Queue any additional bullets with delay (only useful if shotCount > 1) 
         for (int i = 0; i < shotCount; i++)
         {
             float projectileAngle = GameObjectBase::Rotation;
@@ -225,7 +214,7 @@ namespace ETG
             }
 
             //Queue the bullet
-            bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
+            bulletQueue.push_back({i * ShotDelay, projectileAngle});
         }
     }
 

@@ -33,18 +33,6 @@ namespace ETG
         UpdateMovement();
     }
 
-    bool BulletManMoveComp::IsHeroInRange() const
-    {
-        if (!BulletManPtr) return false;
-
-        Hero* hero = GameState::GetInstance().GetHero();
-        if (!hero) return false;
-
-        // Calculate distance to hero
-        const float distanceToHero = Math::Length(hero->GetPosition() - BulletManPtr->GetPosition());
-        return distanceToHero <= DetectionRadius;
-    }
-
     void BulletManMoveComp::UpdateMovement()
     {
         if (!BulletManPtr) return;
@@ -61,7 +49,7 @@ namespace ETG
         DebugTextManager::QueueText("BulletMan Direction: " + std::to_string(directionToHero.x) + ", " + std::to_string(directionToHero.y));
         DebugTextManager::QueueText("BulletMan Speed: " + std::to_string(MovementSpeed));
 
-        // Update BulletMan's direction (used for animations)
+        //NOTE: Important: Based on BulletMan's position and HeroPosition, calculate firstly the direction bulletman needs to turn. 
         BulletManPtr->BulletManDir = DirectionUtils::GetDirectionToHero(hero, BulletManPtr->GetPosition());
 
         // Move if the hero is in range and not in attack range
@@ -76,18 +64,9 @@ namespace ETG
             sf::Vector2f position = BulletManPtr->GetPosition();
             BaseMoveComp::UpdateMovement(directionToHero, position);
             BulletManPtr->SetPosition(position);
+            BulletManPtr->BulletManShoot();
         }
-
-        //Shoot if timer is up and attackDistance is reached
-        else if (distanceToHero <= BulletManPtr->attackDistance && BulletManPtr->attackCooldownTimer <= 0)
-        {
-            // In attack range and cooldown finished, enter shooting state
-            BulletManPtr->BulletManState = EnemyStateEnum::Shooting;
-            BulletManPtr->attackCooldownTimer = BulletManPtr->attackCooldown; // Reset cooldown
-
-            // Stop movement
-            Velocity = {0.0f, 0.0f};
-        }
+        
         else
         {
             // Either at proper distance or in cooldown, just idle
@@ -95,12 +74,20 @@ namespace ETG
 
             // Gradually slow down
             Velocity *= 0.9f;
-        }
 
-        // Update attack cooldown timer
-        if (BulletManPtr->attackCooldownTimer > 0)
-        {
-            BulletManPtr->attackCooldownTimer -= Globals::FrameTick;
+            BulletManPtr->BulletManShoot();
         }
+    }
+
+    bool BulletManMoveComp::IsHeroInRange() const
+    {
+        if (!BulletManPtr) return false;
+
+        Hero* hero = GameState::GetInstance().GetHero();
+        if (!hero) return false;
+
+        // Calculate distance to hero
+        const float distanceToHero = Math::Length(hero->GetPosition() - BulletManPtr->GetPosition());
+        return distanceToHero <= DetectionRadius;
     }
 }

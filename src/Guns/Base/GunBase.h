@@ -54,7 +54,7 @@ namespace ETG
         ModifierManager<IGunModifier> modifierManager; 
         
         std::vector<QueuedBullet> bulletQueue; //Queue of bullets waiting to be fired
-        static constexpr float MULTI_SHOT_DELAY = 0.1f;  // Delay between bullets in seconds
+        float ShotDelay = 0.1f;  // Delay between bullets in seconds. Every gun might need different delay
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
 
@@ -120,7 +120,7 @@ namespace ETG
         float ReloadSoundVolume = 10;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase),
-                             (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ReloadTime, IsReloading,
+                             (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ShotDelay, ReloadTime, IsReloading,
                                  FireRate, ShotSpeed, Range, Damage, Force, Spread),
                              (ProjTexture, OriginOffset),
                              ())

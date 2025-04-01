@@ -87,12 +87,12 @@ void ETG::SawedOff::EnqueueProjectiles(const int shotCount, const float Effectiv
         }
         
         //Queue the bullet
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle - 15});
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle + 15});
+        bulletQueue.push_back({i * ShotDelay, projectileAngle});
+        bulletQueue.push_back({i * ShotDelay, projectileAngle - 15});
+        bulletQueue.push_back({i * ShotDelay, projectileAngle + 15});
 
         //Last bullet should shoot with a bit of spread and delay
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY + Math::GenRandomNumber(LastBulletDelayMin,LastBulletDelayMax), projectileAngle + Math::GenRandomNumber(-LastBulletSpread, LastBulletSpread)});
+        bulletQueue.push_back({i * ShotDelay + Math::GenRandomNumber(LastBulletDelayMin,LastBulletDelayMax), projectileAngle + Math::GenRandomNumber(-LastBulletSpread, LastBulletSpread)});
     }
 
     //Handle ammo depletion

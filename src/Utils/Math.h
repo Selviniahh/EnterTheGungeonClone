@@ -135,6 +135,14 @@ public:
         return direction * force * deltaTime;
     }
 
+    static float AngleBetween(const sf::Vector2f& from, const sf::Vector2f& to)
+    {
+        float deltaY = to.y - from.y;
+        float deltaX = to.x - from.x;
+        float angleRadians = std::atan2(deltaY, deltaX);
+        return RadiansToDegrees(angleRadians);
+    }
+
     //-----------------------------Transformations-----------------------------------------------------
 
     [[nodiscard]] static sf::Vector2f RotateVector(const float rotation, const sf::Vector2f scale, const sf::Vector2f& offset)
@@ -155,6 +163,7 @@ public:
         sf::Vector2f BottomLeft{};
         sf::Vector2f BottomRight{};
     };
+
 
     [[nodiscard]] static FourCorner CalculateFourCorner(sf::Vector2f& pos, const sf::Vector2f& size, const sf::Vector2f& origin, const sf::Vector2f& scale = {1.f, 1.f})
     {

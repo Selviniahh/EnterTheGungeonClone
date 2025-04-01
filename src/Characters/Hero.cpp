@@ -54,10 +54,10 @@ void ETG::Hero::Initialize()
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
         //If the collision is with enemy, just change the color of the enemy for now 
-        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
-        {
-            enemyObj->SetColor(sf::Color::Blue);
-        }
+        // if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
+        // {
+        //     enemyObj->SetColor(sf::Color::Blue);
+        // }
 
         //If it's ActiveItem, assign our pointer
         if (auto* activeItem = dynamic_cast<ActiveItemBase*>(eventData.Other))
@@ -69,10 +69,10 @@ void ETG::Hero::Initialize()
     CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
     {
         //Handle collisin exit
-        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
-        {
-            enemyObj->SetColor(sf::Color::White);
-        }
+        // if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
+        // {
+        //     enemyObj->SetColor(sf::Color::White);
+        // }
     });
 }
 
