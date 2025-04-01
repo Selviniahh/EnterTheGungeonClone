@@ -57,10 +57,6 @@ namespace ETG
         auto& sceneObjs = GameState::GetInstance().GetSceneObjs();
         auto* obj = sceneObjs[name];
 
-        // Notify Engine about the object being destroyed
-        static Engine* engine = GameState::GetInstance().GetEngine(); //This will run every time any object needs to be destroyed. So I wanna avoid calling GetInstance() every time but there's no neat way to do that
-        engine->OnObjectDestroyed(obj);
-
         //Remove from scene objects unordered_map firstly 
         sceneObjs.erase(name);
 
@@ -70,7 +66,8 @@ namespace ETG
         orderedObjList.erase(it, orderedObjList.end()); //remove all the objects starting with it to end. Read above comment firstly
     }
 
-    //NOTE: For now I am unsure how this function should be. Game objects always constructed as unique_ptr. Removing them from container will already deallocate the game object. 
+    //NOTE: NOT USED YET. For now I am unsure how this function should be. Game objects always constructed as unique_ptr. Removing them from container will already deallocate the game object. So
+    //UnregisterGameObject function will be enough to remove the object from the container (for now).
     template <typename T>
     void DestroyGameObject(std::unique_ptr<T>& obj)
     {

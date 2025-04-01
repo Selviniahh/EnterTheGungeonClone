@@ -110,6 +110,7 @@ namespace ETG
         //Mark this object to be destroyed
         virtual void MarkForDestroy() {PendingDestroy = true;}
         [[nodiscard]] bool IsPendingDestroy() const {return PendingDestroy;}
+        bool IsValid() const {return GameClass::IsValid(this);}
 
         // Animation component management
         void SetAnimationInterface(IAnimationComponent* animComp) { AnimInterface = animComp; }

@@ -22,9 +22,6 @@ public:
     static bool RelativeOrientationOpen;
     static bool PropertiesOpen;
 
-    // Called when objects are destroyed
-    void OnObjectDestroyed(const ETG::GameObjectBase* obj);
-
 private:
     void UpdateDetailsPanel();
     friend void ImGuiSetRelativeOrientation(ETG::GameObjectBase* obj);

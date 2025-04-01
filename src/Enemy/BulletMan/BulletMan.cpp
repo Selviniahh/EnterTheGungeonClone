@@ -25,17 +25,17 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 
     //Collision
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
-    CollisionComp->CollisionRadius = 10.0f;
+    CollisionComp->CollisionRadius = 4.f;
     CollisionComp->CollisionVisualizationColor = sf::Color::Magenta;
     CollisionComp->SetCollisionEnabled(true);
 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
         // Check if we collided with a projectile and it's not from an enemy's projectile
-        auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other);
-        auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
+        const auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other);
+        const auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
         if (projectile && !enemyObj)
-        {   
+        {
             HandleProjectileCollision(projectile);
         }
 
@@ -48,18 +48,21 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 
     CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
     {
-        if (auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
+        if (!eventData.Other->IsValid()) return; //In case this is a projectile just destroyed, avoid dangling pointers
+        if (const auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
         {
             isInAttackRange = false;
         }
     });
-        
+
     // Set up force event handlers
-    OnForceStart.AddListener([this]() {
+    OnForceStart.AddListener([this]()
+    {
         BulletManState = EnemyStateEnum::Hit;
     });
 
-    OnForceEnd.AddListener([this]() {
+    OnForceEnd.AddListener([this]()
+    {
         // Reset to idle state when force ends
         if (BulletManState == EnemyStateEnum::Hit)
             BulletManState = EnemyStateEnum::Idle;
@@ -80,13 +83,13 @@ void ETG::BulletMan::HandleProjectileCollision(const ProjectileBase* projectile)
     if (dynamic_cast<class Hero*>(rootOwner) || dynamic_cast<class Hero*>(projectileOwner))
     {
         // This is a hero projectile that hit us
-        
+
         // Calculate force direction (from projectile to bulletman)
         const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
-        
+
         // Get force from projectile or use a default value
         float forceMagnitude = projectile->Force;
-        
+
         // Apply the force
         ApplyForce(forceDirection, forceMagnitude);
     }
@@ -124,40 +127,40 @@ void ETG::BulletMan::Update()
     // Only process movement and AI if not being forced
     if (!IsBeingForced)
     {
-    CollisionComp->Update();
-    MoveComp->Update();
+        CollisionComp->Update();
+        MoveComp->Update();
 
-    // Update animation Flip sprites based on direction like Hero does
-    AnimationComp->FlipSpritesX(BulletManDir, *this);
-    AnimationComp->FlipSpritesY<GunBase>(BulletManDir, *Gun);
+        // Update animation Flip sprites based on direction like Hero does
+        AnimationComp->FlipSpritesX(BulletManDir, *this);
+        AnimationComp->FlipSpritesY<GunBase>(BulletManDir, *Gun);
 
-    //Set hand properties
-    const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(BulletManDir) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
-    Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
-    Hand->Update();
+        //Set hand properties
+        const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(BulletManDir) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
+        Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
+        Hand->Update();
 
-    //Rest is all gun shooting and gun orientation
-    if (Hand && Gun)
-    {
-        // Position the gun relative to the hand.
-        const sf::Vector2f handPos = Hand->GetPosition();
-        Gun->SetPosition(handPos + Hand->GunOffset);
+        //Rest is all gun shooting and gun orientation
+        if (Hand && Gun)
+        {
+            // Position the gun relative to the hand.
+            const sf::Vector2f handPos = Hand->GetPosition();
+            Gun->SetPosition(handPos + Hand->GunOffset);
 
-        // Aim the gun toward the hero.
-        const float angle = Math::AngleBetween(handPos, Hero->GetPosition());
-        Gun->Rotation = angle;
-    }
+            // Aim the gun toward the hero.
+            const float angle = Math::AngleBetween(handPos, Hero->GetPosition());
+            Gun->Rotation = angle;
+        }
 
-    if (BulletManState == EnemyStateEnum::Shooting)
-    {
-        Gun->PrepareShooting();
-    }
+        if (BulletManState == EnemyStateEnum::Shooting)
+        {
+            Gun->PrepareShooting();
+        }
 
-    //Decrement the attack timer
-    if (attackCooldownTimer > 0)
-    {
-        attackCooldownTimer -= Globals::FrameTick;
-    }
+        //Decrement the attack timer
+        if (attackCooldownTimer > 0)
+        {
+            attackCooldownTimer -= Globals::FrameTick;
+        }
     }
 
     // Always update animation and gun regardless of force state
@@ -169,13 +172,13 @@ void ETG::BulletMan::BulletManShoot()
 {
     // Don't shoot if being forced/hit
     if (IsBeingForced) return;
-    
+
     //If the gun is shooting, we have to set enemy's animation to be shooting as well
     if (Gun->CurrentGunState == GunStateEnum::Shoot && !Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
     {
         BulletManState = EnemyStateEnum::Shooting;
     }
-    
+
     if (attackCooldownTimer <= 0)
     {
         // In attack range and cooldown finished, enter shooting state

@@ -101,6 +101,7 @@ add_executable(ETG main.cpp
         src/Guns/Magnum/Magnum.h
         src/Enemy/BulletMan/Components/BulletManMoveComp.cpp
         src/Enemy/BulletMan/Components/BulletManMoveComp.h
+        src/Core/GameClass.cpp
 )
 
 # Easiest and fastest way is VCPKG 

@@ -182,7 +182,7 @@ void Engine::DisplayHierarchy(GameObjectBase* object)
 void Engine::DisplayProperties() const
 {
     // Check if the selected object is still valid
-    if (SelectedObj)
+    if (SelectedObj && SelectedObj->IsValid())
     {
         //Display the Absolute and Relative orientation only if the SelectedObj is not inherited from ComponentBase
         if (!dynamic_cast<ComponentBase*>(SelectedObj))
@@ -217,15 +217,6 @@ void Engine::DisplayProperties() const
         }
         else
             PropertiesOpen = false;
-    }
-}
-
-//NOTE: For now only projectiles are destroyed and once they are destroyed, they will be assigned nullptr if they are selected during deallocation 
-void Engine::OnObjectDestroyed(const GameObjectBase* obj)
-{
-    if (SelectedObj == obj)
-    {
-        SelectedObj = nullptr;
     }
 }
 

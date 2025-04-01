@@ -20,8 +20,8 @@ ETG::ProjectileBase::ProjectileBase(const sf::Texture& texture, const sf::Vector
     Force = force;
 
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
-    CollisionComp->CollisionRadius = 10.0f;
-    CollisionComp->CollisionVisualizationColor = sf::Color::Magenta;
+    CollisionComp->CollisionRadius = 1.0f;
+    CollisionComp->CollisionVisualizationColor = sf::Color::Blue;
     CollisionComp->SetCollisionEnabled(true);
 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
@@ -32,8 +32,8 @@ ETG::ProjectileBase::ProjectileBase(const sf::Texture& texture, const sf::Vector
         
         if (heroObj && enemyObj)
         {
-            std::cout << "we need to play impact animation here and then destroy but nevermind" << std::endl;
-            // MarkForDestroy(); //we cannot destroy so easily. I need to find a way to completely restructure all raw pointers to be weak pointers.
+            std::cout << "we need to play impact animation here for " << this->Owner->Owner->GetObjectName() << " 's projectile and then destroy but nevermind " << std::endl;
+            MarkForDestroy(); //we cannot destroy so easily. I need to find a way to completely restructure all raw pointers to be weak pointers.
         }
     });
 }
@@ -64,9 +64,8 @@ void ETG::ProjectileBase::Update()
         //I already not storing any raw pointers as owner. They either shared or unique pointers.
         //Just let's convert raw pointers to be weak pointers. We will check if the pointer is valid before using it all the time all the time all the time
         //Also when object is destroyed, we need to remove all the delegates from the object
-        //For now I will just comment this out so none of projectiles or any game object is destroyed
-        //As a useless workaround, at `Engine` class I created a useless notifier to prevent dangling pointer for SelectedObject. Let's also remove that after we impelement all weak pointers
-        // MarkForDestroy();
+        
+        MarkForDestroy();
         return;
     }
 
@@ -76,6 +75,7 @@ void ETG::ProjectileBase::Update()
 void ETG::ProjectileBase::Draw()
 {
     IsVisible = true;
+    if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
     auto& DrawableProps = GetDrawProperties();
     sf::Sprite frame;
     frame.setTexture(*Texture);
