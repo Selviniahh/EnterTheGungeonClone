@@ -237,8 +237,9 @@ namespace ETG
         const sf::Vector2f direction = Math::RadianToDirection(rad);
         const sf::Vector2f projVelocity = direction * ShotSpeed;
 
-        //Spawn a projectile
-        std::unique_ptr<ProjectileBase> proj = CreateGameObjectDefault<ProjectileBase>(*ProjTexture, spawnPos, projVelocity, Range, projectileAngle, Damage, Force);
+        //Spawn a projectile NOTE: I decided to instead spawn projectiles attached to fired gun. That's because in collision resolution, I need to know the owner gun of the projectile and from that learn whether it's a hero's or enemy's projectile
+        //projectile.
+        std::unique_ptr<ProjectileBase> proj = CreateGameObjectAttached<ProjectileBase>(this,*ProjTexture, spawnPos, projVelocity, Range, projectileAngle, Damage, Force);
         proj->Update();
         projectiles.push_back(std::move(proj));
     }

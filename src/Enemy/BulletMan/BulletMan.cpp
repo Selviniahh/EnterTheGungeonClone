@@ -10,6 +10,7 @@
 #include "../../Characters/Hand/Hand.h"
 #include "../../Guns/Base/GunBase.h"
 #include "../../Guns/Magnum/Magnum.h"
+#include "../../Projectile/ProjectileBase.h"
 #include<SFML/Graphics/Texture.hpp>
 
 namespace ETG
@@ -30,9 +31,17 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
+        // Check if we collided with a projectile and it's not from an enemy's projectile
+        auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other);
+        auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
+        if (projectile && !enemyObj)
+        {   
+            HandleProjectileCollision(projectile);
+        }
+
+        // Handle hero collision if needed
         if (auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
         {
-            // Stop movement when colliding with hero
             isInAttackRange = true;
         }
     });
@@ -41,12 +50,46 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
     {
         if (auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
         {
-            // Resume movement when no longer colliding with hero
             isInAttackRange = false;
         }
     });
+        
+    // Set up force event handlers
+    OnForceStart.AddListener([this]() {
+        BulletManState = EnemyStateEnum::Hit;
+    });
+
+    OnForceEnd.AddListener([this]() {
+        // Reset to idle state when force ends
+        if (BulletManState == EnemyStateEnum::Hit)
+            BulletManState = EnemyStateEnum::Idle;
+    });
 
     BulletMan::Initialize();
+}
+
+void ETG::BulletMan::HandleProjectileCollision(const ProjectileBase* projectile)
+{
+    // Check if this is a hero projectile
+    GameObjectBase* projectileOwner = projectile->Owner;
+    if (!projectileOwner) return;
+
+    GameObjectBase* rootOwner = projectileOwner->Owner;
+    if (!rootOwner) return;
+
+    if (dynamic_cast<class Hero*>(rootOwner) || dynamic_cast<class Hero*>(projectileOwner))
+    {
+        // This is a hero projectile that hit us
+        
+        // Calculate force direction (from projectile to bulletman)
+        const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
+        
+        // Get force from projectile or use a default value
+        float forceMagnitude = projectile->Force;
+        
+        // Apply the force
+        ApplyForce(forceDirection, forceMagnitude);
+    }
 }
 
 ETG::BulletMan::~BulletMan() = default;
@@ -76,15 +119,17 @@ void ETG::BulletMan::Initialize()
 
 void ETG::BulletMan::Update()
 {
-    EnemyBase::Update(); // Start with base update
+    EnemyBase::Update(); // This now includes UpdateForce()
 
+    // Only process movement and AI if not being forced
+    if (!IsBeingForced)
+    {
     CollisionComp->Update();
     MoveComp->Update();
 
     // Update animation Flip sprites based on direction like Hero does
     AnimationComp->FlipSpritesX(BulletManDir, *this);
     AnimationComp->FlipSpritesY<GunBase>(BulletManDir, *Gun);
-    AnimationComp->Update();
 
     //Set hand properties
     const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(BulletManDir) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
@@ -113,13 +158,18 @@ void ETG::BulletMan::Update()
     {
         attackCooldownTimer -= Globals::FrameTick;
     }
-    Gun->Update();
+    }
 
-    EnemyBase::Update();
+    // Always update animation and gun regardless of force state
+    AnimationComp->Update();
+    Gun->Update();
 }
 
 void ETG::BulletMan::BulletManShoot()
 {
+    // Don't shoot if being forced/hit
+    if (IsBeingForced) return;
+    
     //If the gun is shooting, we have to set enemy's animation to be shooting as well
     if (Gun->CurrentGunState == GunStateEnum::Shoot && !Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
     {

@@ -3,6 +3,8 @@
 
 namespace ETG
 {
+    class CollisionComponent;
+
     class ProjectileBase : public GameObjectBase
     {
     public:
@@ -17,6 +19,8 @@ namespace ETG
         float Range;
         float Damage;
         float Force; //knockback amount
+
+        std::unique_ptr<CollisionComponent> CollisionComp;
 
     private:
         float DistanceTraveled = 0.0f; //Track the total distance traveled

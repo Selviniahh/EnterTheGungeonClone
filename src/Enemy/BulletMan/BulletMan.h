@@ -7,7 +7,7 @@ namespace ETG
     class BulletManAnimComp;
     class BulletManMoveComp;
     class Magnum;
-
+    class ProjectileBase;
 
     class BulletMan : public EnemyBase
     {
@@ -18,6 +18,8 @@ namespace ETG
         void Update() override;
         void BulletManShoot(); //Shoot if timer is up and attackDistance
         void Draw() override;
+
+        void HandleProjectileCollision(const ProjectileBase* projectile);
 
         EnemyStateEnum BulletManState{EnemyStateEnum::Idle};
         Direction BulletManDir{Direction::Right};

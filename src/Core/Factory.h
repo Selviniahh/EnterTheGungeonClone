@@ -58,7 +58,7 @@ namespace ETG
         auto* obj = sceneObjs[name];
 
         // Notify Engine about the object being destroyed
-        static Engine* engine = GameState::GetInstance().GetEngine(); //This will run every time any object needs to be destroyed. So I wanma to avoid calling GetInstance() every time but there's no neat way to do that
+        static Engine* engine = GameState::GetInstance().GetEngine(); //This will run every time any object needs to be destroyed. So I wanna avoid calling GetInstance() every time but there's no neat way to do that
         engine->OnObjectDestroyed(obj);
 
         //Remove from scene objects unordered_map firstly 

@@ -53,7 +53,7 @@ namespace ETG
         BulletManPtr->BulletManDir = DirectionUtils::GetDirectionToHero(hero, BulletManPtr->GetPosition());
 
         // Move if the hero is in range and not in attack range
-        if (distanceToHero > StopDistance && !BulletManPtr->isInAttackRange)
+        if (distanceToHero > StopDistance)
         {
             // Set the state to running when moving
             BulletManPtr->BulletManState = EnemyStateEnum::Run;
