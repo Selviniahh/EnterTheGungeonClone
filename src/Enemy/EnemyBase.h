@@ -5,14 +5,16 @@
 #include "../Core/Events/EventDelegate.h"
 
 // Forward declarations
-class BaseHealthComp;
-class CollisionComponent;
+
 
 namespace ETG
 {
+    class ProjectileBase;
     class Hero;
     class Hand;
     class RogueSpecial;
+    class BaseHealthComp;
+    class CollisionComponent;
 
     class EnemyBase : public GameObjectBase
     {
@@ -25,12 +27,15 @@ namespace ETG
 
     public:
         // Force handling when hit by projectiles
-        void ApplyForce(const sf::Vector2f& forceDirection, float magnitude);
+        void ApplyForce(const sf::Vector2f& forceDirection, float magnitude, float forceDuration);
         void UpdateForce();
+        virtual void HandleProjectileCollision(const ProjectileBase* projectile);
+
+        std::unique_ptr<CollisionComponent> CollisionComp;
         
         // Force parameters
-        float ForceSpeed = 150.0f;
-        float ForceMagnitude = 0.0f;
+        float ForceMultiply = 5.0f; //NOTE: Shouldn't this be Gun's Force? 
+        float ForceMagnitude = 1.f;
         float ForceTimer = 0.0f;
         float ForceMaxDuration = 0.5f;
         sf::Vector2f ForceDirection = {0.0f, 0.0f};
@@ -41,11 +46,11 @@ namespace ETG
         EventDelegate<> OnForceEnd;
 
     protected:
-        std::unique_ptr<BaseHealthComp> HealthComp;
+        // std::unique_ptr<BaseHealthComp> HealthComp;
         std::unique_ptr<Hand> Hand;
         Hero* Hero;
 
         BOOST_DESCRIBE_CLASS(EnemyBase, (GameObjectBase),
-            (Hero, ForceSpeed, ForceMaxDuration), (), ())
+            (Hero, ForceMultiply, ForceMaxDuration), (), ())
     };
 }

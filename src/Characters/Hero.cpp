@@ -6,6 +6,7 @@
 #include "../Managers/GameState.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
+#include "../Projectile/ProjectileBase.h"
 #include "../UI/UIObjects/ReloadText.h"
 #include "Components/HeroAnimComp.h"
 #include "Components/HeroMoveComp.h"
@@ -49,15 +50,24 @@ void ETG::Hero::Initialize()
     GameObjectBase::Initialize();
     CurrentGun = RogueSpecial.get(); //Hero's default gun is RogueSpecial
     ReloadText->LinkToGun(CurrentGun);
-
-    //Set up collision delegates. Move these to initialize after it works well. 
+    
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
-        //If the collision is with enemy, just change the color of the enemy for now 
-        // if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
-        // {
-        //     enemyObj->SetColor(sf::Color::Blue);
-        // }
+        //If the collision is with enemy, We need to apply force to our hero just like we do in EnemyBase
+        //TODO: we need Force logic from lots of places. Should we create ForceComponent for this purpose? 
+        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
+        {
+            std::cout << "Collision with " << enemyObj->GetObjectName() << " Push yourself to opposite direction and damage yourself " << std::endl;
+        }
+
+        //If the collision is with enemy projectile, we need to damage our hero and destroy the enemy projectile
+        auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
+        auto* enemyProj = dynamic_cast<ProjectileBase*>(eventData.Other);
+        if (enemyObj && enemyProj)
+        {
+            std::cout << "Collision with " << enemyObj->GetObjectName() << "'s projectile. Push yourself to opposite direction and damage yourself " << std::endl;
+            enemyProj->MarkForDestroy();
+        }
 
         //If it's ActiveItem, assign our pointer
         if (auto* activeItem = dynamic_cast<ActiveItemBase*>(eventData.Other))
@@ -68,11 +78,7 @@ void ETG::Hero::Initialize()
 
     CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
     {
-        //Handle collisin exit
-        // if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
-        // {
-        //     enemyObj->SetColor(sf::Color::White);
-        // }
+        //No exit required for now
     });
 }
 
@@ -119,7 +125,7 @@ void ETG::Hero::Update()
 
     //Update  all equipped guns (for their projectiles only)
     for (const auto guns : EquippedGuns) guns->Update();
-    
+
     GameObjectBase::Update();
 }
 

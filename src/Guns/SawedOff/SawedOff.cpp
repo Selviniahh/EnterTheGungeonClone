@@ -16,7 +16,7 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
                                                            6, // MagazineSize
                                                            5.0f, // ReloadTime
                                                            5.5f, // Damage
-                                                           0.f, // Force
+                                                           20.f, // Force
                                                            3.0f) // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<SawedOffAnimComp>(this);
@@ -50,7 +50,9 @@ void ETG::SawedOff::Initialize()
         if (auto* hero = dynamic_cast<Hero*>(eventData.Other))
         {
             hero->EquipGun(this);
-            CollisionComp->SetCollisionEnabled(false); //After equip 
+            CollisionComp->SetCollisionEnabled(false); //After equip
+            this->Owner = hero; //Set the owner of the gun to the hero This is important because during projectile collision, we need to know the owner of the projectile
+
         }
     });
 

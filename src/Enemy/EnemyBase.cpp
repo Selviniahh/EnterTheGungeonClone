@@ -1,23 +1,37 @@
 #include "EnemyBase.h"
-#include "../Guns/RogueSpecial/RogueSpecial.h"
 #include "../Utils/Math.h"
-#include "../Core/Components/BaseHealthComp.h"
 #include "../Characters/Hand/Hand.h"
 #include "../Characters/Hero.h"
 #include "../Core/Components/CollisionComponent.h"
 #include "../Managers/Globals.h"
+#include "../Core/Factory.h"
+#include "../Projectile/ProjectileBase.h"
 
 namespace ETG
 {
-    EnemyBase::EnemyBase() : HealthComp(nullptr), Hand(nullptr), Hero(GameState::GetInstance().GetHero())
+    EnemyBase::EnemyBase() : Hand(nullptr), Hero(GameState::GetInstance().GetHero()) //HealthComp(nullptr),
     {
+        EnemyBase::Initialize();
     }
 
     EnemyBase::~EnemyBase() = default;
 
     void EnemyBase::Initialize()
     {
-        // Implementation
+        CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
+        CollisionComp->CollisionRadius = 4.f;
+        CollisionComp->CollisionVisualizationColor = sf::Color::Magenta;
+        CollisionComp->SetCollisionEnabled(true);
+
+        CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
+        {
+            // Check if we collided with a projectile
+            const auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other);
+            if (projectile)
+            {
+                HandleProjectileCollision(projectile);
+            }
+        });
     }
 
     void EnemyBase::Update()
@@ -34,11 +48,12 @@ namespace ETG
         GameObjectBase::Draw();
     }
 
-    void EnemyBase::ApplyForce(const sf::Vector2f& forceDirection, float magnitude)
+    void EnemyBase::ApplyForce(const sf::Vector2f& forceDirection, float magnitude, float forceDuration)
     {
         // Set force parameters
         ForceDirection = forceDirection;
         ForceMagnitude = magnitude;
+        ForceMaxDuration = forceDuration;
         ForceTimer = 0.0f;
         IsBeingForced = true;
 
@@ -56,7 +71,7 @@ namespace ETG
         if (ForceTimer < ForceMaxDuration)
         {
             // Calculate current force magnitude using lerp (starts strong, gradually weakens)
-            const float currentForce = Math::IntervalLerp(ForceMagnitude * ForceSpeed, 0.0f, ForceMaxDuration, ForceTimer);
+            const float currentForce = Math::IntervalLerp(ForceMagnitude * ForceMultiply, 0.0f, ForceMaxDuration, ForceTimer);
 
             // Apply force to position
             Position += ForceDirection * currentForce * Globals::FrameTick;
@@ -68,6 +83,30 @@ namespace ETG
 
             // Broadcast force end event
             OnForceEnd.Broadcast();
+        }
+    }
+
+    void EnemyBase::HandleProjectileCollision(const ProjectileBase* projectile)
+    {
+        // Check if this is a hero projectile
+        auto projectileOwnerGun = dynamic_cast<GunBase*>(projectile->Owner);
+        if (!projectileOwnerGun) return;
+
+        GameObjectBase* rootOwner = projectileOwnerGun->Owner;
+        if (!rootOwner) return;
+
+        if (dynamic_cast<class Hero*>(rootOwner) || dynamic_cast<class Hero*>(projectileOwnerGun))
+        {
+            // This is a hero projectile that hit us
+
+            // Calculate force direction (from projectile to bulletman)
+            const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
+
+            // Get force from projectile or use a default value
+            float forceMagnitude = projectile->Force;
+
+            // Apply the force
+            ApplyForce(forceDirection, forceMagnitude, (projectileOwnerGun->FireRate / 3.0));
         }
     }
 }

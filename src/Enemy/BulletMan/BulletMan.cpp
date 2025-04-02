@@ -12,6 +12,7 @@
 #include "../../Guns/Magnum/Magnum.h"
 #include "../../Projectile/ProjectileBase.h"
 #include<SFML/Graphics/Texture.hpp>
+#include "../../Core/Components/CollisionComponent.h"
 
 namespace ETG
 {
@@ -22,29 +23,6 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 {
     this->Position = position;
     Depth = 2; // Set depth like Hero does
-
-    //Collision
-    CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
-    CollisionComp->CollisionRadius = 4.f;
-    CollisionComp->CollisionVisualizationColor = sf::Color::Magenta;
-    CollisionComp->SetCollisionEnabled(true);
-
-    CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
-    {
-        // Check if we collided with a projectile and it's not from an enemy's projectile
-        const auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other);
-        const auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
-        if (projectile && !enemyObj)
-        {
-            HandleProjectileCollision(projectile);
-        }
-
-        // Handle hero collision if needed
-        if (auto* heroObj = dynamic_cast<class Hero*>(eventData.Other))
-        {
-            isInAttackRange = true;
-        }
-    });
 
     CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
     {
@@ -69,30 +47,6 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
     });
 
     BulletMan::Initialize();
-}
-
-void ETG::BulletMan::HandleProjectileCollision(const ProjectileBase* projectile)
-{
-    // Check if this is a hero projectile
-    GameObjectBase* projectileOwner = projectile->Owner;
-    if (!projectileOwner) return;
-
-    GameObjectBase* rootOwner = projectileOwner->Owner;
-    if (!rootOwner) return;
-
-    if (dynamic_cast<class Hero*>(rootOwner) || dynamic_cast<class Hero*>(projectileOwner))
-    {
-        // This is a hero projectile that hit us
-
-        // Calculate force direction (from projectile to bulletman)
-        const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
-
-        // Get force from projectile or use a default value
-        float forceMagnitude = projectile->Force;
-
-        // Apply the force
-        ApplyForce(forceDirection, forceMagnitude);
-    }
 }
 
 ETG::BulletMan::~BulletMan() = default;
@@ -125,10 +79,13 @@ void ETG::BulletMan::Update()
     EnemyBase::Update(); // This now includes UpdateForce()
 
     // Only process movement and AI if not being forced
-    if (!IsBeingForced)
+    if (true)
     {
         CollisionComp->Update();
-        MoveComp->Update();
+
+        //Make movement if it's not being forced 
+        if (!IsBeingForced)
+            MoveComp->Update();
 
         // Update animation Flip sprites based on direction like Hero does
         AnimationComp->FlipSpritesX(BulletManDir, *this);
@@ -187,6 +144,12 @@ void ETG::BulletMan::BulletManShoot()
     }
 }
 
+void ETG::BulletMan::HandleProjectileCollision(const ProjectileBase* projectile)
+{
+    EnemyBase::HandleProjectileCollision(projectile);
+    BulletManState = EnemyStateEnum::Hit;
+}
+
 
 void ETG::BulletMan::Draw()
 {
@@ -194,6 +157,7 @@ void ETG::BulletMan::Draw()
     EnemyBase::Draw();
     SpriteBatch::Draw(GetDrawProperties());
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
-    Hand->Draw();
+
     Gun->Draw();
+    Hand->Draw();
 }

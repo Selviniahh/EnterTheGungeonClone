@@ -16,17 +16,16 @@ namespace ETG
         ~BulletMan() override;
         void Initialize() override;
         void Update() override;
-        void BulletManShoot(); //Shoot if timer is up and attackDistance
         void Draw() override;
-
-        void HandleProjectileCollision(const ProjectileBase* projectile);
-
+        
+        void BulletManShoot(); //Shoot if timer is up and attackDistance
+        void HandleProjectileCollision(const ProjectileBase* projectile) override;
+        
         EnemyStateEnum BulletManState{EnemyStateEnum::Idle};
         Direction BulletManDir{Direction::Right};
 
         std::unique_ptr<BulletManAnimComp> AnimationComp;
         std::unique_ptr<BulletManMoveComp> MoveComp;
-        std::unique_ptr<CollisionComponent> CollisionComp;
 
         // Attack parameters...
         float attackCooldown = 2.0f;

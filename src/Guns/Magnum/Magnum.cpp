@@ -16,7 +16,7 @@ ETG::Magnum::Magnum(const sf::Vector2f& pos) : GunBase(pos,
                                                        6, // MagazineSize
                                                        2.0f, // ReloadTime
                                                        5.5f, // Damage
-                                                       0.f, // Force
+                                                       4.f, // Force
                                                        3.0f) // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<MagnumAnimComp>(this);
@@ -54,7 +54,8 @@ void ETG::Magnum::Initialize()
         if (hero && !enemyOwner) // If hero is not null AND owner is not an enemy
         {
             hero->EquipGun(this);
-            CollisionComp->SetCollisionEnabled(false); // After equip 
+            CollisionComp->SetCollisionEnabled(false); // After equip
+            this->Owner = hero; //Set the owner of the gun to the hero This is important because during projectile collision, we need to know the owner of the projectile
         }
     });
 }

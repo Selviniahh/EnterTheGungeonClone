@@ -60,15 +60,14 @@ void ETG::GameManager::Initialize()
     //Always initialize debug text last 
     DebugText = std::make_unique<class DebugText>();
 
+    BulletMan = ETG::CreateGameObjectDefault<class BulletMan>(sf::Vector2f{50,50});
     PlatinumBullets = ETG::CreateGameObjectDefault<class PlatinumBullets>();
     DoubleShoot = ETG::CreateGameObjectDefault<class DoubleShoot>();
     Ak47 = ETG::CreateGameObjectDefault<class AK47>(sf::Vector2f{-100,100});
     SawedOff = ETG::CreateGameObjectDefault<class SawedOff>(sf::Vector2f{-150,100});
     Magnum = ETG::CreateGameObjectDefault<class Magnum>(sf::Vector2f{-200,100});
 
-    BulletMan = ETG::CreateGameObjectDefault<class BulletMan>(sf::Vector2f{50,50});
 
-    
     //TODO: Work on safely destroying and error resolution for accessing destroyed object
     // DestroyGameObject(Hero);
 

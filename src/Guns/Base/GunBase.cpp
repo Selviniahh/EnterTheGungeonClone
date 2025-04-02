@@ -223,11 +223,10 @@ namespace ETG
         //Restart muzzle flash animation and shoot animation
         if (MuzzleFlash->IsVisible) MuzzleFlash->Restart();
         ShootSound.play();
-
-        AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();
-
+        
         //Set animation state
         CurrentGunState = GunStateEnum::Shoot;
+        RestartCurrentAnimStateAnimation();
 
         //Calculate spawn position
         const sf::Vector2f spawnPos = ArrowComp->GetPosition();
@@ -248,12 +247,18 @@ namespace ETG
     {
         //IF already reloading or magazine is full do not invoke again
         if (IsReloading || MagazineAmmo == MagazineSize) return;
-
+        
         CurrentGunState = GunStateEnum::Reload; //update animation
+        RestartCurrentAnimStateAnimation();
         IsReloading = true;
         ReloadSound.play();
         OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
         OnReloadInvoke.Broadcast(true);
+    }
+
+    void GunBase::RestartCurrentAnimStateAnimation()
+    {
+        AnimationComp->AnimManagerDict[CurrentGunState].AnimationDict[CurrentGunState].Restart();
     }
 
     void GunBase::SetShootSound(const std::string& soundPath)
