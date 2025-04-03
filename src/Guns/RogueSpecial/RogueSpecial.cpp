@@ -13,7 +13,7 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 10,
 2.0f,
 3.5f,
-7.f,
+30.f,
 10.f)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);

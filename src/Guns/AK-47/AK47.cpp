@@ -15,7 +15,7 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
     30,        // MagazineSize
     2.0f,      // ReloadTime
     5.5f,      // Damage
-    2.0f,      // Force
+    17.0f,      // Force
     3.0f)      // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<AK47AnimComp>(this);

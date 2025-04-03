@@ -24,7 +24,6 @@
 #include "../UI/UIObjects/AmmoCounter.h"
 #include "../UI/UIObjects/ReloadSlider.h"
 #include "../Core/Components/CollisionComponent.h"
-#include "../Enemy/BulletMan/Components/BulletManMoveComp.h"
 #include "../Items/Active/DoubleShoot.h"
 #include "../Items/Passive/PlatinumBullets.h"
 #include "../Guns/AK-47/AK47.h"
@@ -32,7 +31,6 @@
 #include "../Guns/SawedOff/SawedOff.h"
 #include "../Enemy/BulletMan/BulletMan.h"
 #include "../Enemy/BulletMan/Components/BulletManAnimComp.h"
-#include "../Enemy/BulletMan/Components/BulletManMoveComp.h"
 
 
 //TODO: This class should be completely automated. A script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
@@ -142,7 +140,6 @@ namespace ETG
             RegisterType<Magnum>();
             RegisterType<SawedOffAnimComp>();
             RegisterType<BulletMan>();
-            RegisterType<BulletManMoveComp>();
             RegisterType<BulletManAnimComp>();
         }
 

@@ -6,10 +6,13 @@
 #include "../Managers/Globals.h"
 #include "../Core/Factory.h"
 #include "../Projectile/ProjectileBase.h"
+#include "Components/EnemyMoveCompBase.h"
+#include "../Guns/Base/GunBase.h"
+#include "../Guns/Magnum/Magnum.h"
 
 namespace ETG
 {
-    EnemyBase::EnemyBase() : Hand(nullptr), Hero(GameState::GetInstance().GetHero()) //HealthComp(nullptr),
+    EnemyBase::EnemyBase() : Hand(nullptr), Hero(GameState::GetInstance().GetHero())
     {
         EnemyBase::Initialize();
     }
@@ -23,11 +26,14 @@ namespace ETG
         CollisionComp->CollisionVisualizationColor = sf::Color::Magenta;
         CollisionComp->SetCollisionEnabled(true);
 
+        MoveComp = ETG::CreateGameObjectAttached<EnemyMoveCompBase>(this);
+        MoveComp->Initialize();
+
+        // Set up collision handling
         CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
         {
             // Check if we collided with a projectile
-            const auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other);
-            if (projectile)
+            if (const auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other))
             {
                 HandleProjectileCollision(projectile);
             }
@@ -36,77 +42,64 @@ namespace ETG
 
     void EnemyBase::Update()
     {
-        // Update force effect
-        UpdateForce();
+        if (MoveComp)
+            MoveComp->Update();
 
         GameObjectBase::Update();
     }
 
     void EnemyBase::Draw()
     {
-        // Implementation
         GameObjectBase::Draw();
-    }
-
-    void EnemyBase::ApplyForce(const sf::Vector2f& forceDirection, float magnitude, float forceDuration)
-    {
-        // Set force parameters
-        ForceDirection = forceDirection;
-        ForceMagnitude = magnitude;
-        ForceMaxDuration = forceDuration;
-        ForceTimer = 0.0f;
-        IsBeingForced = true;
-
-        // Broadcast force start event
-        OnForceStart.Broadcast();
-    }
-
-    void EnemyBase::UpdateForce()
-    {
-        if (!IsBeingForced) return;
-
-        // Increment force timer
-        ForceTimer += Globals::FrameTick;
-
-        if (ForceTimer < ForceMaxDuration)
-        {
-            // Calculate current force magnitude using lerp (starts strong, gradually weakens)
-            const float currentForce = Math::IntervalLerp(ForceMagnitude * ForceMultiply, 0.0f, ForceMaxDuration, ForceTimer);
-
-            // Apply force to position
-            Position += ForceDirection * currentForce * Globals::FrameTick;
-        }
-        else
-        {
-            // Force effect is done
-            IsBeingForced = false;
-
-            // Broadcast force end event
-            OnForceEnd.Broadcast();
-        }
     }
 
     void EnemyBase::HandleProjectileCollision(const ProjectileBase* projectile)
     {
         // Check if this is a hero projectile
-        auto projectileOwnerGun = dynamic_cast<GunBase*>(projectile->Owner);
+        const auto projectileOwnerGun = dynamic_cast<GunBase*>(projectile->Owner);
         if (!projectileOwnerGun) return;
 
         GameObjectBase* rootOwner = projectileOwnerGun->Owner;
         if (!rootOwner) return;
 
+        // is this a hero projectile that hit us
         if (dynamic_cast<class Hero*>(rootOwner) || dynamic_cast<class Hero*>(projectileOwnerGun))
         {
-            // This is a hero projectile that hit us
-
-            // Calculate force direction (from projectile to bulletman)
+            // Calculate force direction (from projectile to enemy)
             const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
 
-            // Get force from projectile or use a default value
-            float forceMagnitude = projectile->Force;
+            // Get force from projectile
+            const float forceMagnitude = projectile->Force;
 
             // Apply the force
-            ApplyForce(forceDirection, forceMagnitude, (projectileOwnerGun->FireRate / 3.0));
+            ApplyForce(forceDirection, forceMagnitude, projectileOwnerGun->FireRate / ForceDurationDivider);
+        }
+    }
+
+    void EnemyBase::ApplyForce(const sf::Vector2f& forceDirection, const float magnitude, const float forceDuration) const
+    {
+        if (MoveComp)
+        {
+            MoveComp->ApplyForce(forceDirection, magnitude, forceDuration);
+        }
+    }
+
+    void EnemyBase::EnemyShoot()
+    {
+        // Don't shoot if being forced/hit
+        if (IsBeingForced()) return;
+
+        //If the gun is shooting, we have to set enemy's animation to be shooting as well
+        if (Gun->CurrentGunState == GunStateEnum::Shoot && !Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
+        {
+            EnemyState = EnemyStateEnum::Shooting;
+        }
+
+        if (attackCooldownTimer <= 0)
+        {
+            // In attack range and cooldown finished, enter shooting state
+            EnemyState = EnemyStateEnum::Shooting;
+            attackCooldownTimer = attackCooldown; // Reset cooldown
         }
     }
 }

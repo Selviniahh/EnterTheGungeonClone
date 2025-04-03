@@ -1,0 +1,41 @@
+#pragma once
+#include <boost/describe/class.hpp>
+#include <SFML/System/Vector2.hpp>
+
+#include "../../Core/Components/BaseMoveComp.h"
+
+namespace ETG
+{
+    class Hero;
+    class EnemyBase;
+
+    class EnemyMoveCompBase : public BaseMoveComp
+    {
+    public:
+        explicit EnemyMoveCompBase(float maxSpeed = 100.0f, float acceleration = 5000.0f, float deceleration = 8000.0f);
+        ~EnemyMoveCompBase() override;
+
+        void Initialize() override;
+        void Update() override;
+
+        // AI movement parameters
+        float DetectionRadius = 200.0f;     // How far enemy can detect the Hero
+        float StopDistance = 150.0f;        // How close enemy gets before stopping
+
+    protected:
+        // Override in derived classes to implement specific enemy movement behavior
+        virtual void UpdateAIMovement();
+
+        // Get the direction to the hero
+        sf::Vector2f GetDirectionToHero() const;
+        float GetDistanceToHero() const;
+        Hero* Hero; // Static pointer to the hero for all enemies
+        
+        // The owner as an EnemyBase
+        EnemyBase* OwnerEnemy = nullptr;
+        
+
+        BOOST_DESCRIBE_CLASS(EnemyMoveCompBase, (BaseMoveComp),
+                         (DetectionRadius, StopDistance), (), ())
+    };
+}

@@ -21,8 +21,8 @@ void ETG::BulletManAnimComp::Initialize()
         BulletMan = dynamic_cast<class BulletMan*>(Owner);
         if (BulletMan)
         {
-            CurrentState = BulletMan->BulletManState;
-            CurrentAnimStateKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->BulletManDir);
+            CurrentState = BulletMan->EnemyState;
+            CurrentAnimStateKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
         }
     }
 }
@@ -77,21 +77,21 @@ void ETG::BulletManAnimComp::Update()
     AnimationKey newKey;
 
     // Set key based on state (similar to HeroAnimComp approach)
-    if (BulletMan->BulletManState == EnemyStateEnum::Idle)
-        newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->BulletManDir);
+    if (BulletMan->EnemyState == EnemyStateEnum::Idle)
+        newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
     
-    else if (BulletMan->BulletManState == EnemyStateEnum::Run)
-        newKey = DirectionUtils::GetBulletManRunEnum(BulletMan->BulletManDir);
+    else if (BulletMan->EnemyState == EnemyStateEnum::Run)
+        newKey = DirectionUtils::GetBulletManRunEnum(BulletMan->EnemyDir);
     
-    else if (BulletMan->BulletManState == EnemyStateEnum::Shooting)
-        newKey = DirectionUtils::GetBulletManShootingEnum(BulletMan->BulletManDir);
+    else if (BulletMan->EnemyState == EnemyStateEnum::Shooting)
+        newKey = DirectionUtils::GetBulletManShootingEnum(BulletMan->EnemyDir);
     
-    else if (BulletMan->BulletManState == EnemyStateEnum::Hit)
-        newKey = DirectionUtils::GetBulletManHitEnum(BulletMan->BulletManDir);
+    else if (BulletMan->EnemyState == EnemyStateEnum::Hit)
+        newKey = DirectionUtils::GetBulletManHitEnum(BulletMan->EnemyDir);
     
     else
         newKey = BulletManIdleEnum::Idle_Back; // Default fallback
 
     // Update base animation component with current state and key
-    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->BulletManState, newKey);
+    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->EnemyState, newKey);
 }
