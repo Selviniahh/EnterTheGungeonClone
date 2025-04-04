@@ -106,7 +106,7 @@ void ETG::BulletMan::Update()
 
     //Make movement if it's not being forced
     //NOTE: if gonna shoot, shoot and then update movement otherwise enemy will never be able to shoot
-    if (!IsBeingForced())
+    if (!MoveComp->IsBeingForced)
         MoveComp->Update();
 
     //Decrement the attack timer

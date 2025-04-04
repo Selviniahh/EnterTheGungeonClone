@@ -6,7 +6,6 @@
 
 namespace ETG
 {
-    class Magnum;
     class ProjectileBase;
     class Hero;
     class Hand;
@@ -14,6 +13,7 @@ namespace ETG
     class BaseHealthComp;
     class CollisionComponent;
     class EnemyMoveCompBase;
+    class GunBase;
 
     class EnemyBase : public GameObjectBase
     {
@@ -28,11 +28,6 @@ namespace ETG
         // Projectile collision handling
         virtual void HandleProjectileCollision(const ProjectileBase* projectile);
 
-        // Force handling helpers that delegate to MoveComp
-        void ApplyForce(const sf::Vector2f& forceDirection, float magnitude, float forceDuration) const;
-        bool IsBeingForced() const { return MoveComp ? MoveComp->IsBeingForced : false; }
-        virtual void EnemyShoot(); //Shoot if timer is up and attackDistance
-
         EnemyStateEnum EnemyState{EnemyStateEnum::Idle};
         Direction EnemyDir{Direction::Right};
 
@@ -41,12 +36,17 @@ namespace ETG
         float attackCooldownTimer = 0.0f;
         bool isInAttackRange = false; //For now 
 
-        std::unique_ptr<Magnum> Gun; //TODO: MAke this GunBase after you're done with all
+        std::unique_ptr<GunBase> Gun;
+        std::unique_ptr<BaseHealthComp> HealthComp;
 
         std::unique_ptr<CollisionComponent> CollisionComp;
+        EventDelegate<> OnShooting;
         std::unique_ptr<EnemyMoveCompBase> MoveComp;
 
     protected:
+        // Force handling helpers that delegate to MoveComp
+        void HandleShooting(); //Shoot if timer is up and attackDistance
+        
         std::unique_ptr<Hand> Hand;
         Hero* Hero;
 

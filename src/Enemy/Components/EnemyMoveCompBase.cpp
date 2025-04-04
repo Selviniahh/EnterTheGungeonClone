@@ -38,7 +38,7 @@ namespace ETG
 
     void EnemyMoveCompBase::UpdateAIMovement()
     {
-        //For now, we won't need this for a very long time. Firstly we need a map editor, then map itself and loader, all procedurally generated which shouldn't take less than 2-3 thousand lines of code
+        //Firstly we need a map editor, then map itself and loader, all procedurally generated which shouldn't take less than 2-3 thousand lines of code
         //So what we need to worry about is when more enemies are collectively moving to hero, they will bump each other. So one enemy is an obstacle for another one.
         //After map has been created, we should just use A* to handle all pathfinding.
         //However, for now I'll just create second bigger collision component. If bigger collision component is colliding with another enemy, we will just halve enemy's velocity until collision is over.
@@ -46,7 +46,6 @@ namespace ETG
         //For now BulletManMoveComp will just move to hero all blindness.
 
         if (!OwnerEnemy) return;
-
         if (!Hero->IsValid()) return;
 
         // Calculate direction and distance to hero
@@ -66,16 +65,15 @@ namespace ETG
             sf::Vector2f position = OwnerEnemy->GetPosition();
             UpdateMovement(directionToHero, position);
             OwnerEnemy->SetPosition(position);
-            OwnerEnemy->EnemyShoot();
+            OwnerEnemy->OnShooting.Broadcast();
         }
         else
         {
-            // Either at proper distance or in cooldown, just idle
             OwnerEnemy->EnemyState = EnemyStateEnum::Idle;
 
-            // Gradually slow down
+            // Gradually %10 slow down
             Velocity *= 0.9f;
-            OwnerEnemy->EnemyShoot();
+            OwnerEnemy->OnShooting.Broadcast();
         }
     }
 
