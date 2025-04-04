@@ -28,7 +28,7 @@ Animation::Animation(const std::shared_ptr<sf::Texture>& texture, const float ea
 void Animation::Update()
 {
     if (!Active || !Texture || Texture->getSize().x == 0) throw std::runtime_error("Something is wrong");
-    if (AnimTimeLeft > 1000.0f || AnimTimeLeft < -1000) throw std::runtime_error("Animation Time is so big");
+    if (AnimTimeLeft > 9999999.0f || AnimTimeLeft < -1000) throw std::runtime_error("Animation Time is so big");
     
     AnimTimeLeft -= ETG::Globals::FrameTick;
     if (AnimTimeLeft <= 0)

@@ -2,47 +2,96 @@
 #include "../../Managers/Globals.h"
 #include "../../Utils/Math.h"
 
-BaseMoveComp::BaseMoveComp(float maxSpeed, float acceleration, float deceleration)
-    : ComponentBase(), MaxSpeed(maxSpeed),
-      Acceleration(acceleration),
-      Deceleration(deceleration),
-      Velocity(0.f, 0.f)
+namespace ETG
 {
-}
-
-void BaseMoveComp::UpdateMovement(const sf::Vector2f& inputDir, sf::Vector2f& position)
-{
-    const float deltaTime = ETG::Globals::FrameTick; // delta time from your globals
-
-    //There's a movement input
-    if (inputDir != sf::Vector2f(0.f, 0.f))
+    BaseMoveComp::BaseMoveComp(const float maxSpeed, const float acceleration, const float deceleration)
+        : MaxSpeed(maxSpeed), Acceleration(acceleration), Deceleration(deceleration), Velocity(0.f, 0.f)
     {
-        // Accelerate: add (normalized input * acceleration * dt)
-        const sf::Vector2f normDir = Math::Normalize(inputDir);
-        Velocity += normDir * Acceleration * deltaTime;
-        
-        // Clamp speed to MaxSpeed.
-        float currentSpeed = Math::VectorLength(Velocity);
-        if (currentSpeed > MaxSpeed)
-        {
-            Velocity = Math::Normalize(Velocity) * MaxSpeed;
-        }
     }
-    else
+
+    void BaseMoveComp::Update()
     {
-        // No input: decelerate.
-        float currentSpeed = Math::VectorLength(Velocity);
-        float decAmount = Deceleration * deltaTime;
-        if (decAmount > currentSpeed)
+        // Update force effect in the base Update
+        UpdateForce();
+    }
+
+    void BaseMoveComp::UpdateMovement(const sf::Vector2f& inputDir, sf::Vector2f& position)
+    {
+        // Don't process normal movement when being forced
+        if (IsBeingForced) return;
+
+        const float deltaTime = Globals::FrameTick; // delta time from your globals
+
+        //There's a movement input
+        if (inputDir != sf::Vector2f(0.f, 0.f))
         {
-            Velocity = sf::Vector2f(0.f, 0.f);
+            // Accelerate: add (normalized input * acceleration * dt)
+            const sf::Vector2f normDir = Math::Normalize(inputDir);
+            Velocity += normDir * Acceleration * deltaTime;
+
+            // Clamp speed to MaxSpeed.
+            const float currentSpeed = Math::VectorLength(Velocity);
+            if (currentSpeed > MaxSpeed)
+            {
+                //Firstly normalize so that we will just have pure direction and then multiply by max speed. 
+                Velocity = Math::Normalize(Velocity) * MaxSpeed;
+            }
         }
         else
         {
-            Velocity -= Math::Normalize(Velocity) * decAmount;
+            // No input so decelerate.
+            const float currentSpeed = Math::VectorLength(Velocity);
+            const float decAmount = Deceleration * deltaTime;
+            if (decAmount > currentSpeed)
+            {
+                Velocity = sf::Vector2f(0.f, 0.f);
+            }
+            else
+            {
+                Velocity -= Math::Normalize(Velocity) * decAmount;
+            }
         }
+
+        // Update the position by velocity.
+        position += Velocity * deltaTime;
     }
 
-    // Update the position by velocity.
-    position += Velocity * deltaTime;
+    void BaseMoveComp::ApplyForce(const sf::Vector2f& forceDirection, const float magnitude, const float forceDuration)
+    {
+        // Set force parameters
+        ForceDirection = forceDirection;
+        ForceMagnitude = magnitude;
+        ForceMaxDuration = forceDuration;
+        ForceTimer = 0.0f;
+        IsBeingForced = true;
+
+        // Broadcast force start event
+        OnForceStart.Broadcast();
+    }
+
+    void BaseMoveComp::UpdateForce()
+    {
+        if (!IsBeingForced) return;
+        if (!Owner) return;
+
+        ForceTimer += Globals::FrameTick;
+
+        if (ForceTimer < ForceMaxDuration)
+        {
+            // Calculate current force magnitude using lerp (starts strong, gradually weakens)
+            //So for instance we will lerp from 200 to 0 over half second and then apply the value to position
+            const float currentForce = Math::IntervalLerp(ForceMagnitude * ForceSpeed, 0.0f, ForceMaxDuration, ForceTimer);
+
+            // Apply force to position
+            Owner->SetPosition(Owner->GetPosition() + ForceDirection * currentForce * Globals::FrameTick);
+        }
+        else
+        {
+            // Force effect is done
+            IsBeingForced = false;
+            OnForceEnd.Broadcast();
+            Velocity = sf::Vector2f(0.f, 0.f); // Reset velocity after force ends so based on acceleration it will slowly build up velocity in every force
+            
+        }
+    }
 }

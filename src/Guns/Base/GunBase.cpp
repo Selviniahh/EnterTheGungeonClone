@@ -108,17 +108,6 @@ namespace ETG
         {
             CurrentGunState = GunStateEnum::Idle;
         }
-        // Durin reload if reload animation has finished, we have to revert back to idle state
-        // else if (AnimationComp->CurrentState == GunStateEnum::Reload &&
-        //     AnimationComp->AnimManagerDict[AnimationComp->CurrentState].IsAnimationFinished())
-        // {
-        //     // Reload is finished - refill magazine and return to idle
-        //     //TODO: Weirdly, I wrote reloading logic inside ReloadText UI class. I have to create delegates to fire one from here and then migrate reload logic to here
-        //     AnimationComp->AnimManagerDict[AnimationComp->CurrentState].CurrentAnim->Restart();
-        //     CurrentGunState = GunStateEnum::Idle;
-        //     IsReloading = false;
-        //     MagazineAmmo = MagazineSize; // Refill the magazine
-        // }
 
         // Continue with the rest of the update logic
         ArrowComp->SetPosition(this->Position + Math::RotateVector(Rotation, Scale, ArrowComp->arrowOffset));
@@ -211,7 +200,7 @@ namespace ETG
 
     void GunBase::EnqueueProjectiles(const int shotCount, const float EffectiveSpread)
     {
-        //Queue any additional bullets with delay
+        //Queue any additional bullets with delay (only useful if shotCount > 1) 
         for (int i = 0; i < shotCount; i++)
         {
             float projectileAngle = GameObjectBase::Rotation;
@@ -225,7 +214,7 @@ namespace ETG
             }
 
             //Queue the bullet
-            bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
+            bulletQueue.push_back({i * ShotDelay, projectileAngle});
         }
     }
 
@@ -234,11 +223,10 @@ namespace ETG
         //Restart muzzle flash animation and shoot animation
         if (MuzzleFlash->IsVisible) MuzzleFlash->Restart();
         ShootSound.play();
-
-        AnimationComp->AnimManagerDict[GunStateEnum::Shoot].AnimationDict[GunStateEnum::Shoot].Restart();
-
+        
         //Set animation state
         CurrentGunState = GunStateEnum::Shoot;
+        RestartCurrentAnimStateAnimation();
 
         //Calculate spawn position
         const sf::Vector2f spawnPos = ArrowComp->GetPosition();
@@ -248,8 +236,9 @@ namespace ETG
         const sf::Vector2f direction = Math::RadianToDirection(rad);
         const sf::Vector2f projVelocity = direction * ShotSpeed;
 
-        //Spawn a projectile
-        std::unique_ptr<ProjectileBase> proj = CreateGameObjectDefault<ProjectileBase>(*ProjTexture, spawnPos, projVelocity, Range, projectileAngle, Damage, Force);
+        //Spawn a projectile NOTE: I decided to instead spawn projectiles attached to fired gun. That's because in collision resolution, I need to know the owner gun of the projectile and from that learn whether it's a hero's or enemy's projectile
+        //projectile.
+        std::unique_ptr<ProjectileBase> proj = CreateGameObjectAttached<ProjectileBase>(this,*ProjTexture, spawnPos, projVelocity, Range, projectileAngle, Damage, Force);
         proj->Update();
         projectiles.push_back(std::move(proj));
     }
@@ -258,12 +247,18 @@ namespace ETG
     {
         //IF already reloading or magazine is full do not invoke again
         if (IsReloading || MagazineAmmo == MagazineSize) return;
-
+        
         CurrentGunState = GunStateEnum::Reload; //update animation
+        RestartCurrentAnimStateAnimation();
         IsReloading = true;
         ReloadSound.play();
         OnAmmoRunOut.Broadcast(false); // Notify that we have ammo again
         OnReloadInvoke.Broadcast(true);
+    }
+
+    void GunBase::RestartCurrentAnimStateAnimation()
+    {
+        AnimationComp->AnimManagerDict[CurrentGunState].AnimationDict[CurrentGunState].Restart();
     }
 
     void GunBase::SetShootSound(const std::string& soundPath)

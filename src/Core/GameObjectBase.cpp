@@ -34,7 +34,7 @@ void ETG::GameObjectBase::VisualizeOrigin() const
 {
     if (DrawOriginPoint)
     {
-        Globals::DrawSinglePixelAtLoc(DrawProps.Position, sf::Vector2i(1,1), Rotation);
+        Globals::DrawSinglePixelAtLoc(DrawProps.Position, sf::Vector2i(1, 1), Rotation);
     }
 }
 
@@ -117,7 +117,6 @@ std::string ETG::GameObjectBase::SetObjectNameToSelfClassName()
 
 void ETG::GameObjectBase::PopulateSpecificWidgets()
 {
-    
 }
 
 void ETG::GameObjectBase::IncrementName()
@@ -132,13 +131,22 @@ void ETG::GameObjectBase::IncrementName()
 
         for (const auto& [objectName, gameObject] : SceneObjs)
         {
-            if (objectName == ObjectName) continue; //Current element is the first object initialized
+            if (objectName == ObjectName) continue;
 
-            if (objectName.contains(BaseName)) //Basename is found, Get this obj's suffix value 
+            // Only process if it contains the base name and has potential numeric suffix
+            if (objectName.starts_with(BaseName))
             {
-                std::string Suffix = objectName.substr(ObjectName.size());
-                const signed int LastDigit = std::stoi(Suffix);
-                Suffixes.push_back(LastDigit);
+                std::string Suffix = objectName.substr(BaseName.size());
+
+                // Check if Suffix is purely numeric
+                const bool isNumeric = !Suffix.empty() && std::ranges::all_of(Suffix,
+                                                                              [](const char c) { return std::isdigit(c); });
+
+                if (isNumeric)
+                {
+                    const signed int LastDigit = std::stoi(Suffix);
+                    Suffixes.push_back(LastDigit);
+                }
             }
         }
 

@@ -40,6 +40,7 @@ namespace ETG
 
         //NOTE: This is the actual projectile firing logic. Override this without calling base in child to implement custom shooting logic
         virtual void EnqueueProjectiles(int shotCount, float EffectiveSpread);
+        void RestartCurrentAnimStateAnimation();
 
         //NOTE: EnqueueProjectiles will add projectiles to the queue, this function will fire them in tick.
         void UpdateProjectiles(); //If projectile needs to be removed, remove and update
@@ -54,7 +55,10 @@ namespace ETG
         ModifierManager<IGunModifier> modifierManager; 
         
         std::vector<QueuedBullet> bulletQueue; //Queue of bullets waiting to be fired
-        static constexpr float MULTI_SHOT_DELAY = 0.1f;  // Delay between bullets in seconds
+
+        //NOTE: I am writing this cuz it's been 4th time I did same mistake. This delay is only related with active item's double shooting. Unless it's activated this won't be used
+        //As best practice, I need to move this back to the Active item.  
+        float ShotDelay = 0.1f;  
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
 
@@ -120,7 +124,7 @@ namespace ETG
         float ReloadSoundVolume = 10;
 
         BOOST_DESCRIBE_CLASS(GunBase, (GameObjectBase),
-                             (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ReloadTime, IsReloading,
+                             (CurrentGunState, MaxAmmo, MagazineSize, MagazineAmmo, ShotDelay, ReloadTime, IsReloading,
                                  FireRate, ShotSpeed, Range, Damage, Force, Spread),
                              (ProjTexture, OriginOffset),
                              ())

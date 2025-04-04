@@ -31,10 +31,13 @@ namespace ETG
             static_cast<float>(Texture->getSize().x / 2),
             static_cast<float>(Texture->getSize().y / 2)
         };
+
+        arrowOriginOffset = {-2.f, 0.f};
     }
 
     inline void ArrowComp::Draw()
     {
+        if (!IsVisible) return;
         ComponentBase::Draw();
         SpriteBatch::Draw(GetDrawProperties());
         Globals::DrawSinglePixelAtLoc(Position, {1, 1}, Rotation);

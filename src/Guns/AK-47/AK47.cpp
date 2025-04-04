@@ -15,7 +15,7 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
     30,        // MagazineSize
     2.0f,      // ReloadTime
     5.5f,      // Damage
-    9.0f,      // Force
+    17.0f,      // Force
     3.0f)      // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<AK47AnimComp>(this);
@@ -48,7 +48,8 @@ void ETG::AK47::Initialize()
         if (auto* hero = dynamic_cast<Hero*>(eventData.Other))
         {
             hero->EquipGun(this);
-            CollisionComp->SetCollisionEnabled(false); //After equip 
+            CollisionComp->SetCollisionEnabled(false); //After equip
+            this->Owner = hero; //Set the owner of the gun to the hero This is important because during projectile collision, we need to know the owner of the projectile
         }
     });
 
@@ -85,10 +86,10 @@ void ETG::AK47AnimComp::SetAnimations()
     AddGunAnimationForState(GunStateEnum::Idle, IdleAnim);
 
     // Shoot animations
-    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_shoot_001", "png", 0.18f)};
+    const Animation ShootAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_shoot_001", "png", 0.15f)};
     AddGunAnimationForState(GunStateEnum::Shoot, ShootAnim);
 
     // Reload Animation
-    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_reload_001", "png", 3.00f, false)};
+    const Animation ReloadAnim = {Animation::CreateSpriteSheet("Guns/AK47", "ak47_reload_001", "png", ReloadAnimInterval, false)};
     AddGunAnimationForState(GunStateEnum::Reload, ReloadAnim);
 }

@@ -23,6 +23,7 @@ void Engine::Initialize()
 {
     //Initialize Imgui-SFML after creating the window
     if (!ImGui::SFML::Init(*Window)) throw std::runtime_error("Cannot initialize ImGUI with the given Window");
+    GameState::GetInstance().SetEngine(this);
 
     GameState::GetInstance().SetEngineUISize(&windowSize);
     windowSize = {400, (float)(Window->getSize().y)};
@@ -47,7 +48,7 @@ void Engine::Update()
 
     //If window is updated, need to assign to this variable so Game UI can be updated
     windowSize = ImGui::GetWindowSize();
-    
+
     UpdateDetailsPanel();
 
     PreviousGameFocus = CurrentGameFocus;
@@ -65,7 +66,7 @@ bool Engine::IsGameWindowFocused()
         return false;
 
     // Check if the game has focus; if not, ignore input.
-    if (!CurrentGameFocus) 
+    if (!CurrentGameFocus)
         return false;
 
     // Determine if focus was just gained
@@ -73,7 +74,7 @@ bool Engine::IsGameWindowFocused()
         InputManager::LeftClickRequired = true;
 
     // Process events to check for mouse release
-    if (InputManager::LeftClickRequired && GameManager::GameEvent.type == sf::Event::MouseButtonReleased && 
+    if (InputManager::LeftClickRequired && GameManager::GameEvent.type == sf::Event::MouseButtonReleased &&
         ETG::GameManager::GameEvent.mouseButton.button == sf::Mouse::Left)
     {
         InputManager::LeftClickRequired = false;
@@ -103,16 +104,16 @@ void Engine::UpdateDetailsPanel()
     //Game object pane
     if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_None))
     {
-        const float hierarchyHeight = Math::CalculatePercentageOfValue((float)ScreenSize.y, 25); 
+        const float hierarchyHeight = Math::CalculatePercentageOfValue((float)ScreenSize.y, 25);
         // constexpr float hierarchyHeight = 300;
-        
+
         // Create a child window with scrolling enabled
         ImGui::BeginChild("HierarchyScrollingRegion", ImVec2(0, hierarchyHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
-        
+
         // Assuming Scene is the root object
         GameObjectBase* sceneObj = GameState::GetInstance().GetSceneObj();
         DisplayHierarchy(sceneObj);
-        
+
         ImGui::EndChild(); // End the scrollable region
     }
 
@@ -180,7 +181,8 @@ void Engine::DisplayHierarchy(GameObjectBase* object)
 
 void Engine::DisplayProperties() const
 {
-    if (SelectedObj != nullptr)
+    // Check if the selected object is still valid
+    if (SelectedObj && SelectedObj->IsValid())
     {
         //Display the Absolute and Relative orientation only if the SelectedObj is not inherited from ComponentBase
         if (!dynamic_cast<ComponentBase*>(SelectedObj))
@@ -208,9 +210,9 @@ void Engine::DisplayProperties() const
             if (SelectedObj->IsGameObjectUISpecified && ImGui::TreeNode("Current Object"))
             {
                 SelectedObj->PopulateSpecificWidgets();
-                ImGui::TreePop();                
+                ImGui::TreePop();
             }
-            
+
             ImGui::TreePop();
         }
         else

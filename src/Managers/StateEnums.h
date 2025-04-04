@@ -32,12 +32,26 @@ namespace ETG
     };
     BOOST_DESCRIBE_ENUM(HeroDashEnum, Dash_Back, Dash_BackWard, Dash_Front, Dash_Left, Dash_Right, Unknown)
 
+    //I wish to have hit animations for all 8 directions
+    enum class HeroHit
+    {
+        JustHit
+    };
+    BOOST_DESCRIBE_ENUM(HeroHit, JustHit)
+
+    enum class HeroDeath
+    {
+        Dead
+    };
+    BOOST_DESCRIBE_ENUM(HeroDeath, Dead)
+
     enum class HeroStateEnum
     {
         Idle,
         Run,
         Dash,
-        Die
+        Die,
+        Hit
     };
     BOOST_DESCRIBE_ENUM(HeroStateEnum, Idle, Run, Dash, Die)
 
@@ -46,7 +60,9 @@ namespace ETG
         Idle,
         Run,
         Dash,
-        Die
+        Die,
+        Shooting,
+        Hit
     };
     BOOST_DESCRIBE_ENUM(EnemyStateEnum, Idle, Run, Dash, Die)
 
@@ -66,6 +82,23 @@ namespace ETG
         Idle_Left
     };
     BOOST_DESCRIBE_ENUM(BulletManIdleEnum, Idle_Back, Idle_Left, Idle_Right)
+
+    enum class BulletManShootingEnum
+    {
+        Shoot_Left,
+        Shoot_Right,
+    };
+    BOOST_DESCRIBE_ENUM(BulletManShootingEnum, Shoot_Left, Shoot_Right)
+
+    enum class BulletManHitEnum
+    {
+        Hit_Back_Left,
+        Hit_Back_Right,
+        Hit_Left,
+        Hit_Right
+    };
+    
+    BOOST_DESCRIBE_ENUM(BulletManHitEnum, Hit_Back_Left, Hit_Back_Right, Hit_Left, Hit_Right)
     
     enum class GunStateEnum
     {

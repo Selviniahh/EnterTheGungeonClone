@@ -24,8 +24,8 @@ namespace ETG
     public:
         MagnumAnimComp();
         void SetAnimations() override;
-        float ShootAnimInterval = 0.15f;
-        float ReloadAnimInterval = 3.f / 2.f;
+        float ShootAnimInterval = 0.1f;
+        float ReloadAnimInterval = 3.f / 2.f; //Frame Count / Reload Time = Reload Time; (but of course we need to divide bigger value first as we can't have negative anim interval)  
         
         BOOST_DESCRIBE_CLASS(MagnumAnimComp, (BaseAnimComp), (), (), ())
     };

@@ -2,15 +2,18 @@
 #include <filesystem>
 
 #include "../Core/Components/CollisionComponent.h"
+#include "../Core/Components/BaseHealthComp.h"
 #include "../Enemy/EnemyBase.h"
 #include "../Managers/GameState.h"
 #include "../Managers/SpriteBatch.h"
 #include "../Guns/RogueSpecial/RogueSpecial.h"
+#include "../Projectile/ProjectileBase.h"
 #include "../UI/UIObjects/ReloadText.h"
 #include "Components/HeroAnimComp.h"
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "Hand/Hand.h"
+
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -31,6 +34,8 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
     MoveComp->Initialize();
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
+    HealthComp = ETG::CreateGameObjectAttached<BaseHealthComp>(this, 0.5); //by default health will be 4
+    HealthComp->InvulnerabilityEnabled = true;
 
     //Collision comp:
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
@@ -39,7 +44,8 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 
     //Set default gun to equipped guns
     EquippedGuns.push_back(RogueSpecial.get());
-    CurrentGun = EquippedGuns[0];
+    CurrentGun = EquippedGuns[0]; //Hero's default gun is RogueSpecial
+    ReloadText->LinkToGun(CurrentGun);
 
     Hero::Initialize();
 }
@@ -47,16 +53,45 @@ ETG::Hero::Hero(const sf::Vector2f Position)
 void ETG::Hero::Initialize()
 {
     GameObjectBase::Initialize();
-    CurrentGun = RogueSpecial.get(); //Hero's default gun is RogueSpecial
-    ReloadText->LinkToGun(CurrentGun);
 
-    //Set up collision delegates. Move these to initialize after it works well. 
+    //NOTE: damage taken at here
+    HealthComp->OnDamageTaken.AddListener([this](const float damage, const GameObjectBase* instigator)
+    {
+        //IF dead ignore the damage
+        if (CurrentHeroState == HeroStateEnum::Die) return;
+
+        CurrentHeroState = HeroStateEnum::Hit;
+        const sf::Vector2f knockbackDir = Math::Normalize(Position - instigator->GetPosition());
+        MoveComp->ApplyForce(knockbackDir, KnockBackMagnitude, 0.2f);
+    });
+
+    HealthComp->OnDeath.AddListener([this](GameObjectBase* instigator)
+    {
+        CurrentHeroState = HeroStateEnum::Die;
+        //We should play death animation here once and disable all kind of movement. Maybe I might implement that but after the health bar
+    });
+
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
-        //If the collision is with enemy, just change the color of the enemy for now 
+        //If the collision is with enemy, apply force to our hero and damage
+        //TODO: we need Force logic from lots of places.
         if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
         {
-            enemyObj->SetColor(sf::Color::Blue);
+            std::cout << "Collision with " << enemyObj->GetObjectName() << " Push yourself to opposite direction and damage yourself " << std::endl;
+            HealthComp->OnDamageTaken.Broadcast(0.5f, enemyObj);
+            HealthComp->ApplyDamage(0.5, enemyObj);
+        }
+
+        //If the collision is with enemy projectile, damage our hero and destroy the enemy projectile
+        auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
+        auto* enemyProj = dynamic_cast<ProjectileBase*>(eventData.Other);
+        if (enemyObj && enemyProj)
+        {
+            if (AnimationComp->IsDashing) return; //If dashing, ignore the hit and do not destroy the projectile
+
+            HealthComp->OnDamageTaken.Broadcast(0.5, enemyProj);
+            HealthComp->ApplyDamage(0.5, enemyObj);
+            enemyProj->MarkForDestroy();
         }
 
         //If it's ActiveItem, assign our pointer
@@ -68,11 +103,7 @@ void ETG::Hero::Initialize()
 
     CollisionComp->OnCollisionExit.AddListener([this](const CollisionEventData& eventData)
     {
-        //Handle collisin exit
-        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
-        {
-            enemyObj->SetColor(sf::Color::White);
-        }
+        //No exit required for now
     });
 }
 
@@ -83,10 +114,13 @@ void ETG::Hero::Update()
     GameObjectBase::Update();
     CollisionComp->Update();
     InputComp->Update(*this);
-    MoveComp->Update(); //NOTE: When InputComp changes `HeroPtr->CurrentHeroState` new AnimState changes needs to be reflected in `AnimationComp` then `MoveComp` or I can move all dash to AnimationComp????  
+    MoveComp->Update(); //NOTE: When InputComp changes `HeroPtr->CurrentHeroState` new AnimState changes needs to be reflected in `AnimationComp` then `MoveComp` or I can move all dash to AnimationComp????
+    HealthComp->Update();
 
-    AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
-    AnimationComp->FlipSpritesX(CurrentDirection, *this);
+    std::cout << HealthComp->CurrentHealth << std::endl;
+
+    if (CurrentHeroState != HeroStateEnum::Hit) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
+    if (CurrentHeroState != HeroStateEnum::Hit) AnimationComp->FlipSpritesX(CurrentDirection, *this);
     AnimationComp->Update();
 
     //Set hand properties
@@ -113,13 +147,14 @@ void ETG::Hero::Update()
     //Will run only if reload needed 
     ReloadText->Update();
 
-    //If dashing do not draw gun and hand
-    Hand->IsVisible = !(AnimationComp->IsDashing);
-    CurrentGun->IsVisible = !(AnimationComp->IsDashing);
+    //If dashing or hit anim playing do not draw gun and hand
+    Hand->IsVisible = !(AnimationComp->IsDashing) && CurrentHeroState != HeroStateEnum::Hit && CurrentHeroState != HeroStateEnum::Die;
+    CurrentGun->IsVisible = !(AnimationComp->IsDashing) && CurrentHeroState != HeroStateEnum::Hit && CurrentHeroState != HeroStateEnum::Die;
 
     //Update  all equipped guns (for their projectiles only)
-    for (const auto guns : EquippedGuns) guns->Update();
-    
+    for (const auto guns : EquippedGuns)
+        guns->Update();
+
     GameObjectBase::Update();
 }
 

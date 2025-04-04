@@ -99,6 +99,12 @@ add_executable(ETG main.cpp
         src/Guns/SawedOff/SawedOff.h
         src/Guns/Magnum/Magnum.cpp
         src/Guns/Magnum/Magnum.h
+        src/Core/GameClass.cpp
+        src/Core/Components/TimerComponent.h
+        src/Core/Components/TimerComponent.cpp
+        src/Core/Components/TimerComponent.h
+        src/Enemy/Components/EnemyMoveCompBase.cpp
+        src/Enemy/Components/EnemyMoveCompBase.h
 )
 
 # Easiest and fastest way is VCPKG 

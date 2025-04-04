@@ -16,7 +16,7 @@ struct always_false : std::false_type
 };
 
 //Variant necessary to provide hashing based on the given type.   
-using AnimationKey = std::variant<std::string, int, ETG::HeroStateEnum, ETG::HeroRunEnum, ETG::BulletManIdleEnum, ETG::BulletManRunEnum, ETG::HeroIdleEnum, ETG::HeroDashEnum, ETG::GunStateEnum, ETG::EnemyStateEnum>;
+using AnimationKey = std::variant<std::string, int, ETG::HeroStateEnum, ETG::HeroRunEnum, ETG::BulletManIdleEnum, ETG::BulletManRunEnum, ETG::BulletManShootingEnum, ETG::BulletManHitEnum, ETG::HeroIdleEnum, ETG::HeroDashEnum, ETG::GunStateEnum, ETG::EnemyStateEnum, ETG::HeroHit, ETG::HeroDeath>;
 
 // 3) Custom hash + equality
 //Based on given key of variant, convert it to hash
@@ -89,7 +89,7 @@ public:
 
     // Return the current frame as a texture for the last key
     std::shared_ptr<sf::Texture> GetCurrentFrameAsTexture();
-    Animation* GetCurrentAnimation();
+    const Animation* GetCurrentAnimation() const;
 
     // Check if the current animation has finished
     bool IsAnimationFinished();
@@ -160,7 +160,7 @@ inline std::shared_ptr<sf::Texture> AnimationManager::GetCurrentFrameAsTexture()
     throw std::runtime_error("Failed to find current frame's texture. Last Key: ");
 }
 
-inline Animation* AnimationManager::GetCurrentAnimation()
+const inline Animation* AnimationManager::GetCurrentAnimation() const
 {
     const auto it = AnimationDict.find(LastKey);
     if (it != AnimationDict.end())

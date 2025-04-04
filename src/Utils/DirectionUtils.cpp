@@ -20,7 +20,7 @@ void ETG::DirectionUtils::PopulateDirectionRanges(DirectionMap mapToFill)
     mapToFill[{337, 360}] = Direction::Right;
 }
 
-ETG::Direction ETG::DirectionUtils::GetDirectionToHero(const Hero* Hero, sf::Vector2f SelfPosition)
+ETG::Direction ETG::DirectionUtils::GetDirectionToHero(const Hero* Hero, const sf::Vector2f SelfPosition)
 {
     const sf::Vector2f dirVector = Math::Normalize(Hero->GetPosition() - SelfPosition);
 
@@ -77,6 +77,29 @@ ETG::HeroRunEnum ETG::DirectionUtils::GetHeroRunEnum(Direction currDir)
     if (currDir == Direction::Right || currDir == Direction::Left) return HeroRunEnum::Run_Forward;
     if (currDir == Direction::FrontHandRight || currDir == Direction::FrontHandLeft) return HeroRunEnum::Run_Front;
     return HeroRunEnum::Run_Forward; // Default case
+}
+
+ETG::BulletManShootingEnum ETG::DirectionUtils::GetBulletManShootingEnum(Direction currDir)
+{
+    if (currDir == Direction::BackHandRight) return BulletManShootingEnum::Shoot_Right;
+    if (currDir == Direction::BackDiagonalRight ) return BulletManShootingEnum::Shoot_Right;
+    if (currDir == Direction::Right) return BulletManShootingEnum::Shoot_Right;
+    if (currDir == Direction::FrontHandRight) return BulletManShootingEnum::Shoot_Right;
+    return BulletManShootingEnum::Shoot_Left; // else  return left
+}
+
+ETG::BulletManHitEnum ETG::DirectionUtils::GetBulletManHitEnum(Direction currDir)
+{
+    if (currDir == Direction::BackHandRight) return BulletManHitEnum::Hit_Back_Right;
+    if (currDir == Direction::BackDiagonalRight) return BulletManHitEnum::Hit_Back_Right;
+    if (currDir == Direction::Right) return BulletManHitEnum::Hit_Right;
+    if (currDir == Direction::FrontHandRight) return BulletManHitEnum::Hit_Right;
+    if (currDir == Direction::BackHandLeft) return BulletManHitEnum::Hit_Back_Left;
+    if (currDir == Direction::BackDiagonalLeft) return BulletManHitEnum::Hit_Back_Left;
+    if (currDir == Direction::Left) return BulletManHitEnum::Hit_Left;
+    if (currDir == Direction::FrontHandLeft) return BulletManHitEnum::Hit_Left;
+
+    return BulletManHitEnum::Hit_Left; // else  return left
 }
 
 //Do not put any breakpoint at this function otherwise Key presses that captured in above GetDashDirectionEnum won't be captured during debugging. 

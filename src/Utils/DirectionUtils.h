@@ -2,8 +2,8 @@
 #include <functional>
 #include <string>
 #include <SFML/System/Vector2.hpp>
-
 #include "../../src/Managers/StateEnums.h"
+
 
 namespace ETG
 {
@@ -38,6 +38,8 @@ namespace ETG
         //DirectionMap's key pair represents minimum and maximum degree range. The value is the corresponding Direction for degree range.
         //In Short, take the map and calculated angle, and return the Found Direction from angle. 
         static Direction GetHeroDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, float angle);
+        static BulletManShootingEnum GetBulletManShootingEnum(Direction currDir);
+        static BulletManHitEnum GetBulletManHitEnum(Direction currDir);
 
         static Direction LastDashDirection;
         static const Direction& GetDirectionFromDash() {return LastDashDirection;} //This will run instead of above GetHeroDirectionFromAngle if state is Dash

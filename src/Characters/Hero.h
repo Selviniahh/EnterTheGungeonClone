@@ -17,6 +17,8 @@ namespace ETG
     class InputComponent;
     class HeroMoveComp;
     class ReloadSlider;
+    class BaseHealthComp;
+
 
     class Hero : public GameObjectBase
     {
@@ -39,6 +41,7 @@ namespace ETG
         std::unique_ptr<Hand> Hand;
         std::unique_ptr<ReloadText> ReloadText;
         std::unique_ptr<CollisionComponent> CollisionComp;
+        std::unique_ptr<BaseHealthComp> HealthComp;
 
         ActiveItemBase* CurrActiveItem{};
 
@@ -49,6 +52,7 @@ namespace ETG
         std::vector<GunBase*> EquippedGuns; // Array of equipped guns
         GunBase* CurrentGun = nullptr; // Currently selected gun
         int currentGunIndex = 0; // Track the index of current gun
+        float KnockBackMagnitude = 150.f;
 
         //When equipping a new gun pickup
         void EquipGun(GunBase* newGun);
@@ -58,7 +62,7 @@ namespace ETG
         void SwitchToNextGun();
 
         BOOST_DESCRIBE_CLASS(Hero, (GameObjectBase),
-                             (MouseAngle, CurrentDirection, CurrentHeroState, IsShooting),
+                             (MouseAngle, CurrentDirection, CurrentHeroState, IsShooting, KnockBackMagnitude),
                              (),
                              ())
     private:
