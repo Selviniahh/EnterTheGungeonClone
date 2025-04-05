@@ -107,6 +107,7 @@ add_executable(ETG main.cpp
         src/Core/Components/TimerComponent.h
         src/Enemy/Components/EnemyMoveCompBase.cpp
         src/Enemy/Components/EnemyMoveCompBase.h
+        src/Core/Scene/Scene.cpp
 )
 
 # Easiest and fastest way is VCPKG 

@@ -24,9 +24,7 @@ void ETG::BulletManMoveComp::Initialize()
 
 void ETG::BulletManMoveComp::UpdateAIMovement()
 {
-    if (!BulletManPtr) return;
-
-    if (!Hero->IsValid()) return;
+    if (!BulletManPtr || !Hero->IsValid() || BulletManPtr->IsDead()) return;
 
     // Calculate direction and distance to hero
     const sf::Vector2f directionToHero = GetDirectionToHero();

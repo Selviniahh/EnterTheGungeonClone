@@ -86,6 +86,7 @@ void ETG::GameManager::Update()
         Ak47->Update();
         SawedOff->Update();
         Magnum->Update();
+        Scene->Update();
         BulletMan->Update();
         PlatinumBullets->Update();
         DoubleShoot->Update();
@@ -103,6 +104,7 @@ void ETG::GameManager::Draw()
 
     GlobSpriteBatch.begin();
     Hero->Draw();
+    Scene->Draw();
     BulletMan->Draw();
     PlatinumBullets->Draw();
     DoubleShoot->Draw();

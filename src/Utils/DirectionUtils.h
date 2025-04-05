@@ -4,16 +4,11 @@
 #include <SFML/System/Vector2.hpp>
 #include "../../src/Managers/StateEnums.h"
 
-
-namespace ETG
-{
-    class Hero;
-}
-
 //NOTE: For now this class hosts basic enum operations for both hero and enemy. Later on I will decide if it's worth to separate this class
 namespace ETG
 {
     enum class Direction;
+    class Hero;
 
     struct PairHash
     {
@@ -40,6 +35,7 @@ namespace ETG
         static Direction GetHeroDirectionFromAngle(const std::unordered_map<std::pair<int, int>, Direction, PairHash>& DirectionMap, float angle);
         static BulletManShootingEnum GetBulletManShootingEnum(Direction currDir);
         static BulletManHitEnum GetBulletManHitEnum(Direction currDir);
+        static BulletManDeathEnum GetBulletManDeathEnum(Direction currDir);
 
         static Direction LastDashDirection;
         static const Direction& GetDirectionFromDash() {return LastDashDirection;} //This will run instead of above GetHeroDirectionFromAngle if state is Dash

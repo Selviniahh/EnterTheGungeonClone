@@ -114,7 +114,7 @@ void ETG::Hero::Update()
     MoveComp->Update(); //NOTE: When InputComp changes `HeroPtr->CurrentHeroState` new AnimState changes needs to be reflected in `AnimationComp` then `MoveComp` or I can move all dash to AnimationComp????
     HealthComp->Update();
 
-    std::cout << HealthComp->CurrentHealth << std::endl;
+    // std::cout << HealthComp->CurrentHealth << std::endl;
 
     //Flip animations if not hit or dead
     if (!IsCurrStateHitDie()) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);

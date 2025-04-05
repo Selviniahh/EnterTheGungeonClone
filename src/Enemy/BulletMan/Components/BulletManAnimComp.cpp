@@ -63,6 +63,19 @@ void ETG::BulletManAnimComp::SetAnimations()
         Animation::CreateSpriteSheet("Enemy/BulletMan/Hit", "bullet_hit_right_001", "png", 0.08f),
     };
     AddAnimationsForState<BulletManHitEnum>(EnemyStateEnum::Hit, hitAnims);
+
+    // Death animation
+    const auto DeathAnims = std::vector<Animation>{
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_back_south_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_front_north_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_left_back_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_left_front_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_left_side_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_right_back_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_right_front_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_right_side_001", "png", 0.08f),
+    };
+    AddAnimationsForState<BulletManDeathEnum>(EnemyStateEnum::Die, DeathAnims);
 }
 
 void ETG::BulletManAnimComp::Update()
@@ -95,6 +108,10 @@ void ETG::BulletManAnimComp::Update()
         newKey = DirectionUtils::GetBulletManHitEnum(BulletMan->EnemyDir);
         break;
 
+    case EnemyStateEnum::Die:
+        newKey = DirectionUtils::GetBulletManDeathEnum(BulletMan->EnemyDir);
+        break;
+
     default:
         newKey = BulletManIdleEnum::Idle_Back; // Default fallback
         break;
@@ -102,4 +119,10 @@ void ETG::BulletManAnimComp::Update()
 
     // Update base animation component with current state and key
     BaseAnimComp<EnemyStateEnum>::Update(BulletMan->EnemyState, newKey);
+
+    // When death animation finishes, pause on the last frame
+    if (BulletMan->EnemyState == EnemyStateEnum::Die && AnimManagerDict[EnemyStateEnum::Die].IsAnimationFinished())
+    {
+        AnimManagerDict[EnemyStateEnum::Die].CurrentAnim->PlayOnlyLastFrame();
+    }
 }

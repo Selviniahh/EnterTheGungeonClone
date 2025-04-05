@@ -227,8 +227,6 @@ namespace ETG
 
 
     //-----------------------------------------UI----------------------------------------
-
-
     template <typename StateEnum>
     void BaseAnimComp<StateEnum>::PopulateSpecificWidgets()
     {

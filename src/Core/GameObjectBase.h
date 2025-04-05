@@ -65,6 +65,7 @@ namespace ETG
         //The typename without any increment
         std::string TypeName{};
 
+    public:
         void ComputeDrawProperties();
         void VisualizeOrigin() const;
         void IncrementName();
