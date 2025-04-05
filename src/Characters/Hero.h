@@ -25,6 +25,11 @@ namespace ETG
     public:
         explicit Hero(sf::Vector2f Position);
         ~Hero() override;
+
+        //When current animation is Dash, Hit, Die, we need to stop movement, stop collision, stop shooting etc. For all of these purposes use this  
+        bool IsCurrStateDashHitDie() const;
+        bool IsCurrStateHitDie() const;
+        
         void Update() override;
         void Initialize() override;
         void Draw() override;
@@ -52,7 +57,7 @@ namespace ETG
         std::vector<GunBase*> EquippedGuns; // Array of equipped guns
         GunBase* CurrentGun = nullptr; // Currently selected gun
         int currentGunIndex = 0; // Track the index of current gun
-        float KnockBackMagnitude = 150.f;
+        float KnockBackMagnitude = 250.f; //TODO: Should apply damage also contain knockback magnitude
 
         //When equipping a new gun pickup
         void EquipGun(GunBase* newGun);
@@ -66,6 +71,6 @@ namespace ETG
                              (),
                              ())
     private:
-        void UpdateGunVisibility();
+        void UpdateGunVisibility() const;
     };
 }

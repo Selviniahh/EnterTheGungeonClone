@@ -1,6 +1,5 @@
 #include "Hero.h"
 #include <filesystem>
-
 #include "../Core/Components/CollisionComponent.h"
 #include "../Core/Components/BaseHealthComp.h"
 #include "../Enemy/EnemyBase.h"
@@ -13,7 +12,6 @@
 #include "Components/HeroMoveComp.h"
 #include "Components/InputComponent.h"
 #include "Hand/Hand.h"
-
 
 float ETG::Hero::MouseAngle = 0;
 ETG::Direction ETG::Hero::CurrentDirection{};
@@ -34,8 +32,8 @@ ETG::Hero::Hero(const sf::Vector2f Position)
     MoveComp = ETG::CreateGameObjectAttached<HeroMoveComp>(this);
     MoveComp->Initialize();
     InputComp = ETG::CreateGameObjectAttached<InputComponent>(this);
-    HealthComp = ETG::CreateGameObjectAttached<BaseHealthComp>(this, 0.5); //by default health will be 4
-    HealthComp->InvulnerabilityEnabled = true;
+    HealthComp = ETG::CreateGameObjectAttached<BaseHealthComp>(this, 2.f); //by default health will be 4
+    HealthComp->InvulnerabilityEnabled = false;
 
     //Collision comp:
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
@@ -65,20 +63,19 @@ void ETG::Hero::Initialize()
         MoveComp->ApplyForce(knockbackDir, KnockBackMagnitude, 0.2f);
     });
 
+    //NOTE: Hero will die at here
     HealthComp->OnDeath.AddListener([this](GameObjectBase* instigator)
     {
         CurrentHeroState = HeroStateEnum::Die;
-        //We should play death animation here once and disable all kind of movement. Maybe I might implement that but after the health bar
     });
 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
         //If the collision is with enemy, apply force to our hero and damage
-        //TODO: we need Force logic from lots of places.
         if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
         {
             std::cout << "Collision with " << enemyObj->GetObjectName() << " Push yourself to opposite direction and damage yourself " << std::endl;
-            HealthComp->OnDamageTaken.Broadcast(0.5f, enemyObj);
+            KnockBackMagnitude = 350.f;
             HealthComp->ApplyDamage(0.5, enemyObj);
         }
 
@@ -89,7 +86,7 @@ void ETG::Hero::Initialize()
         {
             if (AnimationComp->IsDashing) return; //If dashing, ignore the hit and do not destroy the projectile
 
-            HealthComp->OnDamageTaken.Broadcast(0.5, enemyProj);
+            KnockBackMagnitude = 150.f;
             HealthComp->ApplyDamage(0.5, enemyObj);
             enemyProj->MarkForDestroy();
         }
@@ -119,8 +116,9 @@ void ETG::Hero::Update()
 
     std::cout << HealthComp->CurrentHealth << std::endl;
 
-    if (CurrentHeroState != HeroStateEnum::Hit) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
-    if (CurrentHeroState != HeroStateEnum::Hit) AnimationComp->FlipSpritesX(CurrentDirection, *this);
+    //Flip animations if not hit or dead
+    if (!IsCurrStateHitDie()) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
+    if (!IsCurrStateHitDie()) AnimationComp->FlipSpritesX(CurrentDirection, *this);
     AnimationComp->Update();
 
     //Set hand properties
@@ -128,30 +126,32 @@ void ETG::Hero::Update()
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
     Hand->Update();
 
+    //Will run only if reload needed 
+    ReloadText->Update();
+
     //Gun orientation
     CurrentGun->SetPosition(Hand->GetPosition() + Hand->GunOffset);
     CurrentGun->Rotation = MouseAngle;
 
+
     //Shoot only if these conditions are met 
-    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading && !AnimationComp->IsDashing)
+    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading && !IsCurrStateDashHitDie())
     {
         CurrentGun->PrepareShooting();
     }
 
     //Try to use Active item
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && CurrActiveItem)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && CurrActiveItem && !IsCurrStateDashHitDie())
     {
         CurrActiveItem->RequestUsage();
     }
 
-    //Will run only if reload needed 
-    ReloadText->Update();
-
     //If dashing or hit anim playing do not draw gun and hand
-    Hand->IsVisible = !(AnimationComp->IsDashing) && CurrentHeroState != HeroStateEnum::Hit && CurrentHeroState != HeroStateEnum::Die;
-    CurrentGun->IsVisible = !(AnimationComp->IsDashing) && CurrentHeroState != HeroStateEnum::Hit && CurrentHeroState != HeroStateEnum::Die;
+    Hand->IsVisible = !IsCurrStateDashHitDie();
+    CurrentGun->IsVisible = !IsCurrStateDashHitDie();
 
     //Update  all equipped guns (for their projectiles only)
+    //NOTE: if (IsAttachedObjectNeeded()) //Calling this will act like stopping the time for projectiles. If I had some time, I'd implement stop time active item
     for (const auto guns : EquippedGuns)
         guns->Update();
 
@@ -162,19 +162,29 @@ void ETG::Hero::Draw()
 {
     if (!IsVisible) return;
     GameObjectBase::Draw();
-    CurrentGun->Draw();
     SpriteBatch::Draw(GetDrawProperties());
-
+    CurrentGun->Draw();
     ReloadText->Draw();
     Hand->Draw();
 
     //Draw all equipped guns (for their projectiles only)
-    for (const auto guns : EquippedGuns) guns->Draw();
+    for (const auto guns : EquippedGuns)
+        guns->Draw();
 
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
-//----------------------------Gun Switch stuffs ----------------------------
+bool ETG::Hero::IsCurrStateDashHitDie() const
+{
+    return CurrentHeroState == HeroStateEnum::Dash || CurrentHeroState == HeroStateEnum::Hit || CurrentHeroState == HeroStateEnum::Die;
+}
+
+bool ETG::Hero::IsCurrStateHitDie() const
+{
+    return CurrentHeroState == HeroStateEnum::Hit || CurrentHeroState == HeroStateEnum::Die;
+}
+
+//----------------------------Gun Switch Functionalities ----------------------------
 ETG::GunBase* ETG::Hero::GetCurrentHoldingGun() const
 {
     return CurrentGun;
@@ -216,7 +226,7 @@ void ETG::Hero::SwitchToNextGun()
     UpdateGunVisibility();
 }
 
-void ETG::Hero::UpdateGunVisibility()
+void ETG::Hero::UpdateGunVisibility() const
 {
     for (GunBase* gun : EquippedGuns)
     {

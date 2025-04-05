@@ -32,7 +32,7 @@ namespace ETG
             Animation::CreateSpriteSheet("Player/Run/Forward", "rogue_run_forward_hands_001", "png", RunAnimFrameInterval),
             Animation::CreateSpriteSheet("Player/Run/Front", "rogue_run_front_hands_001", "png", RunAnimFrameInterval),
         };
-        AddAnimationsForState<HeroRunEnum>(HeroStateEnum::Run,runAnims);
+        AddAnimationsForState<HeroRunEnum>(HeroStateEnum::Run, runAnims);
 
         //Idle
         const auto idleAnims = std::vector<Animation>{
@@ -42,8 +42,8 @@ namespace ETG
             Animation::CreateSpriteSheet("Player/Idle/Right", "rogue_idle_hands_001", "png", IdleAnimFrameInterval),
         };
         const auto idleEnumValues = ConstructEnumVector<HeroIdleEnum>();
-        AddAnimationsForState<HeroIdleEnum>(HeroStateEnum::Idle,idleAnims);
-        
+        AddAnimationsForState<HeroIdleEnum>(HeroStateEnum::Idle, idleAnims);
+
         //Dash
         const auto dashAnims = std::vector<Animation>{
             Animation::CreateSpriteSheet("Player/Dash/Back", "rogue_dodge_back_001", "png", DashAnimFrameInterval), //Dash_Back 0.62
@@ -56,13 +56,13 @@ namespace ETG
 
         //Hit (Because there's no hit animation, spin animation will be used)
         const auto spinAnim = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/Spin", "rogue_spin_001", "png", 0.10), //Dash_Right Will take: 0.466159 seconds
+            Animation::CreateSpriteSheet("Player/Spin", "rogue_spin_001", "png", 0.10),
         };
         AddAnimationsForState<HeroHit>(HeroStateEnum::Hit, spinAnim);
 
         //Death 
         const auto DeathAnim = std::vector<Animation>{
-            Animation::CreateSpriteSheet("Player/ShotDeath", "rogue_shot_death_001", "png", 0.25), //Dash_Right Will take: 0.466159 seconds
+            Animation::CreateSpriteSheet("Player/ShotDeath", "rogue_shot_death_001", "png", 0.10),
         };
         AddAnimationsForState<HeroDeath>(HeroStateEnum::Die, DeathAnim);
     }
@@ -70,7 +70,7 @@ namespace ETG
     void HeroAnimComp::StartDash(HeroDashEnum direction)
     {
         if (IsDashing) return;
-        
+
         IsDashing = true;
         DashTimer = 0.f; //Reset the timer
         CurrentDashDirection = direction;
@@ -102,32 +102,35 @@ namespace ETG
     {
         AnimationKey newKey;
 
-        if (HeroPtr->CurrentHeroState == HeroStateEnum::Idle)
+        switch (HeroPtr->CurrentHeroState)
         {
+        case HeroStateEnum::Idle:
             newKey = DirectionUtils::GetHeroIdleDirectionEnum(HeroPtr->CurrentDirection);
             HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Idle].AnimationDict[newKey].FrameInterval = IdleAnimFrameInterval;
-        }
+            break;
 
-        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Run)
-        {
+        case HeroStateEnum::Run:
             newKey = DirectionUtils::GetHeroRunEnum(HeroPtr->CurrentDirection);
             HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Run].AnimationDict[newKey].FrameInterval = RunAnimFrameInterval;
-        }
+            break;
 
-        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Dash)
-        {
+        case HeroStateEnum::Dash:
             newKey = CurrentDashDirection;
             DashTimer += Globals::FrameTick;
-        }
-        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Hit)
-        {
+            break;
+
+        case HeroStateEnum::Hit:
             newKey = HeroHit::JustHit;
-        }
-        else if (HeroPtr->CurrentHeroState == HeroStateEnum::Die)
-        {
+            break;
+
+        case HeroStateEnum::Die:
             newKey = HeroDeath::Dead;
+            break;
+
+        default:
+            break;
         }
-        
+
         //NOTE: I know calling base here and then executing rest of the codes looks weird however, during state changes the base animation's `ChangeAnimStateIfRequired` will restart animation if state has ever changes
         //If the dash functionality below executed before this base, the dash animation will not restart so after executing once `IsDashAnimFinished` will always return true forever
         //One option is to extract  `ChangeAnimStateIfRequired` from base and call here however I believe in every anim state change, generally all animations needs to restart so I don't wanna move a generic function into it's child 
@@ -149,10 +152,10 @@ namespace ETG
             HeroPtr->CurrentHeroState = HeroStateEnum::Idle;
         }
 
+        //NOTE: If hero is dead and animation is finished, set the animation to last frame. Hero's animation and state will never change ever again after death
         if (HeroPtr->CurrentHeroState == HeroStateEnum::Die && HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Die].IsAnimationFinished())
         {
-            HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Die].CurrentAnim->FrameInterval = 9999;
+            HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Die].CurrentAnim->PlayOnlyLastFrame();
         }
-
     }
 }

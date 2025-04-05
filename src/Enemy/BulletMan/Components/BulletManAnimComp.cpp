@@ -14,7 +14,7 @@ ETG::BulletManAnimComp::~BulletManAnimComp() = default;
 void ETG::BulletManAnimComp::Initialize()
 {
     BaseAnimComp<EnemyStateEnum>::Initialize();
-    
+
     // Set initial state here
     if (Owner)
     {
@@ -47,14 +47,14 @@ void ETG::BulletManAnimComp::SetAnimations()
         Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_back_001", "png", 0.12f),
     };
     AddAnimationsForState<BulletManRunEnum>(EnemyStateEnum::Run, runAnims);
-    
+
     // Shooting animation
     const auto shootingAnims = std::vector<Animation>{
         Animation::CreateSpriteSheet("Enemy/BulletMan/Shooting", "bullet_shooting_left_001", "png", 0.1f),
         Animation::CreateSpriteSheet("Enemy/BulletMan/Shooting", "bullet_shooting_right_001", "png", 0.1f),
     };
     AddAnimationsForState<BulletManShootingEnum>(EnemyStateEnum::Shooting, shootingAnims);
-    
+
     // Hit animation
     const auto hitAnims = std::vector<Animation>{
         Animation::CreateSpriteSheet("Enemy/BulletMan/Hit", "bullet_hit_back_left_001", "png", 0.08f),
@@ -73,24 +73,32 @@ void ETG::BulletManAnimComp::Update()
         BulletMan = dynamic_cast<class BulletMan*>(Owner);
         if (!BulletMan) return; // Safety check
     }
-    
+
     AnimationKey newKey;
 
     // Set key based on state (similar to HeroAnimComp approach)
-    if (BulletMan->EnemyState == EnemyStateEnum::Idle)
+    switch (BulletMan->EnemyState)
+    {
+    case EnemyStateEnum::Idle:
         newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
-    
-    else if (BulletMan->EnemyState == EnemyStateEnum::Run)
+        break;
+
+    case EnemyStateEnum::Run:
         newKey = DirectionUtils::GetBulletManRunEnum(BulletMan->EnemyDir);
-    
-    else if (BulletMan->EnemyState == EnemyStateEnum::Shooting)
+        break;
+
+    case EnemyStateEnum::Shooting:
         newKey = DirectionUtils::GetBulletManShootingEnum(BulletMan->EnemyDir);
-    
-    else if (BulletMan->EnemyState == EnemyStateEnum::Hit)
+        break;
+
+    case EnemyStateEnum::Hit:
         newKey = DirectionUtils::GetBulletManHitEnum(BulletMan->EnemyDir);
-    
-    else
+        break;
+
+    default:
         newKey = BulletManIdleEnum::Idle_Back; // Default fallback
+        break;
+    }
 
     // Update base animation component with current state and key
     BaseAnimComp<EnemyStateEnum>::Update(BulletMan->EnemyState, newKey);
