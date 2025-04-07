@@ -31,6 +31,8 @@ namespace ETG
         void Update(const StateEnum& stateEnum, const AnimationKey& animKey);
         void PopulateSpecificWidgets() override;
 
+
+    public:
         template <typename DirectionEnum>
         void AddAnimationsForState(StateEnum state, const std::vector<Animation>& animations);
 

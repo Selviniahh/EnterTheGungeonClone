@@ -38,6 +38,7 @@ namespace ETG
         // Delegate that broadcasts when timer completes
         EventDelegate<> OnTimerFinished;
 
+
     private:
         float TotalTime; // Total time in seconds
         float CurrentTime; // Current elapsed time. This will be incremented every frame

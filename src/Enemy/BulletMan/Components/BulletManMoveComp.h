@@ -17,7 +17,7 @@ namespace ETG
     protected:
         // Override the AI movement behavior for BulletMan
         void UpdateAIMovement() override;
-
+        
     private:
         // Specific reference to BulletMan owner
         BulletMan* BulletManPtr = nullptr;

@@ -18,6 +18,7 @@ namespace ETG
     public:
         explicit ActiveItemBase(const std::string& resourcePath, const std::string& activateResPath, const float& cooldownTime, const float& activeTime);
 
+    public:
         float TotalCooldownTime;
         float TotalConsumeTime;
         float ConsumeTimer; //Will be increased when the item is consuming
@@ -45,7 +46,6 @@ namespace ETG
         std::mt19937 rng{std::random_device{}()};
 
         BOOST_DESCRIBE_CLASS(ActiveItemBase, (GameObjectBase), (TotalCooldownTime, TotalConsumeTime, ConsumeTimer, CoolDownTimer, ActiveItemState), (ItemDescription), ())
-
     };
 
     enum class ActiveItemState
@@ -54,7 +54,6 @@ namespace ETG
         Consuming, //Item is currently being consumed
         Cooldown //Item is in Cooldown state
     };
+
     BOOST_DESCRIBE_ENUM(ActiveItemState, Ready, Consuming, Cooldown)
-
-
 }

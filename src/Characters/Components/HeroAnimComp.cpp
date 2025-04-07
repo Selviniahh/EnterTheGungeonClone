@@ -18,7 +18,7 @@ namespace ETG
         HeroPtr = GameState::GetInstance().GetHero();
         IsGameObjectUISpecified = true;
         HeroAnimComp::SetAnimations();
-        CurrentState = HeroPtr->CurrentHeroState;
+        CurrentState = HeroPtr->GetState();
     }
 
     void HeroAnimComp::SetAnimations()
@@ -79,7 +79,7 @@ namespace ETG
         auto& anim = HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Dash].AnimationDict[direction];
         anim.FrameInterval = DashAnimFrameInterval;
         anim.Restart();
-        HeroPtr->CurrentHeroState = HeroStateEnum::Dash;
+        HeroPtr->SetState(HeroStateEnum::Dash);
         OnDashStart.Broadcast(direction);
     }
 
@@ -102,7 +102,7 @@ namespace ETG
     {
         AnimationKey newKey;
 
-        switch (HeroPtr->CurrentHeroState)
+        switch (HeroPtr->GetState())
         {
         case HeroStateEnum::Idle:
             newKey = DirectionUtils::GetHeroIdleDirectionEnum(HeroPtr->CurrentDirection);
@@ -134,7 +134,7 @@ namespace ETG
         //NOTE: I know calling base here and then executing rest of the codes looks weird however, during state changes the base animation's `ChangeAnimStateIfRequired` will restart animation if state has ever changes
         //If the dash functionality below executed before this base, the dash animation will not restart so after executing once `IsDashAnimFinished` will always return true forever
         //One option is to extract  `ChangeAnimStateIfRequired` from base and call here however I believe in every anim state change, generally all animations needs to restart so I don't wanna move a generic function into it's child 
-        BaseAnimComp<HeroStateEnum>::Update(HeroPtr->CurrentHeroState, newKey);
+        BaseAnimComp<HeroStateEnum>::Update(HeroPtr->GetState(), newKey);
 
         //If Dash animation is complete, Stop Dash and set Current state to idle
         if (IsDashing && DashTimer >= MinDashDuration && IsDashAnimFinished())
@@ -143,17 +143,17 @@ namespace ETG
         }
 
         //After hit, hit animation needs to be played once and then it will be set to idle
-        if (HeroPtr->CurrentHeroState == HeroStateEnum::Hit && HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Hit].IsAnimationFinished())
+        if (HeroPtr->GetState() == HeroStateEnum::Hit && HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Hit].IsAnimationFinished())
         {
             //Restart current hit animation otherwise after first play, above IsAnimationFinished will always return true
             HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Hit].CurrentAnim->Restart();
 
             //After hit animation is finished, set idle state 
-            HeroPtr->CurrentHeroState = HeroStateEnum::Idle;
+            HeroPtr->SetState(HeroStateEnum::Idle);
         }
 
         //NOTE: If hero is dead and animation is finished, set the animation to last frame. Hero's animation and state will never change ever again after death
-        if (HeroPtr->CurrentHeroState == HeroStateEnum::Die && HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Die].IsAnimationFinished())
+        if (HeroPtr->GetState() == HeroStateEnum::Die && HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Die].IsAnimationFinished())
         {
             HeroPtr->AnimationComp->AnimManagerDict[HeroStateEnum::Die].CurrentAnim->PlayOnlyLastFrame();
         }

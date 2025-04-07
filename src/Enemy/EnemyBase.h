@@ -27,6 +27,7 @@ namespace ETG
         // Projectile collision handling
         virtual void HandleProjectileCollision(const ProjectileBase* projectile);
 
+    public:
         // Force handling helpers that delegate to MoveComp
         void ApplyForce(const sf::Vector2f& forceDirection, float magnitude, float forceDuration) const;
         [[nodiscard]] bool IsBeingForced() const { return MoveComp ? MoveComp->IsBeingForced : false; }

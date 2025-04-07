@@ -93,25 +93,22 @@ namespace ETG
 
     void HeroMoveComp::UpdateMovement()
     {
-        // Ensure we have a valid hero pointer.
-        // if (!HeroPtr) HeroPtr = GameState::GetInstance().GetHero();
-
         // Determine input direction.
         sf::Vector2f inputDir(0.f, 0.f);
-        if (InputManager::IsMoving() && !HeroPtr->AnimationComp->IsDashing && HeroPtr->CurrentHeroState != HeroStateEnum::Die && HeroPtr->CurrentHeroState != HeroStateEnum::Hit)
+        if (InputManager::IsMoving() && !HeroPtr->AnimationComp->IsDashing && HeroPtr->GetState() != HeroStateEnum::Die && HeroPtr->GetState() != HeroStateEnum::Hit)
         {
             inputDir = InputManager::direction;
-            HeroPtr->CurrentHeroState = HeroStateEnum::Run;
+            HeroPtr->SetState(HeroStateEnum::Run);
         }
-        else if (HeroPtr->MoveComp->HeroPtr->AnimationComp->IsDashing && HeroPtr->CurrentHeroState != HeroStateEnum::Die && HeroPtr->CurrentHeroState != HeroStateEnum::Hit)
+        else if (HeroPtr->MoveComp->HeroPtr->AnimationComp->IsDashing && HeroPtr->GetState() != HeroStateEnum::Die && HeroPtr->GetState() != HeroStateEnum::Hit)
         {
-            HeroPtr->CurrentHeroState = HeroStateEnum::Dash;
+            HeroPtr->SetState(HeroStateEnum::Dash);
         }
 
         //If not dead or hit, set to idle as last resort
-        else if (HeroPtr->CurrentHeroState != HeroStateEnum::Die && HeroPtr->CurrentHeroState != HeroStateEnum::Hit)
+        else if (HeroPtr->GetState() != HeroStateEnum::Die && HeroPtr->GetState() != HeroStateEnum::Hit)
         {
-            HeroPtr->CurrentHeroState = HeroStateEnum::Idle;
+            HeroPtr->SetState(HeroStateEnum::Idle);
         }
 
         // Use the base helper to update velocity and position.
@@ -120,7 +117,7 @@ namespace ETG
 
     bool HeroMoveComp::IsDashAvailable() const
     {
-        return DashCooldownTimer <= 0.f && HeroPtr->CurrentHeroState != HeroStateEnum::Die && HeroPtr->CurrentHeroState != HeroStateEnum::Hit;
+        return DashCooldownTimer <= 0.f && HeroPtr->GetState() != HeroStateEnum::Die && HeroPtr->GetState() != HeroStateEnum::Hit;
     }
 
     void HeroMoveComp::StartDashCooldown()

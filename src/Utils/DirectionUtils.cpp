@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 #include "Math.h"
-#include "../Managers/StateEnums.h"
+#include "../Managers/Enum/StateEnums.h"
 #include "../Characters/Hero.h"
 
 ETG::Direction ETG::DirectionUtils::LastDashDirection{};

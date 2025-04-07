@@ -30,5 +30,4 @@ namespace ETG
 
         BOOST_DESCRIBE_CLASS(ProjectileBase, (GameObjectBase), (ProjVelocity, Range, Damage, Force), (), ())
     };
-    
 }

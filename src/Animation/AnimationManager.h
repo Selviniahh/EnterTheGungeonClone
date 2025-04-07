@@ -7,7 +7,7 @@
 #include <string>
 #include <memory>
 #include "Animation.h"
-#include "../Managers/StateEnums.h"
+#include "../Managers/Enum/StateEnums.h"
 #include "boost/describe.hpp"
 
 template <typename>

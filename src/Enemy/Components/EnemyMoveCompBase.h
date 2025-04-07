@@ -30,6 +30,7 @@ namespace ETG
         // Get the direction to the hero
         sf::Vector2f GetDirectionToHero() const;
         float GetDistanceToHero() const;
+        
         Hero* Hero; // Static pointer to the hero for all enemies
         
         // The owner as an EnemyBase

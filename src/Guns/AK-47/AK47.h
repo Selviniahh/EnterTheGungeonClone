@@ -14,8 +14,7 @@ namespace ETG
         void Update() override;
         void Draw() override;
 
-
-
+    public:
         std::unique_ptr<CollisionComponent> CollisionComp;
 
         BOOST_DESCRIBE_CLASS(AK47, (GunBase), (), (),());

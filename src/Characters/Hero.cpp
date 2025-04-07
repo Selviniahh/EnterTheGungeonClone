@@ -20,7 +20,7 @@ bool ETG::Hero::IsShooting{};
 ETG::Hero::Hero(const sf::Vector2f Position)
 {
     this->Position = Position;
-    Depth = 2;
+    Depth = -1;
     GameState::GetInstance().SetHero(this);
 
     Hand = ETG::CreateGameObjectAttached<class Hand>(this);
@@ -53,48 +53,52 @@ void ETG::Hero::Initialize()
     GameObjectBase::Initialize();
 
     //NOTE: damage taken at here
-    HealthComp->OnDamageTaken.AddListener([this](const float damage, const GameObjectBase* instigator)
+    HealthComp->OnDamageTaken.AddListener([this](const float damage, const float forceMagnitude, const GameObjectBase* instigator)
     {
         //IF dead ignore the damage
         if (CurrentHeroState == HeroStateEnum::Die) return;
 
-        CurrentHeroState = HeroStateEnum::Hit;
+        this->SetState(HeroStateEnum::Hit);
         const sf::Vector2f knockbackDir = Math::Normalize(Position - instigator->GetPosition());
-        MoveComp->ApplyForce(knockbackDir, KnockBackMagnitude, 0.2f);
+        MoveComp->ApplyForce(knockbackDir, forceMagnitude, 0.2f);
     });
 
     //NOTE: Hero will die at here
     HealthComp->OnDeath.AddListener([this](GameObjectBase* instigator)
     {
-        CurrentHeroState = HeroStateEnum::Die;
+        this->SetState(HeroStateEnum::Die);
     });
 
     CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
     {
         //If the collision is with enemy, apply force to our hero and damage
-        if (auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other))
+        if (eventData.Other->IsA<EnemyBase>())
         {
-            std::cout << "Collision with " << enemyObj->GetObjectName() << " Push yourself to opposite direction and damage yourself " << std::endl;
-            KnockBackMagnitude = 350.f;
-            HealthComp->ApplyDamage(0.5, enemyObj);
+            const auto enemyObj = static_cast<EnemyBase*>(eventData.Other); //all safe so ignore (sometimes) useless clang-tidy 
+            HealthComp->ApplyDamage(0.5, EnemyCollideKnockBackMag, enemyObj);
         }
 
         //If the collision is with enemy projectile, damage our hero and destroy the enemy projectile
-        auto* enemyObj = dynamic_cast<EnemyBase*>(eventData.Other->Owner->Owner);
-        auto* enemyProj = dynamic_cast<ProjectileBase*>(eventData.Other);
-        if (enemyObj && enemyProj)
+        //eventData.Other->Owner = Projectile's gun. I didn't write that cuz dynamic_cast is expensive
+        if (eventData.Other->IsA<ProjectileBase>()) //Quick check to reduce possible expensive dynamic_cast
         {
-            if (AnimationComp->IsDashing) return; //If dashing, ignore the hit and do not destroy the projectile
+            auto* projectile = eventData.Other->As<ProjectileBase>();
+            
+            if (projectile && projectile->Owner && projectile->Owner->Owner &&
+                projectile->Owner->Owner->IsA<EnemyBase>())
+            {
+                const auto enemy = static_cast<EnemyBase*>(projectile->Owner->Owner);
+                if (HasAnyFlag(StateFlags, PreventDamage)) return;
 
-            KnockBackMagnitude = 150.f;
-            HealthComp->ApplyDamage(0.5, enemyObj);
-            enemyProj->MarkForDestroy();
-        }
+                HealthComp->ApplyDamage(0.5, HitKnockBackMagnitude, enemy);
+                projectile->MarkForDestroy();
+            }
 
-        //If it's ActiveItem, assign our pointer
-        if (auto* activeItem = dynamic_cast<ActiveItemBase*>(eventData.Other))
-        {
-            CurrActiveItem = activeItem;
+            //If it's ActiveItem, assign our pointer
+            if (auto* activeItem = dynamic_cast<ActiveItemBase*>(eventData.Other))
+            {
+                CurrActiveItem = activeItem;
+            }
         }
     });
 
@@ -106,55 +110,74 @@ void ETG::Hero::Initialize()
 
 ETG::Hero::~Hero() = default;
 
-void ETG::Hero::Update()
+void ETG::Hero::UpdateComponents()
 {
-    GameObjectBase::Update();
     CollisionComp->Update();
     InputComp->Update(*this);
-    MoveComp->Update(); //NOTE: When InputComp changes `HeroPtr->CurrentHeroState` new AnimState changes needs to be reflected in `AnimationComp` then `MoveComp` or I can move all dash to AnimationComp????
+    MoveComp->Update();
     HealthComp->Update();
+}
 
-    // std::cout << HealthComp->CurrentHealth << std::endl;
-
-    //Flip animations if not hit or dead
-    if (!IsCurrStateHitDie()) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
-    if (!IsCurrStateHitDie()) AnimationComp->FlipSpritesX(CurrentDirection, *this);
+void ETG::Hero::UpdateAnimations()
+{
+    if (CanFlipAnims()) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
+    if (CanFlipAnims()) AnimationComp->FlipSpritesX(CurrentDirection, *this);
     AnimationComp->Update();
+}
 
-    //Set hand properties
+void ETG::Hero::UpdateHand() const
+{
     const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(CurrentDirection) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
     Hand->Update();
 
-    //Will run only if reload needed 
-    ReloadText->Update();
+    //If dashing or hit anim playing do not draw gun and hand
+    Hand->IsVisible = CanMove();
+}
 
-    //Gun orientation
+void ETG::Hero::UpdateGuns() const
+{
     CurrentGun->SetPosition(Hand->GetPosition() + Hand->GunOffset);
     CurrentGun->Rotation = MouseAngle;
 
-
-    //Shoot only if these conditions are met 
-    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading && !IsCurrStateDashHitDie())
-    {
-        CurrentGun->PrepareShooting();
-    }
-
-    //Try to use Active item
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && CurrActiveItem && !IsCurrStateDashHitDie())
-    {
-        CurrActiveItem->RequestUsage();
-    }
-
     //If dashing or hit anim playing do not draw gun and hand
-    Hand->IsVisible = !IsCurrStateDashHitDie();
-    CurrentGun->IsVisible = !IsCurrStateDashHitDie();
+    CurrentGun->IsVisible = CanMove();
 
     //Update  all equipped guns (for their projectiles only)
     //NOTE: if (IsAttachedObjectNeeded()) //Calling this will act like stopping the time for projectiles. If I had some time, I'd implement stop time active item
     for (const auto guns : EquippedGuns)
         guns->Update();
+}
 
+void ETG::Hero::HandleShooting()
+{
+    if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading && CanShoot())
+    {
+        CurrentGun->PrepareShooting();
+    }
+}
+
+void ETG::Hero::HandleActiveItem()
+{
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && CurrActiveItem && CanUseActiveItems())
+    {
+        CurrActiveItem->RequestUsage();
+    }
+}
+
+void ETG::Hero::Update()
+{
+    GameObjectBase::Update();
+    UpdateComponents();
+    UpdateAnimations();
+
+    //NOTE: Reload Text: Will run only if reload needed 
+    ReloadText->Update();
+
+    HandleShooting();
+    HandleActiveItem();
+    UpdateHand();
+    UpdateGuns();
     GameObjectBase::Update();
 }
 
@@ -174,14 +197,24 @@ void ETG::Hero::Draw()
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }
 
-bool ETG::Hero::IsCurrStateDashHitDie() const
+//----------------------------State Functionalities ----------------------------
+void ETG::Hero::SetState(const HeroStateEnum& state)
 {
-    return CurrentHeroState == HeroStateEnum::Dash || CurrentHeroState == HeroStateEnum::Hit || CurrentHeroState == HeroStateEnum::Die;
-}
+    CurrentHeroState = state;
 
-bool ETG::Hero::IsCurrStateHitDie() const
-{
-    return CurrentHeroState == HeroStateEnum::Hit || CurrentHeroState == HeroStateEnum::Die;
+    switch (state)
+    {
+    case HeroStateEnum::Idle: StateFlags = StateIdle;
+        break;
+    case HeroStateEnum::Run: StateFlags = StateRun;
+        break;
+    case HeroStateEnum::Dash: StateFlags = StateDash;
+        break;
+    case HeroStateEnum::Die: StateFlags = StateDie;
+        break;
+    case HeroStateEnum::Hit: StateFlags = StateHit;
+        break;
+    }
 }
 
 //----------------------------Gun Switch Functionalities ----------------------------
@@ -199,31 +232,29 @@ void ETG::Hero::EquipGun(GunBase* newGun)
     UpdateGunVisibility();
 }
 
-void ETG::Hero::SwitchToPreviousGun()
+void ETG::Hero::SwitchGun(const int& index)
 {
     // First check if we have any guns at all
     if (EquippedGuns.empty()) return;
 
-    // Move index backwards (-1) with wraparound
+    // Move index backwards -1 or +1 with wraparound
     // No need for additional bounds check - the modulo operation guarantees the index is valid if the vector is not empty
-    currentGunIndex = (currentGunIndex - 1 + EquippedGuns.size()) % EquippedGuns.size();
+    currentGunIndex = (currentGunIndex + index + EquippedGuns.size()) % EquippedGuns.size();
     CurrentGun = EquippedGuns[currentGunIndex];
     ReloadText->LinkToGun(CurrentGun);
     ReloadText->SetNeedsReload(CurrentGun->IsMagazineEmpty());
     UpdateGunVisibility();
 }
 
+void ETG::Hero::SwitchToPreviousGun()
+{
+    SwitchGun(-1);
+}
+
 //Gun switching
 void ETG::Hero::SwitchToNextGun()
 {
-    if (EquippedGuns.empty()) return;
-
-    // Move index forwards with wraparound
-    currentGunIndex = (currentGunIndex + 1) % EquippedGuns.size();
-    CurrentGun = EquippedGuns[currentGunIndex];
-    ReloadText->LinkToGun(CurrentGun);
-    ReloadText->SetNeedsReload(CurrentGun->IsMagazineEmpty());
-    UpdateGunVisibility();
+    SwitchGun(1);
 }
 
 void ETG::Hero::UpdateGunVisibility() const

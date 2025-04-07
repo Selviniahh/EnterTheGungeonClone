@@ -29,6 +29,8 @@ namespace ETG
         void ApplyForce(const sf::Vector2f& forceDirection, float magnitude, float forceDuration);
         void UpdateForce();
 
+        
+
         // Force parameters
         float ForceSpeed = 1;
         float ForceMagnitude = 0.0f;

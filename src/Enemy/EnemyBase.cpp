@@ -38,7 +38,7 @@ namespace ETG
             if (const auto projectile = dynamic_cast<ProjectileBase*>(eventData.Other))
             {
                 // HandleProjectileCollision(projectile);
-                HealthComp->ApplyDamage(projectile->Damage, projectile);
+                HealthComp->ApplyDamage(projectile->Damage,projectile->Force, projectile);
             }
         });
         
@@ -74,7 +74,7 @@ namespace ETG
             CollisionComp->SetCollisionEnabled(false);
         });
 
-        HealthComp->OnDamageTaken.AddListener([this](const float damage, const GameObjectBase* instigator)
+        HealthComp->OnDamageTaken.AddListener([this](const float damage, const float forceMagnitude, const GameObjectBase* instigator)
         {
             //IF dead ignore the damage
             if (EnemyState == EnemyStateEnum::Die) return;

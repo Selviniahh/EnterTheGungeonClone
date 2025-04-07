@@ -15,6 +15,7 @@ namespace ETG
         void Draw() override;
         void Update() override;
 
+    public:
         sf::Vector2f arrowOriginOffset;
         sf::Vector2f arrowOffset;
 

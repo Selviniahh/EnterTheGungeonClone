@@ -21,6 +21,7 @@ namespace ETG
         void BulletManShoot(); //Shoot if timer is up and attackDistance
         void HandleProjectileCollision(const ProjectileBase* projectile) override;
         
+    public:
         std::unique_ptr<BulletManAnimComp> AnimationComp;
 
         // Attack parameters...

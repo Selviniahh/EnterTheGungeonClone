@@ -22,7 +22,9 @@ namespace ETG
     {
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         obj->Owner = GameState::GetInstance().GetSceneObj();
+        obj->template SetTypeInfo<T>(); //Set the type ID for this object
 
+        
         const std::string objName = obj->SetObjectNameToSelfClassName();
         RegisterGameObject(objName, obj.get());
         return obj;
@@ -33,7 +35,8 @@ namespace ETG
     {
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         obj->Owner = OwnerObj;
-
+        obj->template SetTypeInfo<T>(); //Set the type ID for this object
+        
         // After full construction, set the object name based on its true dynamic type name and Set obj to unordered_map and vector
         const std::string objName = obj->SetObjectNameToSelfClassName();
         RegisterGameObject(objName, obj.get());

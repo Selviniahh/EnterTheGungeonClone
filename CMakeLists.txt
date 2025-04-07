@@ -108,6 +108,8 @@ add_executable(ETG main.cpp
         src/Enemy/Components/EnemyMoveCompBase.cpp
         src/Enemy/Components/EnemyMoveCompBase.h
         src/Core/Scene/Scene.cpp
+        src/Managers/Enum/StateFlags.h
+        src/Core/TypeID.h
 )
 
 # Easiest and fastest way is VCPKG 
