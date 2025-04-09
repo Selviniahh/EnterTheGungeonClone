@@ -13,9 +13,13 @@ namespace ETG
         using IDType = uint32_t;
 
         // Get unique ID for a type
+        //NOTE: T might look like not used but based on every given typename, we creating static variable id. So every typename will have a static id.
+        //If typename is already defined before, it will return already created id without INCREMENTING.
+        //If typename seen for the first time, it will create a new id and return it.
+        //In every new typename, id will be  
         template<typename T>
         static IDType GetID() {
-            static const IDType id = NextID();
+            static const IDType id = NextID(); //if this executed before with same typename, this line will be skipped
             return id;
         }
 
@@ -30,11 +34,11 @@ namespace ETG
         }
         
         // Check if Child inherits from Parent
-        static bool IsBaseOf(IDType childID, IDType parentID) {
+        static bool IsBaseOf(const IDType childID, const IDType parentID) {
             if (childID == parentID) return true; // Same type
             
             // Check direct inheritance
-            auto it = BaseClasses.find(childID);
+            const auto it = BaseClasses.find(childID);
             if (it != BaseClasses.end()) {
                 if (it->second.contains(parentID)) return true;
                 

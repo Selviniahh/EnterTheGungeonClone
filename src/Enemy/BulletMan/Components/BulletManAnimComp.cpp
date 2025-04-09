@@ -21,7 +21,7 @@ void ETG::BulletManAnimComp::Initialize()
         BulletMan = dynamic_cast<class BulletMan*>(Owner);
         if (BulletMan)
         {
-            CurrentState = BulletMan->EnemyState;
+            CurrentState = BulletMan->GetState();
             CurrentAnimStateKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
         }
     }
@@ -90,7 +90,7 @@ void ETG::BulletManAnimComp::Update()
     AnimationKey newKey;
 
     // Set key based on state (similar to HeroAnimComp approach)
-    switch (BulletMan->EnemyState)
+    switch (BulletMan->GetState())
     {
     case EnemyStateEnum::Idle:
         newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
@@ -118,10 +118,10 @@ void ETG::BulletManAnimComp::Update()
     }
 
     // Update base animation component with current state and key
-    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->EnemyState, newKey);
+    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->GetState(), newKey);
 
     // When death animation finishes, pause on the last frame
-    if (BulletMan->EnemyState == EnemyStateEnum::Die && AnimManagerDict[EnemyStateEnum::Die].IsAnimationFinished())
+    if (BulletMan->GetState() == EnemyStateEnum::Die && AnimManagerDict[EnemyStateEnum::Die].IsAnimationFinished())
     {
         AnimManagerDict[EnemyStateEnum::Die].CurrentAnim->PlayOnlyLastFrame();
     }

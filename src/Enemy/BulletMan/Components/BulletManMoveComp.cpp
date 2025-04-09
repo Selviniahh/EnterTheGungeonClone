@@ -24,7 +24,7 @@ void ETG::BulletManMoveComp::Initialize()
 
 void ETG::BulletManMoveComp::UpdateAIMovement()
 {
-    if (!BulletManPtr || !Hero->IsValid() || BulletManPtr->IsDead()) return;
+    if (!BulletManPtr || !Hero->IsValid() || !BulletManPtr->CanMove()) return;
 
     // Calculate direction and distance to hero
     const sf::Vector2f directionToHero = GetDirectionToHero();
@@ -37,7 +37,7 @@ void ETG::BulletManMoveComp::UpdateAIMovement()
     if (distanceToHero > StopDistance)
     {
         // Set the state to running when moving
-        BulletManPtr->EnemyState = EnemyStateEnum::Run;
+        BulletManPtr->SetState(EnemyStateEnum::Run);
         MaxSpeed = MovementSpeed;
 
         // Update movement
@@ -49,7 +49,7 @@ void ETG::BulletManMoveComp::UpdateAIMovement()
     else
     {
         // Either at proper distance or in cooldown, just idle
-        BulletManPtr->EnemyState = EnemyStateEnum::Idle;
+        BulletManPtr->SetState(EnemyStateEnum::Idle);
 
         // Gradually slow down
         Velocity *= 0.9f;

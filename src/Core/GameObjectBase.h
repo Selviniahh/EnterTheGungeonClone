@@ -140,7 +140,7 @@ namespace ETG
 
         //Type checking without knowing derived types
         template <typename T>
-        bool IsA() const
+        [[nodiscard]] bool IsA() const
         {
             return TypeID::IsBaseOf(GetType(), TypeID::GetID<T>());
         }

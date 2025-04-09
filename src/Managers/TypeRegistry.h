@@ -37,7 +37,7 @@
 TypeID::RegisterBaseClass<Derived, Base>();
 
 
-//TODO: This class should be completely automated. A script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
+//TODO: This class should be completely automated. A pre build script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
 //TODO: generate all the RegisterType<ClassName> automatically. All source should be gathered in build directory and every file should have suffix "Gen` For example "HeroGen" just like unreal engine
 //TODO: Then instead of taking the source files, cmake should take the files with `Gen` suffix. This way I can avoid calling `RegisterType` for every class and BOOST_DESCRIBE_CLASS.
 //TODO: However I am not sure how ninja builder's incremental build will be affected from this. I should calculate checksums of the source files and if the class changed, then I should run the script to create gen files for only changed classes.

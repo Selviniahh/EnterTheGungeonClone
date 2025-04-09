@@ -97,7 +97,7 @@ void ETG::GameManager::Update()
 void ETG::GameManager::Draw()
 {
     if (!HasFocus) return;
-    Window->clear({7,255,255,255});
+    Window->clear({1,255,255,255});
 
     //NOTE: Draw the main game scene with Custom view. These draws will be drawn zoomed
     Window->setView(Globals::MainView);

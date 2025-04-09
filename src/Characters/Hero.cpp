@@ -80,7 +80,7 @@ void ETG::Hero::Initialize()
 
         //If the collision is with enemy projectile, damage our hero and destroy the enemy projectile
         //eventData.Other->Owner = Projectile's gun. I didn't write that cuz dynamic_cast is expensive
-        if (eventData.Other->IsA<ProjectileBase>()) //Quick check to reduce possible expensive dynamic_cast
+        if (eventData.Other->IsA<ProjectileBase>())
         {
             auto* projectile = eventData.Other->As<ProjectileBase>();
             
@@ -88,15 +88,15 @@ void ETG::Hero::Initialize()
                 projectile->Owner->Owner->IsA<EnemyBase>())
             {
                 const auto enemy = static_cast<EnemyBase*>(projectile->Owner->Owner);
-                if (HasAnyFlag(StateFlags, PreventDamage)) return;
+                if (HasAnyFlag(StateFlags, HeroStateFlags::PreventDamage)) return;
 
                 HealthComp->ApplyDamage(0.5, HitKnockBackMagnitude, enemy);
                 projectile->MarkForDestroy();
             }
-
-            //If it's ActiveItem, assign our pointer
-            if (auto* activeItem = dynamic_cast<ActiveItemBase*>(eventData.Other))
+            
+            if (eventData.Other->IsA<ActiveItemBase>())
             {
+                auto* activeItem = eventData.Other->As<ActiveItemBase>();
                 CurrActiveItem = activeItem;
             }
         }
@@ -149,7 +149,7 @@ void ETG::Hero::UpdateGuns() const
         guns->Update();
 }
 
-void ETG::Hero::HandleShooting()
+void ETG::Hero::HandleShooting() const
 {
     if (IsShooting && CurrentGun->MagazineAmmo != 0 && !CurrentGun->IsReloading && CanShoot())
     {
@@ -157,7 +157,7 @@ void ETG::Hero::HandleShooting()
     }
 }
 
-void ETG::Hero::HandleActiveItem()
+void ETG::Hero::HandleActiveItem() const
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && CurrActiveItem && CanUseActiveItems())
     {
@@ -178,7 +178,6 @@ void ETG::Hero::Update()
     HandleActiveItem();
     UpdateHand();
     UpdateGuns();
-    GameObjectBase::Update();
 }
 
 void ETG::Hero::Draw()
@@ -204,15 +203,15 @@ void ETG::Hero::SetState(const HeroStateEnum& state)
 
     switch (state)
     {
-    case HeroStateEnum::Idle: StateFlags = StateIdle;
+    case HeroStateEnum::Idle: StateFlags = HeroStateFlags::StateIdle;
         break;
-    case HeroStateEnum::Run: StateFlags = StateRun;
+    case HeroStateEnum::Run: StateFlags = HeroStateFlags::StateRun;
         break;
-    case HeroStateEnum::Dash: StateFlags = StateDash;
+    case HeroStateEnum::Dash: StateFlags = HeroStateFlags::StateDash;
         break;
-    case HeroStateEnum::Die: StateFlags = StateDie;
+    case HeroStateEnum::Die: StateFlags = HeroStateFlags::StateDie;
         break;
-    case HeroStateEnum::Hit: StateFlags = StateHit;
+    case HeroStateEnum::Hit: StateFlags = HeroStateFlags::StateHit;
         break;
     }
 }

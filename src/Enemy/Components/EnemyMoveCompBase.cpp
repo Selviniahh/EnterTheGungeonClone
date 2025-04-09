@@ -30,7 +30,7 @@ namespace ETG
     {
         BaseMoveComp::Update(); // This will handle force updates
         
-        if (!OwnerEnemy || IsBeingForced) return;
+        if (!OwnerEnemy || !OwnerEnemy->CanMove()) return;
         
         UpdateAIMovement();
     }

@@ -29,8 +29,8 @@ namespace ETG
         void UpdateAnimations();
         void UpdateHand() const;
         void UpdateGuns() const;
-        void HandleShooting();
-        void HandleActiveItem();
+        void HandleShooting() const;
+        void HandleActiveItem() const;
 
         void Update() override;
         void Initialize() override;
@@ -42,7 +42,7 @@ namespace ETG
         static Direction CurrentDirection;
         static bool IsShooting;
 
-        HeroStateFlags StateFlags{StateIdle};
+        HeroStateFlags StateFlags{HeroStateFlags::StateIdle};
 
         std::unique_ptr<RogueSpecial> RogueSpecial;
         std::unique_ptr<HeroMoveComp> MoveComp;
@@ -67,11 +67,11 @@ namespace ETG
         void SetState(const HeroStateEnum& state);
         [[nodiscard]] HeroStateEnum GetState() const { return CurrentHeroState; }
 
-        [[nodiscard]] inline bool CanSwitchGuns() const { return !CurrentGun->IsReloading && !HasAnyFlag(StateFlags, PreventGunSwitching); }
-        [[nodiscard]] inline bool CanMove() const { return !HasAnyFlag(StateFlags, PreventMovement); }
-        [[nodiscard]] inline bool CanShoot() const { return !HasAnyFlag(StateFlags, PreventShooting); }
-        [[nodiscard]] inline bool CanFlipAnims() const { return !HasAnyFlag(StateFlags, PreventAnimFlip); }
-        [[nodiscard]] inline bool CanUseActiveItems() const { return !HasAnyFlag(StateFlags, PreventActiveItemUsage); }
+        [[nodiscard]] inline bool CanSwitchGuns() const { return !CurrentGun->IsReloading && !HasAnyFlag(StateFlags, HeroStateFlags::PreventGunSwitching); }
+        [[nodiscard]] inline bool CanMove() const { return !HasAnyFlag(StateFlags, HeroStateFlags::PreventMovement); }
+        [[nodiscard]] inline bool CanShoot() const { return !HasAnyFlag(StateFlags, HeroStateFlags::PreventShooting); }
+        [[nodiscard]] inline bool CanFlipAnims() const { return !HasAnyFlag(StateFlags, HeroStateFlags::PreventAnimFlip); }
+        [[nodiscard]] inline bool CanUseActiveItems() const { return !HasAnyFlag(StateFlags, HeroStateFlags::PreventActiveItemUsage); }
 
         //When equipping a new gun pickup
         void EquipGun(GunBase* newGun);

@@ -21,17 +21,9 @@ namespace ETG
 
 ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 {
-    BulletMan::Initialize();
 
     this->Position = position;
     Depth = 4;
-}
-
-ETG::BulletMan::~BulletMan() = default;
-
-void ETG::BulletMan::Initialize()
-{
-    EnemyBase::Initialize();
 
     //NOTE: VERY IMPORTANT. We need to reset the Move comp because in enemy `MoveComp` is EnemyBaseMoveComp. We want to replace it with BulletManMoveComp
     //Solution is create our desired variable and assign it to MoveComp
@@ -39,7 +31,7 @@ void ETG::BulletMan::Initialize()
     newSpecializedMoveComp->Owner = this;
     MoveComp = std::move(newSpecializedMoveComp);
     MoveComp->Initialize();
-    
+
     Hand = ETG::CreateGameObjectAttached<class Hand>(this);
 
     // Initialize animation component
@@ -51,6 +43,28 @@ void ETG::BulletMan::Initialize()
     Gun->Initialize();
 
     Gun->ProjTexture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Projectiles/Enemy" / "8x8_enemy_projectile_001.png").string());
+
+    BulletMan::Initialize();
+}
+
+ETG::BulletMan::~BulletMan() = default;
+
+void ETG::BulletMan::Initialize()
+{
+    EnemyBase::Initialize();
+
+    // Set up force event handlers
+    MoveComp->OnForceStart.AddListener([this]()
+    {
+        this->SetState(EnemyStateEnum::Hit);
+    });
+
+    MoveComp->OnForceEnd.AddListener([this]()
+    {
+        // Reset to idle state when force ends
+        if (GetState() == EnemyStateEnum::Hit)
+            SetState(EnemyStateEnum::Idle);
+    });
 }
 
 void ETG::BulletMan::Update()
@@ -61,8 +75,8 @@ void ETG::BulletMan::Update()
     std::cout << HealthComp->CurrentHealth << std::endl;
 
     // Update animation Flip sprites based on direction like Hero does
-    AnimationComp->FlipSpritesX(EnemyDir, *this);
-    AnimationComp->FlipSpritesY<GunBase>(EnemyDir, *Gun);
+    if (CanFlipAnims()) AnimationComp->FlipSpritesX(EnemyDir, *this);
+    if (CanFlipAnims()) AnimationComp->FlipSpritesY<GunBase>(EnemyDir, *Gun);
 
     //Set hand properties
     const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(EnemyDir) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
@@ -81,7 +95,7 @@ void ETG::BulletMan::Update()
         Gun->Rotation = angle;
     }
 
-    if (EnemyState == EnemyStateEnum::Shooting)
+    if (GetState() == EnemyStateEnum::Shooting)
     {
         Gun->PrepareShooting();
     }
@@ -96,34 +110,42 @@ void ETG::BulletMan::Update()
     AnimationComp->Update();
     Gun->Update();
 
+    // If the gun is not shooting and the animation is finished, set the state to idle
+    if (GetState() == EnemyStateEnum::Shooting &&
+        Gun->CurrentGunState != GunStateEnum::Shoot &&
+        Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
+    {
+        SetState(EnemyStateEnum::Idle);
+    }
+
     //Visibility settings
-    Gun->IsVisible = !IsDead();
-    Hand->IsVisible = !IsDead();
+    Gun->IsVisible = CanFlipAnims();
+    Hand->IsVisible = CanFlipAnims();
 }
 
 void ETG::BulletMan::BulletManShoot()
 {
     // Don't shoot if being forced/hit/dead
-    if (IsBeingForced() || IsDead()) return;
+    if (!CanShoot()) return;
 
     //If the gun is shooting, we have to set enemy's animation to be shooting as well
     if (Gun->CurrentGunState == GunStateEnum::Shoot && !Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
     {
-        EnemyState = EnemyStateEnum::Shooting;
+        SetState(EnemyStateEnum::Shooting);
     }
 
     if (attackCooldownTimer <= 0)
     {
         // In attack range and cooldown finished, enter shooting state
-        EnemyState = EnemyStateEnum::Shooting;
+        SetState(EnemyStateEnum::Shooting);
         attackCooldownTimer = attackCooldown; // Reset cooldown
     }
 }
 
-void ETG::BulletMan::HandleProjectileCollision(const ProjectileBase* projectile)
+void ETG::BulletMan::HandleHitForce(const ProjectileBase* projectile)
 {
-    EnemyBase::HandleProjectileCollision(projectile);
-    EnemyState = EnemyStateEnum::Hit;
+    EnemyBase::HandleHitForce(projectile);
+    SetState(EnemyStateEnum::Hit);
 }
 
 
