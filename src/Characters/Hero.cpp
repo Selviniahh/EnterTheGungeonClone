@@ -83,7 +83,7 @@ void ETG::Hero::Initialize()
         if (eventData.Other->IsA<ProjectileBase>())
         {
             auto* projectile = eventData.Other->As<ProjectileBase>();
-            
+
             if (projectile && projectile->Owner && projectile->Owner->Owner &&
                 projectile->Owner->Owner->IsA<EnemyBase>())
             {
@@ -93,12 +93,12 @@ void ETG::Hero::Initialize()
                 HealthComp->ApplyDamage(0.5, HitKnockBackMagnitude, enemy);
                 projectile->MarkForDestroy();
             }
-            
-            if (eventData.Other->IsA<ActiveItemBase>())
-            {
-                auto* activeItem = eventData.Other->As<ActiveItemBase>();
-                CurrActiveItem = activeItem;
-            }
+        }
+
+        if (eventData.Other->IsA<ActiveItemBase>())
+        {
+            auto* activeItem = eventData.Other->As<ActiveItemBase>();
+            CurrActiveItem = activeItem;
         }
     });
 

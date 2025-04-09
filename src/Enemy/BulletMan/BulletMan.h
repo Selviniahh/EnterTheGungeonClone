@@ -5,7 +5,7 @@
 namespace ETG
 {
     class BulletManAnimComp;
-    class BulletManMoveComp;
+    // Remove BulletManMoveComp forward declaration
     class Magnum;
     class ProjectileBase;
 
@@ -20,7 +20,13 @@ namespace ETG
         
         void BulletManShoot(); //Shoot if timer is up and attackDistance
         void HandleHitForce(const ProjectileBase* projectile) override;
-        
+
+    protected:
+        void UpdateAnimations();
+        void UpdateHandAndGunPositions() const;
+        void UpdateShooting();
+        void UpdateVisibility() const;
+
     public:
         std::unique_ptr<BulletManAnimComp> AnimationComp;
 
@@ -29,6 +35,8 @@ namespace ETG
         float attackCooldownTimer = 0.0f;
 
         std::unique_ptr<Magnum> Gun;
+
+        
 
         BOOST_DESCRIBE_CLASS(BulletMan, (EnemyBase),
                              (attackCooldown, attackCooldownTimer),

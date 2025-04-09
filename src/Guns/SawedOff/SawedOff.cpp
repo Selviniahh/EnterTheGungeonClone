@@ -26,7 +26,6 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    CollisionComp->ShowCollisionBounds = true;
 
     SawedOff::Initialize();
 }

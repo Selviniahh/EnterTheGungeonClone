@@ -20,7 +20,7 @@ namespace ETG
         float CollisionRadius = 0.0f;
 
         //Whether to show collision bounds for debugging
-        bool ShowCollisionBounds = true;
+        bool ShowCollisionBounds = false;
 
         //Color for collision visualiztion
         sf::Color CollisionVisualizationColor = sf::Color::Yellow;

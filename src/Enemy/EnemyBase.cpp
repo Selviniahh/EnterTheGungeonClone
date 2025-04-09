@@ -23,6 +23,19 @@ namespace ETG
         MoveComp = ETG::CreateGameObjectAttached<EnemyMoveCompBase>(this);
         MoveComp->Initialize();
 
+        // Register force event handlers for the move component
+        MoveComp->OnForceStart.AddListener([this]()
+        {
+            this->SetState(EnemyStateEnum::Hit);
+        });
+
+        MoveComp->OnForceEnd.AddListener([this]()
+        {
+            // Reset to idle state when force ends
+            if (GetState() == EnemyStateEnum::Hit)
+                SetState(EnemyStateEnum::Idle);
+        });
+
         HealthComp = ETG::CreateGameObjectAttached<BaseHealthComp>(this, 30.f);
         HealthComp->Initialize();
 
@@ -48,7 +61,6 @@ namespace ETG
             }
         });
 
-        
 
         HealthComp->OnDeath.AddListener([this](const GameObjectBase* instigator)
         {
@@ -68,7 +80,7 @@ namespace ETG
             CollisionComp->SetCollisionEnabled(false);
         });
 
-        //In the future, enemy will take damage from explosive environment 
+        //In the future, enemy will take damage from explosive environment %
         HealthComp->OnDamageTaken.AddListener([this](const float damage, const float forceMagnitude, const GameObjectBase* instigator)
         {
             HandleHitForce(instigator->As<ProjectileBase>());
@@ -91,14 +103,19 @@ namespace ETG
     void EnemyBase::SetState(const EnemyStateEnum& state)
     {
         EnemyState = state;
-    
+
         switch (state)
         {
-        case EnemyStateEnum::Idle: StateFlags = EnemyStateFlag::StateIdle; break;
-        case EnemyStateEnum::Run: StateFlags = EnemyStateFlag::StateRun; break;
-        case EnemyStateEnum::Shooting: StateFlags = EnemyStateFlag::StateShooting; break;
-        case EnemyStateEnum::Hit: StateFlags = EnemyStateFlag::StateHit; break;
-        case EnemyStateEnum::Die: StateFlags = EnemyStateFlag::StateDie; break;
+        case EnemyStateEnum::Idle: StateFlags = EnemyStateFlag::StateIdle;
+            break;
+        case EnemyStateEnum::Run: StateFlags = EnemyStateFlag::StateRun;
+            break;
+        case EnemyStateEnum::Shooting: StateFlags = EnemyStateFlag::StateShooting;
+            break;
+        case EnemyStateEnum::Hit: StateFlags = EnemyStateFlag::StateHit;
+            break;
+        case EnemyStateEnum::Die: StateFlags = EnemyStateFlag::StateDie;
+            break;
         default: break;
         }
     }
@@ -107,7 +124,7 @@ namespace ETG
     void EnemyBase::HandleHitForce(const ProjectileBase* projectile)
     {
         const auto* projectileOwnerGun = projectile->Owner->As<GunBase>();
-        
+
         // Check if this is a hero projectile
         // Calculate force direction (from projectile to enemy)
         const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());

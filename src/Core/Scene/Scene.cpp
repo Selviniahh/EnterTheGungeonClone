@@ -56,7 +56,6 @@ namespace ETG
             enemies.push_back(std::move(newEnemy));
 
             // Log confirmation
-            std::cout << "BulletMan spawned at (" << x << ", " << y << ")" << std::endl;
         }
     }
 

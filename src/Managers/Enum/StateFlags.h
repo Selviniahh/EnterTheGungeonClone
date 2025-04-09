@@ -35,11 +35,11 @@ namespace ETG
         StateHit = 1 << 3,
         StateDie = 1 << 4,
     
-        PreventMovement = StateShooting | StateDie | StateHit,
+        PreventMovement =  StateDie | StateHit,
         PreventShooting = StateDie | StateHit,
         PreventAnimFlip = StateDie,
     
-        CanMove = StateIdle | StateRun,
+        CanMove = StateIdle | StateRun | StateShooting,
         CanShoot = StateIdle | StateRun | StateShooting,
         CanFlipAnims = StateIdle | StateRun | StateShooting | StateHit
     };

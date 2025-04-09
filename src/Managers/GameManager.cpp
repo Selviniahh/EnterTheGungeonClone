@@ -31,7 +31,7 @@ void ETG::GameManager::Initialize()
 {
     //During development for different resolution and size monitors, Window mode will be half of host's window size
     const auto VideoMode = sf::VideoMode::getDesktopMode();
-    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width / 1.4, VideoMode.height / 1.4), "SFML example");
+    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width / 1.1, VideoMode.height / 1.1), "SFML example");
     // Window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getDesktopMode(), "SFML example", sf::Style::Fullscreen);
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
@@ -122,7 +122,7 @@ void ETG::GameManager::Draw()
     ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: non batch draws here. 
-    DebugText->Draw(*Window);
+    // DebugText->Draw(*Window);
     EngineUI.Draw();
 
     //Display the frame after everything is set to be drawn

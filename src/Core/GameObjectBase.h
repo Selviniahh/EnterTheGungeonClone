@@ -76,7 +76,7 @@ namespace ETG
 
         GameObjectBase* Owner = nullptr;
         bool DrawBound = false;
-        bool DrawOriginPoint = true;
+        bool DrawOriginPoint = false;
         bool IsGameObjectUISpecified = false;
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;

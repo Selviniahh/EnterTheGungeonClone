@@ -22,9 +22,9 @@ namespace ETG
         float DetectionRadius = 200.0f;     // How far enemy can detect the Hero
         float StopDistance = 150.0f;        // How close enemy gets before stopping
         float MovementSpeed = 40.0f;        // Default movement speed
-
+        
     protected:
-        // Override in derived classes to implement specific enemy movement behavior
+        // Enemy AI movement implementation
         virtual void UpdateAIMovement();
 
         // Get the direction to the hero
@@ -36,7 +36,6 @@ namespace ETG
         // The owner as an EnemyBase
         EnemyBase* OwnerEnemy = nullptr;
         
-
         BOOST_DESCRIBE_CLASS(EnemyMoveCompBase, (BaseMoveComp),
                          (DetectionRadius, StopDistance, MovementSpeed), (), ())
     };

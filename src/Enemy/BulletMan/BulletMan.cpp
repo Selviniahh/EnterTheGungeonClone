@@ -1,17 +1,15 @@
 #include "BulletMan.h"
 #include <filesystem>
+#include<SFML/Graphics/Texture.hpp>
 #include "../../Core/Factory.h"
 #include "../../Managers/DebugTexts.h"
 #include "../../Managers/SpriteBatch.h"
 #include "../../Utils/Math.h"
 #include "Components/BulletManAnimComp.h"
-#include "Components/BulletManMoveComp.h"
 #include "../../Core/Components/CollisionComponent.h"
 #include "../../Characters/Hand/Hand.h"
 #include "../../Guns/Base/GunBase.h"
 #include "../../Guns/Magnum/Magnum.h"
-#include<SFML/Graphics/Texture.hpp>
-
 #include "../../Core/Components/BaseHealthComp.h"
 
 namespace ETG
@@ -21,16 +19,10 @@ namespace ETG
 
 ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 {
-
     this->Position = position;
     Depth = 4;
-
-    //NOTE: VERY IMPORTANT. We need to reset the Move comp because in enemy `MoveComp` is EnemyBaseMoveComp. We want to replace it with BulletManMoveComp
-    //Solution is create our desired variable and assign it to MoveComp
-    auto newSpecializedMoveComp = ETG::CreateGameObjectDefault<BulletManMoveComp>();
-    newSpecializedMoveComp->Owner = this;
-    MoveComp = std::move(newSpecializedMoveComp);
-    MoveComp->Initialize();
+    
+    BulletMan::Initialize();
 
     Hand = ETG::CreateGameObjectAttached<class Hand>(this);
 
@@ -41,10 +33,7 @@ ETG::BulletMan::BulletMan(const sf::Vector2f& position)
 
     Gun = ETG::CreateGameObjectAttached<Magnum>(this, Hand->GetRelativePosition());
     Gun->Initialize();
-
     Gun->ProjTexture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "Projectiles/Enemy" / "8x8_enemy_projectile_001.png").string());
-
-    BulletMan::Initialize();
 }
 
 ETG::BulletMan::~BulletMan() = default;
@@ -52,38 +41,43 @@ ETG::BulletMan::~BulletMan() = default;
 void ETG::BulletMan::Initialize()
 {
     EnemyBase::Initialize();
-
-    // Set up force event handlers
-    MoveComp->OnForceStart.AddListener([this]()
-    {
-        this->SetState(EnemyStateEnum::Hit);
-    });
-
-    MoveComp->OnForceEnd.AddListener([this]()
-    {
-        // Reset to idle state when force ends
-        if (GetState() == EnemyStateEnum::Hit)
-            SetState(EnemyStateEnum::Idle);
-    });
+    
+    MoveComp->DetectionRadius = 200.0f;
+    MoveComp->StopDistance = 150.0f;
+    MoveComp->MovementSpeed = 40.0f;
+    MoveComp->MaxSpeed = 100.0f;
+    MoveComp->Acceleration = 10.0f;
+    MoveComp->Deceleration = 5000.0f;
 }
 
 void ETG::BulletMan::Update()
 {
-    EnemyBase::Update(); // This now includes UpdateForce()
+    EnemyBase::Update();
     CollisionComp->Update();
 
-    std::cout << HealthComp->CurrentHealth << std::endl;
+    UpdateAnimations();
+    UpdateHandAndGunPositions();
+    UpdateShooting();
+    UpdateVisibility();
+}
 
-    // Update animation Flip sprites based on direction like Hero does
+void ETG::BulletMan::UpdateAnimations()
+{
+    // Update animation Flip sprites based on direction
     if (CanFlipAnims()) AnimationComp->FlipSpritesX(EnemyDir, *this);
     if (CanFlipAnims()) AnimationComp->FlipSpritesY<GunBase>(EnemyDir, *Gun);
+    
+    AnimationComp->Update();
+}
 
+void ETG::BulletMan::UpdateHandAndGunPositions() const
+{
     //Set hand properties
-    const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(EnemyDir) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
+    const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(EnemyDir) ? 
+        sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
     Hand->Update();
 
-    //Rest is all gun shooting and gun orientation
     if (Hand && Gun)
     {
         // Position the gun relative to the hand.
@@ -94,31 +88,37 @@ void ETG::BulletMan::Update()
         const float angle = Math::AngleBetween(handPos, Hero->GetPosition());
         Gun->Rotation = angle;
     }
+    
+    Gun->Update();
+}
 
-    if (GetState() == EnemyStateEnum::Shooting)
-    {
-        Gun->PrepareShooting();
-    }
-
-    //Decrement the attack timer
+void ETG::BulletMan::UpdateShooting()
+{
+    // Decrement the attack timer
     if (attackCooldownTimer > 0)
     {
         attackCooldownTimer -= Globals::FrameTick;
     }
 
-    // Always update animation and gun regardless of force state
-    AnimationComp->Update();
-    Gun->Update();
+    // Make actual shooting happen
+    if (GetState() == EnemyStateEnum::Shooting)
+    {
+        Gun->PrepareShooting();
+    }
 
     // If the gun is not shooting and the animation is finished, set the state to idle
-    if (GetState() == EnemyStateEnum::Shooting &&
-        Gun->CurrentGunState != GunStateEnum::Shoot &&
+    if (GetState() == EnemyStateEnum::Shooting && Gun->CurrentGunState != GunStateEnum::Shoot &&
         Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
     {
         SetState(EnemyStateEnum::Idle);
     }
+    
+    // BulletMan-specific shooting logic needs to be called after checking state transitions
+    BulletManShoot();
+}
 
-    //Visibility settings
+void ETG::BulletMan::UpdateVisibility() const
+{
     Gun->IsVisible = CanFlipAnims();
     Hand->IsVisible = CanFlipAnims();
 }
@@ -132,6 +132,7 @@ void ETG::BulletMan::BulletManShoot()
     if (Gun->CurrentGunState == GunStateEnum::Shoot && !Gun->GetAnimationInterface()->GetAnimation()->IsAnimationFinished())
     {
         SetState(EnemyStateEnum::Shooting);
+        return;
     }
 
     if (attackCooldownTimer <= 0)
@@ -147,7 +148,6 @@ void ETG::BulletMan::HandleHitForce(const ProjectileBase* projectile)
     EnemyBase::HandleHitForce(projectile);
     SetState(EnemyStateEnum::Hit);
 }
-
 
 void ETG::BulletMan::Draw()
 {

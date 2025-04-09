@@ -23,8 +23,8 @@ namespace ETG
 
     private:
         // Coordinates for spawning enemies
-        float spawnX = 100.0f;
-        float spawnY = 100.0f;
+        float spawnX = 0.0f;
+        float spawnY = 0.0f;
         
         // Container for all spawned enemies
         std::vector<std::unique_ptr<BulletMan>> enemies;

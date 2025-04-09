@@ -174,6 +174,8 @@ namespace ETG
             REGISTER_BASE_CLASS(BulletMan, EnemyBase);
             RegisterType<BulletManAnimComp>();
             REGISTER_BASE_CLASS(BulletManAnimComp, BaseAnimComp<EnemyStateEnum>);
+            RegisterType<EnemyMoveCompBase>();
+            REGISTER_BASE_CLASS(EnemyMoveCompBase, BaseMoveComp);
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;

@@ -33,6 +33,7 @@ namespace ETG
             static_cast<float>(Texture->getSize().y / 2)
         };
 
+        IsVisible = false;
         arrowOriginOffset = {-2.f, 0.f};
     }
 

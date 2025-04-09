@@ -65,8 +65,6 @@ add_executable(ETG main.cpp
         src/Enemy/BulletMan/BulletMan.h
         src/Enemy/BulletMan/Components/BulletManAnimComp.cpp
         src/Enemy/BulletMan/Components/BulletManAnimComp.h
-        src/Enemy/BulletMan/Components/BulletManMoveComp.cpp
-        src/Enemy/BulletMan/Components/BulletManMoveComp.h
         src/Core/Components/ArrowComp.h
         src/Guns/VFX/MuzzleFlash.cpp
         src/Guns/VFX/MuzzleFlash.h
