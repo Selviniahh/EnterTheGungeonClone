@@ -49,7 +49,6 @@ namespace ETG
 
     inline void ReloadText::Initialize()
     {
-        GameObjectBase::Initialize();
         Hero = GameState::GetInstance().GetHero();
         Texture = std::make_shared<sf::Texture>();
         Texture->loadFromFile((std::filesystem::path(RESOURCE_PATH) / "UI" / "ReloadText.png").generic_string());
@@ -57,6 +56,7 @@ namespace ETG
         Origin.y = Texture->getSize().y / 2;
         Scale = sf::Vector2f{0.2f, 0.2f};
         Color = sf::Color{255, 255, 255, 255};
+        GameObjectBase::Initialize();
     }
 
     //We will relink the gun when we change the gun

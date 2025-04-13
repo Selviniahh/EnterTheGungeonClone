@@ -2,6 +2,8 @@
 #include <memory>
 #include "../Managers/GameState.h"
 
+class Engine;
+
 //Factory global functions: 
 namespace ETG
 {
@@ -19,8 +21,10 @@ namespace ETG
     std::unique_ptr<T> CreateGameObjectDefault(Args&&... args)
     {
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
-        obj->Owner =  GameState::GetInstance().GetSceneObj();
+        obj->Owner = GameState::GetInstance().GetSceneObj();
+        obj->template SetTypeInfo<T>(); //Set the type ID for this object
 
+        
         const std::string objName = obj->SetObjectNameToSelfClassName();
         RegisterGameObject(objName, obj.get());
         return obj;
@@ -31,7 +35,8 @@ namespace ETG
     {
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         obj->Owner = OwnerObj;
-
+        obj->template SetTypeInfo<T>(); //Set the type ID for this object
+        
         // After full construction, set the object name based on its true dynamic type name and Set obj to unordered_map and vector
         const std::string objName = obj->SetObjectNameToSelfClassName();
         RegisterGameObject(objName, obj.get());
@@ -45,9 +50,8 @@ namespace ETG
         auto& sceneObjs = GameState::GetInstance().GetSceneObjs();
         sceneObjs[name] = obj;
 
-        auto& orderedObjList =  GameState::GetInstance().GetOrderedSceneObjs();
+        auto& orderedObjList = GameState::GetInstance().GetOrderedSceneObjs();
         orderedObjList.push_back(obj);
-        
     }
 
     //For now this function is only for updating hierarchy tab for removed game objects. 
@@ -55,25 +59,25 @@ namespace ETG
     {
         auto& sceneObjs = GameState::GetInstance().GetSceneObjs();
         auto* obj = sceneObjs[name];
-        
+
         //Remove from scene objects unordered_map firstly 
         sceneObjs.erase(name);
 
         //Remove from ordered list
-        auto& orderedObjList =  GameState::GetInstance().GetOrderedSceneObjs();
+        auto& orderedObjList = GameState::GetInstance().GetOrderedSceneObjs();
         const auto it = std::ranges::remove(orderedObjList, obj).begin(); //Move objects at the `End iterator` position that needs to removed. This will remove everything that satisfies the condition
-        orderedObjList.erase(it,orderedObjList.end()); //remove all the objects inside `it`
-        
+        orderedObjList.erase(it, orderedObjList.end()); //remove all the objects starting with it to end. Read above comment firstly
     }
 
-    //NOTE: For now I am unsure how this function should be. Game objects always constructed as unique_ptr. Removing them from container will already deallocate the game object. 
+    //NOTE: NOT USED YET. For now I am unsure how this function should be. Game objects always constructed as unique_ptr. Removing them from container will already deallocate the game object. So
+    //UnregisterGameObject function will be enough to remove the object from the container (for now).
     template <typename T>
     void DestroyGameObject(std::unique_ptr<T>& obj)
     {
         if (!obj) return; // Safety check
-    
+
         UnregisterGameObject(obj->SetObjectNameToSelfClassName());
-    
+
         // Reset the unique_ptr to release memory
         obj.reset();
     }

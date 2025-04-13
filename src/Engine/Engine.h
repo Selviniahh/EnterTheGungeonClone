@@ -36,7 +36,5 @@ private:
     sf::Vector2f windowSize;
     ETG::GameObjectBase* SelectedObj = nullptr;
 
-    
-
     std::unordered_set<ETG::GameObjectBase*> OwnerObjects;
 };

@@ -16,7 +16,7 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
                                                            6, // MagazineSize
                                                            5.0f, // ReloadTime
                                                            5.5f, // Damage
-                                                           0.f, // Force
+                                                           50.f, // Force
                                                            3.0f) // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<SawedOffAnimComp>(this);
@@ -26,7 +26,6 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    CollisionComp->ShowCollisionBounds = true;
 
     SawedOff::Initialize();
 }
@@ -50,7 +49,9 @@ void ETG::SawedOff::Initialize()
         if (auto* hero = dynamic_cast<Hero*>(eventData.Other))
         {
             hero->EquipGun(this);
-            CollisionComp->SetCollisionEnabled(false); //After equip 
+            CollisionComp->SetCollisionEnabled(false); //After equip
+            this->Owner = hero; //Set the owner of the gun to the hero This is important because during projectile collision, we need to know the owner of the projectile
+
         }
     });
 
@@ -87,12 +88,12 @@ void ETG::SawedOff::EnqueueProjectiles(const int shotCount, const float Effectiv
         }
         
         //Queue the bullet
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle});
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle - 15});
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY, projectileAngle + 15});
+        bulletQueue.push_back({i * ShotDelay, projectileAngle});
+        bulletQueue.push_back({i * ShotDelay, projectileAngle - 15});
+        bulletQueue.push_back({i * ShotDelay, projectileAngle + 15});
 
         //Last bullet should shoot with a bit of spread and delay
-        bulletQueue.push_back({i * MULTI_SHOT_DELAY + Math::GenRandomNumber(LastBulletDelayMin,LastBulletDelayMax), projectileAngle + Math::GenRandomNumber(-LastBulletSpread, LastBulletSpread)});
+        bulletQueue.push_back({i * ShotDelay + Math::GenRandomNumber(LastBulletDelayMin,LastBulletDelayMax), projectileAngle + Math::GenRandomNumber(-LastBulletSpread, LastBulletSpread)});
     }
 
     //Handle ammo depletion

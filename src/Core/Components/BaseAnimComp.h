@@ -31,6 +31,8 @@ namespace ETG
         void Update(const StateEnum& stateEnum, const AnimationKey& animKey);
         void PopulateSpecificWidgets() override;
 
+
+    public:
         template <typename DirectionEnum>
         void AddAnimationsForState(StateEnum state, const std::vector<Animation>& animations);
 
@@ -38,6 +40,8 @@ namespace ETG
 
         // Implement IAnimationComponent interface
         [[nodiscard]] sf::IntRect GetCurrentTextureRect() const override { return CurrTexRect; }
+        [[nodiscard]] const Animation* GetAnimation() const override {return GetCurrentAnimation();};
+        [[nodiscard]] const Animation* GetCurrentAnimation() const;
 
         //I know this function is bad. I will think of something
         static bool IsFacingRight(const Direction& currentDirection);
@@ -53,9 +57,7 @@ namespace ETG
 
         //If the key has changed, change the animation state and restart
         void ChangeAnimStateIfRequired(const AnimationKey& newKey);
-
-        Animation* GetCurrentAnimation();
-
+        
         //Animation properties
         std::unordered_map<StateEnum, AnimationManager> AnimManagerDict{};
         StateEnum CurrentState;
@@ -220,15 +222,13 @@ namespace ETG
     }
 
     template <typename StateEnum>
-    Animation* BaseAnimComp<StateEnum>::GetCurrentAnimation()
+    const Animation* BaseAnimComp<StateEnum>::GetCurrentAnimation() const
     {
-        return AnimManagerDict[CurrentState].GetCurrentAnimation();
+        return AnimManagerDict.at(CurrentState).GetCurrentAnimation();
     }
 
 
     //-----------------------------------------UI----------------------------------------
-
-
     template <typename StateEnum>
     void BaseAnimComp<StateEnum>::PopulateSpecificWidgets()
     {

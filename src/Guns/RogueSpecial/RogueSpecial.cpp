@@ -11,9 +11,9 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 3.f,
 300,
 10,
-3.0f,
+2.0f,
 3.5f,
-2.f,
+30.f,
 10.f)
 {
     AnimationComp = CreateGameObjectAttached<RogueSpecialAnimComp>(this);
@@ -26,7 +26,6 @@ ETG::RogueSpecial::RogueSpecial(const sf::Vector2f& Position) : GunBase(Position
 
 void ETG::RogueSpecial::Initialize()
 {
-    ArrowComp->arrowOriginOffset = {-6.f, 0.f};
     ArrowComp->arrowOffset = {20.f, -6.f};
 
     // Set up the muzzle flash animation.
@@ -48,7 +47,7 @@ void ETG::RogueSpecial::Update()
     if (modifierManager.GetModifier<MultiShotModifier>())
     {
         // When multishot is active, make flash animation match bullet frequency
-        MuzzleFlash->Animation.FrameInterval = MULTI_SHOT_DELAY / 2;
+        MuzzleFlash->Animation.FrameInterval = ShotDelay / 2;
     }
     else
     {

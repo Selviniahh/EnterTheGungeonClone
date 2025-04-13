@@ -92,7 +92,7 @@ void ETG::FrameLeftProgressBar::Draw()
         window->draw(progressRect);
         
         // Try SpriteBatch method as well
-        SpriteBatch::AddDebugCircle(ProgTopCenter, 15);
-        SpriteBatch::AddDebugCircle(ProgBottomCenter, 15);
+        // SpriteBatch::AddDebugCircle(ProgTopCenter, 15);
+        // SpriteBatch::AddDebugCircle(ProgBottomCenter, 15);
     }
 }

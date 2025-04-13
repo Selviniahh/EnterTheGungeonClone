@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include "../Core/Scene/Scene.h"
+#include "../Engine/Engine.h"
 #include "../Items/Active/ActiveItemBase.h"
 #include "../Items/Passive/PassiveItemBase.h"
 
@@ -25,6 +26,7 @@ namespace ETG
         [[nodiscard]] std::unordered_map<std::string, GameObjectBase*>& GetSceneObjs() const { return *SceneObjs; } //Original method for fast lookups
         [[nodiscard]] std::vector<GameObjectBase*>& GetOrderedSceneObjs() {return OrderedSceneObjs;} //New, for ordered hierarchy pane 
         [[nodiscard]] sf::Vector2f* GetEngineUISize() const { return EngineUISize; }
+        [[nodiscard]] Engine* GetEngine() const { return Engine; }
         [[nodiscard]] Scene* GetSceneObj() const { return SceneObj; }
         [[nodiscard]] sf::RenderWindow* GetRenderWindow() const { return Window; }
         [[nodiscard]] std::vector<PassiveItemBase*>& GetEquippedPassiveItems() { return EquippedPassiveItems; }
@@ -33,6 +35,7 @@ namespace ETG
         void SetHero(Hero* hero) { MainHero = hero; }
         void SetSceneObjs(std::unordered_map<std::string, GameObjectBase*>& sceneObj) { SceneObjs = &sceneObj; }
         void SetEngineUISize(sf::Vector2f* size) { EngineUISize = size; }
+        void SetEngine(Engine* engine) { Engine = engine; }
         void SetSceneObj(Scene* sceneObj) { SceneObj = sceneObj; }
         void SetRenderWindow(sf::RenderWindow* window) { Window = window; }
 
@@ -50,6 +53,8 @@ namespace ETG
 
         Scene* SceneObj = nullptr;
         sf::RenderWindow* Window;
+
+        Engine* Engine;
         
         //Owned objects
         sf::Vector2f* EngineUISize{};

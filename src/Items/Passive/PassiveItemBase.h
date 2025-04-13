@@ -34,9 +34,8 @@ namespace ETG
         }
 
         std::string ItemDescription{};
-        
+
     protected:
-        
         //Why did I choose array over vector? std::aray is fixed-size with zero overhead. There's no dynamic memory allocation.
         //It's stack allocated. So use std::array if the collection size is known at compile time
         std::array<sf::SoundBuffer, 2> PickupSoundBuffers;

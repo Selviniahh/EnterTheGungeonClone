@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 #include "Math.h"
-#include "../Managers/StateEnums.h"
+#include "../Managers/Enum/StateEnums.h"
 #include "../Characters/Hero.h"
 
 ETG::Direction ETG::DirectionUtils::LastDashDirection{};
@@ -20,7 +20,7 @@ void ETG::DirectionUtils::PopulateDirectionRanges(DirectionMap mapToFill)
     mapToFill[{337, 360}] = Direction::Right;
 }
 
-ETG::Direction ETG::DirectionUtils::GetDirectionToHero(const Hero* Hero, sf::Vector2f SelfPosition)
+ETG::Direction ETG::DirectionUtils::GetDirectionToHero(const Hero* Hero, const sf::Vector2f SelfPosition)
 {
     const sf::Vector2f dirVector = Math::Normalize(Hero->GetPosition() - SelfPosition);
 
@@ -79,6 +79,66 @@ ETG::HeroRunEnum ETG::DirectionUtils::GetHeroRunEnum(Direction currDir)
     return HeroRunEnum::Run_Forward; // Default case
 }
 
+ETG::BulletManShootingEnum ETG::DirectionUtils::GetBulletManShootingEnum(Direction currDir)
+{
+    if (currDir == Direction::BackHandRight) return BulletManShootingEnum::Shoot_Right;
+    if (currDir == Direction::BackDiagonalRight) return BulletManShootingEnum::Shoot_Right;
+    if (currDir == Direction::Right) return BulletManShootingEnum::Shoot_Right;
+    if (currDir == Direction::FrontHandRight) return BulletManShootingEnum::Shoot_Right;
+    return BulletManShootingEnum::Shoot_Left; // else  return left
+}
+
+ETG::BulletManHitEnum ETG::DirectionUtils::GetBulletManHitEnum(Direction currDir)
+{
+    if (currDir == Direction::BackHandRight) return BulletManHitEnum::Hit_Back_Right;
+    if (currDir == Direction::BackDiagonalRight) return BulletManHitEnum::Hit_Back_Right;
+    if (currDir == Direction::Right) return BulletManHitEnum::Hit_Right;
+    if (currDir == Direction::FrontHandRight) return BulletManHitEnum::Hit_Right;
+    if (currDir == Direction::BackHandLeft) return BulletManHitEnum::Hit_Back_Left;
+    if (currDir == Direction::BackDiagonalLeft) return BulletManHitEnum::Hit_Back_Left;
+    if (currDir == Direction::Left) return BulletManHitEnum::Hit_Left;
+    if (currDir == Direction::FrontHandLeft) return BulletManHitEnum::Hit_Left;
+
+    return BulletManHitEnum::Hit_Left; // else  return left
+}
+
+ETG::BulletManDeathEnum ETG::DirectionUtils::GetBulletManDeathEnum(Direction currDir)
+{
+    switch (currDir)
+    {
+    case Direction::Right:
+        return BulletManDeathEnum::Death_Right_Side;
+
+    case Direction::FrontHandRight:
+        return BulletManDeathEnum::Death_Right_Front;
+
+    case Direction::FrontHandLeft:
+        return BulletManDeathEnum::Death_Left_Front;
+
+    case Direction::Left:
+        return BulletManDeathEnum::Death_Left_Side;
+
+    case Direction::BackDiagonalLeft:
+        return BulletManDeathEnum::Death_Left_Back;
+
+    case Direction::BackHandLeft:
+        return BulletManDeathEnum::Death_Left_Back;
+
+    case Direction::BackHandRight:
+        return BulletManDeathEnum::Death_Right_Back;
+
+    case Direction::BackDiagonalRight:
+        return BulletManDeathEnum::Death_Right_Back;
+
+    case Direction::Front_For_Dash:
+        return BulletManDeathEnum::Death_Front_North;
+
+    default:
+        // Added default case for safety
+        return BulletManDeathEnum::Death_Back_South;
+    }
+}
+
 //Do not put any breakpoint at this function otherwise Key presses that captured in above GetDashDirectionEnum won't be captured during debugging. 
 ETG::HeroDashEnum ETG::DirectionUtils::GetDashDirectionEnum()
 {
@@ -96,7 +156,7 @@ ETG::HeroDashEnum ETG::DirectionUtils::GetDashDirectionEnum()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
     {
         LastDashDirection = Direction::FrontHandLeft;
-        
+
         return HeroDashEnum::Dash_Right;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
@@ -129,7 +189,8 @@ ETG::HeroDashEnum ETG::DirectionUtils::GetDashDirectionEnum()
 
 sf::Vector2f ETG::DirectionUtils::GetDashDirectionVector() //Normalized vectors will be 0.707113562
 {
-    switch (LastDashDirection) {
+    switch (LastDashDirection)
+    {
     case Direction::Left: return {-1.0f, 0.0f};
     case Direction::Right: return {1.0f, 0.0f};
     case Direction::BackHandRight: return {0.0f, -1.0f};

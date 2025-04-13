@@ -3,8 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <boost/describe.hpp>
-
 #include "GameClass.h"
+#include "TypeID.h"
 #include "../Utils/Interface/IAnimationComponent.h"
 
 namespace ETG
@@ -30,6 +30,7 @@ namespace ETG
         virtual void Initialize();
         virtual void Draw();
         virtual void Update();
+        // TypeID::IDType SetTypeID();
 
         //Base position of GameObjects
         //Inherited Objects such as Gun's position will be attached to hand pos in tick. After the object manipulations are completed, the relative offsets needs given in UI needs to be applied
@@ -65,23 +66,26 @@ namespace ETG
         //The typename without any increment
         std::string TypeName{};
 
+        //Each object's type ID
+        TypeID::IDType TypeID{};
+
+    public:
         void ComputeDrawProperties();
         void VisualizeOrigin() const;
         void IncrementName();
 
-    public:
         GameObjectBase* Owner = nullptr;
         bool DrawBound = false;
-        bool DrawOriginPoint = true;
+        bool DrawOriginPoint = false;
         bool IsGameObjectUISpecified = false;
         std::string ObjectName{"Default"};
         std::shared_ptr<sf::Texture> Texture;
-        bool IsVisible{true}; //For now I will only use this for Passive and Active item pick up. 
+        bool IsVisible{true}; //For now I will only use this for Passive and Active item pick up.
 
         // Only the drawing code (or renderer) is expected to use these values.
         [[nodiscard]] const DrawProperties& GetDrawProperties() const { return DrawProps; }
         virtual std::string& GetObjectName() { return ObjectName; }
-
+        [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
         [[nodiscard]] const GameObjectBase* GetOwner() const { return Owner; }
 
         [[nodiscard]] const sf::Vector2f& GetPosition() const { return Position; }
@@ -94,26 +98,23 @@ namespace ETG
         [[nodiscard]] const sf::Vector2f& GetRelativeScale() const { return RelativeScale; }
         [[nodiscard]] const sf::Vector2f& GetRelativeOrigin() const { return RelativeOrigin; }
 
-        //NOTE: Unused for a long time. 
-        // sf::Vector2f& SetRelativePosition(const sf::Vector2f& Pos) { return RelativePos = Pos; }
-        // sf::Vector2f& SetRelativeScale(const sf::Vector2f& Scale) { return RelativeScale = Scale; }
-        // sf::Vector2f& SetRelativeOrigin(const sf::Vector2f& Origin) { return RelativeOrigin = Origin; }
+        [[nodiscard]] TypeID::IDType GetType() const { return TypeID; }
 
-        [[nodiscard]] const std::string& GetTypeName() const { return TypeName; }
 
         virtual void SetPosition(const sf::Vector2f& Position) { this->Position = Position; }
         void SetRotation(const float& rotation) { this->Rotation = rotation; }
         void SetScale(const sf::Vector2f& Scale) { this->Scale = Scale; }
         void SetOrigin(const sf::Vector2f& Origin) { this->Origin = Origin; }
         void SetColor(const sf::Color& color) { this->Color = color; }
-        
+
         //Mark this object to be destroyed
-        virtual void MarkForDestroy() {PendingDestroy = true;}
-        [[nodiscard]] bool IsPendingDestroy() const {return PendingDestroy;}
+        virtual void MarkForDestroy() { PendingDestroy = true; }
+        [[nodiscard]] bool IsPendingDestroy() const { return PendingDestroy; }
+        bool IsValid() const { return GameClass::IsValid(this); }
 
         // Animation component management
         void SetAnimationInterface(IAnimationComponent* animComp) { AnimInterface = animComp; }
-        IAnimationComponent* GetAnimationInterface() { return AnimInterface; } //Never used yet
+        [[nodiscard]] IAnimationComponent* GetAnimationInterface() const { return AnimInterface; } //Never used yet
 
         // Bounds methods
         [[nodiscard]] sf::FloatRect GetBounds() const;
@@ -125,10 +126,46 @@ namespace ETG
 
         virtual void PopulateSpecificWidgets();
 
-
         //Friend classes for Engine UI
         friend void ImGuiSetRelativeOrientation(GameObjectBase* obj);
         friend void ImGuiSetAbsoluteOrientation(GameObjectBase* obj);
+
+        //NOTE:----------------------Type ID----------------------------
+        // Setter for the type ID (to be called from factory)
+        template <typename T>
+        void SetTypeInfo()
+        {
+            TypeID = TypeID::GetID<T>();
+        }
+
+        //Type checking without knowing derived types
+        template <typename T>
+        [[nodiscard]] bool IsA() const
+        {
+            return TypeID::IsBaseOf(GetType(), TypeID::GetID<T>());
+        }
+
+        //Safe casting
+        template <typename T>
+        T* As()
+        {
+            return IsA<T>() ? static_cast<T*>(this) : nullptr;
+        };
+
+        template <typename T>
+        const T* As() const
+        {
+            return IsA<T>() ? static_cast<const T*>(this) : nullptr;
+        }
+
+        //Check owner hierarchy
+        template <typename T>
+        bool HasOwnerOfType(int levels = 1) const
+        {
+            if (levels <= 0 || !Owner) return false;
+            if (Owner->IsA<T>()) return true;
+            return levels > 1 && Owner->HasOwnerOfType<T>(levels - 1);
+        }
 
         BOOST_DESCRIBE_CLASS(GameObjectBase, (GameClass),
                              (Owner, ObjectName,Texture, DrawOriginPoint, DrawBound, IsVisible),

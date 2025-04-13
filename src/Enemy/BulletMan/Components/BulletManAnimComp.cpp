@@ -4,7 +4,8 @@
 
 ETG::BulletManAnimComp::BulletManAnimComp()
 {
-    IsGameObjectUISpecified = false;
+    IsGameObjectUISpecified = true;
+    BulletMan = nullptr;
     BulletManAnimComp::SetAnimations();
 }
 
@@ -13,15 +14,15 @@ ETG::BulletManAnimComp::~BulletManAnimComp() = default;
 void ETG::BulletManAnimComp::Initialize()
 {
     BaseAnimComp<EnemyStateEnum>::Initialize();
-    
+
     // Set initial state here
     if (Owner)
     {
         BulletMan = dynamic_cast<class BulletMan*>(Owner);
         if (BulletMan)
         {
-            CurrentState = BulletMan->BulletManState;
-            CurrentAnimStateKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->BulletManDir);
+            CurrentState = BulletMan->GetState();
+            CurrentAnimStateKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
         }
     }
 }
@@ -30,22 +31,51 @@ void ETG::BulletManAnimComp::SetAnimations()
 {
     BaseAnimComp::SetAnimations();
 
-    //Idle Animation
+    // Idle Animation
     const auto idleAnims = std::vector<Animation>{
         Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_back_001", "png", 0.15f),
         Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_right_001", "png", 0.15f),
         Animation::CreateSpriteSheet("Enemy/BulletMan/Idle", "bullet_idle_right_001", "png", 0.15f),
     };
-    AddAnimationsForState<BulletManIdleEnum>(EnemyStateEnum::Idle,idleAnims);
+    AddAnimationsForState<BulletManIdleEnum>(EnemyStateEnum::Idle, idleAnims);
 
-    //Run animation
-    const auto RunAnims = std::vector<Animation>{
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_back_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_001", "png", 0.15f),
-        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_back_001", "png", 0.15f),
+    // Run animation
+    const auto runAnims = std::vector<Animation>{
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_001", "png", 0.12f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_left_back_001", "png", 0.12f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_001", "png", 0.12f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Run", "bullet_run_right_back_001", "png", 0.12f),
     };
-    AddAnimationsForState<BulletManRunEnum>(EnemyStateEnum::Run,RunAnims);
+    AddAnimationsForState<BulletManRunEnum>(EnemyStateEnum::Run, runAnims);
+
+    // Shooting animation
+    const auto shootingAnims = std::vector<Animation>{
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Shooting", "bullet_shooting_left_001", "png", 0.1f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Shooting", "bullet_shooting_right_001", "png", 0.1f),
+    };
+    AddAnimationsForState<BulletManShootingEnum>(EnemyStateEnum::Shooting, shootingAnims);
+
+    // Hit animation
+    const auto hitAnims = std::vector<Animation>{
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Hit", "bullet_hit_back_left_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Hit", "bullet_hit_back_right_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Hit", "bullet_hit_left_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Hit", "bullet_hit_right_001", "png", 0.08f),
+    };
+    AddAnimationsForState<BulletManHitEnum>(EnemyStateEnum::Hit, hitAnims);
+
+    // Death animation
+    const auto DeathAnims = std::vector<Animation>{
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_back_south_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_front_north_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_left_back_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_left_front_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_left_side_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_right_back_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_right_front_001", "png", 0.08f),
+        Animation::CreateSpriteSheet("Enemy/BulletMan/Death", "bullet_death_right_side_001", "png", 0.08f),
+    };
+    AddAnimationsForState<BulletManDeathEnum>(EnemyStateEnum::Die, DeathAnims);
 }
 
 void ETG::BulletManAnimComp::Update()
@@ -56,31 +86,43 @@ void ETG::BulletManAnimComp::Update()
         BulletMan = dynamic_cast<class BulletMan*>(Owner);
         if (!BulletMan) return; // Safety check
     }
-    
+
     AnimationKey newKey;
 
-    // Set key based on state (identical to HeroAnimComp approach)
-    if (BulletMan->BulletManState == EnemyStateEnum::Idle)
-        newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->BulletManDir);
-    
-    else if (BulletMan->BulletManState == EnemyStateEnum::Run)
-        newKey = DirectionUtils::GetBulletManRunEnum(BulletMan->BulletManDir);
-    else
-        newKey = BulletManIdleEnum::Idle_Back; // Default fallback
-
-    // If key has changed, update and restart animation (just like HeroAnimComp)
-    if (newKey != CurrentAnimStateKey)
+    // Set key based on state (similar to HeroAnimComp approach)
+    switch (BulletMan->GetState())
     {
-        CurrentAnimStateKey = newKey;
+    case EnemyStateEnum::Idle:
+        newKey = DirectionUtils::GetBulletManIdleEnum(BulletMan->EnemyDir);
+        break;
 
-        //Restart the key
-        auto& animManager = AnimManagerDict[CurrentState];
-        if (animManager.AnimationDict.contains(CurrentAnimStateKey))
-        {
-            animManager.AnimationDict[CurrentAnimStateKey].Restart();
-        }
+    case EnemyStateEnum::Run:
+        newKey = DirectionUtils::GetBulletManRunEnum(BulletMan->EnemyDir);
+        break;
+
+    case EnemyStateEnum::Shooting:
+        newKey = DirectionUtils::GetBulletManShootingEnum(BulletMan->EnemyDir);
+        break;
+
+    case EnemyStateEnum::Hit:
+        newKey = DirectionUtils::GetBulletManHitEnum(BulletMan->EnemyDir);
+        break;
+
+    case EnemyStateEnum::Die:
+        newKey = DirectionUtils::GetBulletManDeathEnum(BulletMan->EnemyDir);
+        break;
+
+    default:
+        newKey = BulletManIdleEnum::Idle_Back; // Default fallback
+        break;
     }
 
-    // Update base animation component with current state and key (same as HeroAnimComp)
-    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->BulletManState, CurrentAnimStateKey);
+    // Update base animation component with current state and key
+    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->GetState(), newKey);
+
+    // When death animation finishes, pause on the last frame
+    if (BulletMan->GetState() == EnemyStateEnum::Die && AnimManagerDict[EnemyStateEnum::Die].IsAnimationFinished())
+    {
+        AnimManagerDict[EnemyStateEnum::Die].CurrentAnim->PlayOnlyLastFrame();
+    }
 }

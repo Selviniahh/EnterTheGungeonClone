@@ -11,8 +11,8 @@ Animation::Animation(const std::shared_ptr<sf::Texture>& texture, const float ea
 {
     //This line fixed very very important bug. Since last month, sometimes just one animation frame not playing and sometimes all animation frames are working. The problem was just order of initialization in constructor
     //I tried to assign `AnimTimeLeft` to `FrameInterval` when `FrameInterval`is not initialized yet. This causing all arbitrary number and somehow like %70 everything works and %30 almost always just Hero's Back_Diagonal animation is not playing. Instead assigning in Constructor body fixed it  
-    AnimTimeLeft = FrameInterval; 
-    
+    AnimTimeLeft = FrameInterval;
+
     const int frameXSize = Texture->getSize().x / frameX;
     const int frameYSize = Texture->getSize().y / frameY;
 
@@ -28,7 +28,10 @@ Animation::Animation(const std::shared_ptr<sf::Texture>& texture, const float ea
 void Animation::Update()
 {
     if (!Active || !Texture || Texture->getSize().x == 0) throw std::runtime_error("Something is wrong");
-    if (AnimTimeLeft > 1000.0f || AnimTimeLeft < -1000) throw std::runtime_error("Animation Time is so big");
+    if (AnimTimeLeft > 9999999.0f || AnimTimeLeft < -1000) throw std::runtime_error("Animation Time is so big");
+
+    //NOTE: Skip playing next frame if we only want to play the last frame
+    if (IsOnLastFrame) return;
     
     AnimTimeLeft -= ETG::Globals::FrameTick;
     if (AnimTimeLeft <= 0)
@@ -44,7 +47,7 @@ void Animation::Update()
 void Animation::Draw(const sf::Vector2f position, const float layerDepth, const float rotation) const
 {
     if (!Active || !Texture) return;
-    
+
     sf::Sprite frame;
     frame.setTexture(*Texture);
     frame.setTextureRect(FrameRects[CurrentFrame]);
@@ -82,7 +85,7 @@ void Animation::Restart()
 std::shared_ptr<sf::Texture> Animation::GetCurrentFrameAsTexture() const
 {
     if (!Texture) return nullptr;
-    
+
     // Ensure the cache is large enough
     if (textureCache.size() <= CurrentFrame) textureCache.resize(CurrentFrame + 1);
 
@@ -93,7 +96,7 @@ std::shared_ptr<sf::Texture> Animation::GetCurrentFrameAsTexture() const
         sf::Image frameImage;
         frameImage.create(sourceRectangle.width, sourceRectangle.height);
         frameImage.copy(Texture->copyToImage(), 0, 0, sourceRectangle);
-        
+
         textureCache[CurrentFrame] = std::make_shared<sf::Texture>();
         textureCache[CurrentFrame]->loadFromImage(frameImage);
     }
@@ -108,6 +111,31 @@ bool Animation::IsAnimationFinished() const
 float Animation::GetTotalAnimationTime() const
 {
     return (float)FrameX * FrameInterval;
+}
+
+void Animation::PlayOnlyLastFrame()
+{
+    if (IsOnLastFrame) return; // Already on last frame
+
+    OriginalFrameInterval = FrameInterval; //Set original frame interval so that when we StopPlayingLastFrame, we can return back to initial FrameInterval 
+    CurrentFrame = FrameX - 1; // Set to last frame
+    AnimTimeLeft = 9999999.0f; // Effectively pause. Idk if there's a better way t handle this 
+    CurrRect = FrameRects[CurrentFrame]; // Update the current rectangle
+    IsOnLastFrame = true;
+}
+
+void Animation::StopPlayingLastFrame()
+{
+    if (!IsOnLastFrame) return;
+
+    FrameInterval = OriginalFrameInterval;
+    AnimTimeLeft = FrameInterval; // Reset the animation timer
+    IsOnLastFrame = false;
+}
+
+bool Animation::IsPlayingLastFrame() const
+{
+    return IsOnLastFrame;
 }
 
 Animation Animation::CreateSpriteSheet(const std::string& RelativePath, const std::string& FileName, const std::string& Extension, const float eachFrameSpeed, bool IsSingleSprite)

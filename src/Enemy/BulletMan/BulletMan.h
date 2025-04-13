@@ -5,6 +5,9 @@
 namespace ETG
 {
     class BulletManAnimComp;
+    // Remove BulletManMoveComp forward declaration
+    class Magnum;
+    class ProjectileBase;
 
     class BulletMan : public EnemyBase
     {
@@ -14,13 +17,29 @@ namespace ETG
         void Initialize() override;
         void Update() override;
         void Draw() override;
+        
+        void BulletManShoot(); //Shoot if timer is up and attackDistance
+        void HandleHitForce(const ProjectileBase* projectile) override;
 
+    protected:
+        void UpdateAnimations();
+        void UpdateHandAndGunPositions() const;
+        void UpdateShooting();
+        void UpdateVisibility() const;
 
-        EnemyStateEnum BulletManState{EnemyStateEnum::Idle}; // Initialize with default state
-        Direction BulletManDir{Direction::Right}; // Initialize with default direction
-
+    public:
         std::unique_ptr<BulletManAnimComp> AnimationComp;
-        std::unique_ptr<CollisionComponent> CollisionComp;
 
+        // Attack parameters...
+        float attackCooldown = 2.0f;
+        float attackCooldownTimer = 0.0f;
+
+        std::unique_ptr<Magnum> Gun;
+
+        
+
+        BOOST_DESCRIBE_CLASS(BulletMan, (EnemyBase),
+                             (attackCooldown, attackCooldownTimer),
+                             (), ())
     };
 }
