@@ -1,9 +1,22 @@
 cmake_minimum_required(VERSION 3.28)
 if (NOT DEFINED ENV{VCPKG_CMAKE})
-        message(FATAL_ERROR "VCPKG_CMAKE environment variable is not set.")
+    message(FATAL_ERROR "VCPKG_CMAKE environment variable is not set.")
 endif ()
 
-set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_CMAKE}" CACHE STRING "Vcpkg toolchain file")
+# Check if CMAKE_TOOLCHAIN_FILE was provided via command line
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    # If not provided via command line, check for environment variable
+    if(DEFINED ENV{VCPKG_CMAKE})
+        set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_CMAKE}" CACHE STRING "Vcpkg toolchain file")
+        message(STATUS "Using toolchain file from VCPKG_CMAKE environment variable: ${CMAKE_TOOLCHAIN_FILE}")
+    else()
+        # Neither command line nor environment variable was provided
+        message(FATAL_ERROR "CMAKE_TOOLCHAIN_FILE was not provided via command line and VCPKG_CMAKE environment variable is not set.")
+    endif()
+else()
+    # Toolchain file was provided via command line
+    message(STATUS "Using toolchain file provided via command line: ${CMAKE_TOOLCHAIN_FILE}")
+endif()
 
 project(ETG LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
@@ -165,7 +178,7 @@ add_library(etgcore STATIC
 
 # Common definitions for the static library
 target_compile_definitions(etgcore PRIVATE
-        RESOURCE_PATH="${CMAKE_SOURCE_DIR}/Resources"
+        RESOURCE_PATH="../../Resources"
 )
 
 # Include directories
