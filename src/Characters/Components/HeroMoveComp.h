@@ -22,6 +22,8 @@ namespace ETG
         [[nodiscard]] bool IsDashAvailable() const;
         void StartDashCooldown();
 
+    public:
+
         Hero* HeroPtr = nullptr;
 
         //Dash

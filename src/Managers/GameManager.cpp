@@ -31,7 +31,7 @@ void ETG::GameManager::Initialize()
 {
     //During development for different resolution and size monitors, Window mode will be half of host's window size
     const auto VideoMode = sf::VideoMode::getDesktopMode();
-    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width / 1.4, VideoMode.height / 1.4), "SFML example");
+    Window = std::make_shared<sf::RenderWindow>(sf::VideoMode(VideoMode.width / 1.2, VideoMode.height / 1.2), "SFML example");
     // Window = std::make_shared<sf::RenderWindow>(sf::VideoMode::getDesktopMode(), "SFML example", sf::Style::Fullscreen);
     Window->requestFocus();
     Window->setFramerateLimit(Globals::FPS);
@@ -86,6 +86,7 @@ void ETG::GameManager::Update()
         Ak47->Update();
         SawedOff->Update();
         Magnum->Update();
+        Scene->Update();
         BulletMan->Update();
         PlatinumBullets->Update();
         DoubleShoot->Update();
@@ -96,13 +97,14 @@ void ETG::GameManager::Update()
 void ETG::GameManager::Draw()
 {
     if (!HasFocus) return;
-    Window->clear({7,255,255,255});
+    Window->clear({1,255,255,255});
 
     //NOTE: Draw the main game scene with Custom view. These draws will be drawn zoomed
     Window->setView(Globals::MainView);
 
     GlobSpriteBatch.begin();
     Hero->Draw();
+    Scene->Draw();
     BulletMan->Draw();
     PlatinumBullets->Draw();
     DoubleShoot->Draw();
@@ -120,7 +122,7 @@ void ETG::GameManager::Draw()
     ETG::GlobSpriteBatch.end(*Window);
 
     //NOTE: non batch draws here. 
-    DebugText->Draw(*Window);
+    // DebugText->Draw(*Window);
     EngineUI.Draw();
 
     //Display the frame after everything is set to be drawn

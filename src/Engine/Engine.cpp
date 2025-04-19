@@ -51,8 +51,12 @@ void Engine::Update()
 
     UpdateDetailsPanel();
 
+    const ImGuiIO& io = ImGui::GetIO();
     PreviousGameFocus = CurrentGameFocus;
-    CurrentGameFocus = !(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
+    CurrentGameFocus = !(ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || 
+                         ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || 
+                         io.WantCaptureMouse || 
+                         io.WantCaptureKeyboard);
 
     //The end
     ImGui::End();
@@ -62,7 +66,7 @@ bool Engine::IsGameWindowFocused()
 {
     // First check if ImGui wants to capture mouse input
     const ImGuiIO& io = ImGui::GetIO();
-    if (io.WantCaptureMouse)
+    if (io.WantCaptureMouse || io.WantCaptureKeyboard)
         return false;
 
     // Check if the game has focus; if not, ignore input.

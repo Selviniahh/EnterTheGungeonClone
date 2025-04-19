@@ -9,7 +9,7 @@
 #include "../../Animation/Animation.h"
 #include "../../Core/GameObjectBase.h"
 #include "../../Core/Components/ArrowComp.h"
-#include "../../Managers/StateEnums.h"
+#include "../../Managers/Enum/StateEnums.h"
 #include "../../Core/Components/BaseAnimComp.h"
 #include "../../Core/Events/EventDelegate.h"
 #include "../VFX/MuzzleFlash.h"
@@ -34,6 +34,7 @@ namespace ETG
         void Update() override;
         void Draw() override;
 
+    public:
         //When left click pressed from hero, this will be called. Based on the timer and fire rate, will be called to fire the bullets.
         //NOTE: This will handle every base gun should handle. They are: Check if shooting is possible, decrement magazine size, apply modifiers, broadcast event etc. NO SHOOTING LOGIC
         virtual void PrepareShooting(); //queue the bulletQueue
@@ -49,16 +50,16 @@ namespace ETG
         void SetShootSound(const std::string& soundPath);
         void SetReloadSound(const std::string& soundPath);
         void FireBullet(float projectileAngle); //Fire an individual bullet
-        [[nodiscard]] bool IsMagazineEmpty() const {return MagazineAmmo == 0;}; //Check if the magazine is empty
+        [[nodiscard]] bool IsMagazineEmpty() const { return MagazineAmmo == 0; }; //Check if the magazine is empty
 
         //NOTE: only modifier we have so far. I didn't deem necessary to define this as smart pointer 
-        ModifierManager<IGunModifier> modifierManager; 
-        
+        ModifierManager<IGunModifier> modifierManager;
+
         std::vector<QueuedBullet> bulletQueue; //Queue of bullets waiting to be fired
 
         //NOTE: I am writing this cuz it's been 4th time I did same mistake. This delay is only related with active item's double shooting. Unless it's activated this won't be used
         //As best practice, I need to move this back to the Active item.  
-        float ShotDelay = 0.1f;  
+        float ShotDelay = 0.1f;
 
         using GameObjectBase::Rotation; //Make Rotation public in Gunbase
 
@@ -75,10 +76,10 @@ namespace ETG
         float BaseDamage;
         float BaseForce;
         float BaseSpread;
-        
+
         int BaseMaxAmmo{}; //Total ammo capacity 
         int BaseMagazineSize{}; //Bullets per magazine
-        
+
         //Current effective stats (modified by items/ perks)
         float FireRate; //Time between shots (seconds)
         float ShotSpeed; //How fast bullets travel

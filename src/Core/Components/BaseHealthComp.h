@@ -17,7 +17,7 @@ namespace ETG
         void Update() override;
 
         // Apply damage to this health component's owner
-        bool ApplyDamage(float damage, GameObjectBase* damageInstigator = nullptr);
+        bool ApplyDamage(float damage, float forceMagnitude, GameObjectBase* damageInstigator = nullptr);
 
         // Heal the owner
         bool Heal(float amount, GameObjectBase* healInstigator = nullptr);
@@ -30,13 +30,13 @@ namespace ETG
         
         // Check if currently showing damage feedback
         bool IsShowingDamageFeedback() const;
-        
+
+    public:
         // Events
-        EventDelegate<float, GameObjectBase*> OnDamageTaken;
+        EventDelegate<float, float, GameObjectBase*> OnDamageTaken;
         EventDelegate<float, GameObjectBase*> OnHealed;
         EventDelegate<GameObjectBase*> OnDeath;
 
-    public:
         float CurrentHealth;
         float MaxHealth;
         bool InvulnerabilityEnabled = false; //For now only hero will use this 

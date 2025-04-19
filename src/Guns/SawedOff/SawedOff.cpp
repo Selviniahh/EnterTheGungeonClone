@@ -16,7 +16,7 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
                                                            6, // MagazineSize
                                                            5.0f, // ReloadTime
                                                            5.5f, // Damage
-                                                           20.f, // Force
+                                                           50.f, // Force
                                                            3.0f) // Spread (in degrees)
 {
     AnimationComp = CreateGameObjectAttached<SawedOffAnimComp>(this);
@@ -26,7 +26,6 @@ ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    CollisionComp->ShowCollisionBounds = true;
 
     SawedOff::Initialize();
 }

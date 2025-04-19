@@ -46,7 +46,7 @@ namespace ETG
         return IsDamaged && DamageFeedbackTimer->IsFinished() == false;
     }
 
-    bool BaseHealthComp::ApplyDamage(const float damage, GameObjectBase* damageInstigator)
+    bool BaseHealthComp::ApplyDamage(const float damage, const float forceMagnitude, GameObjectBase* damageInstigator)
     {
         // Don't process damage if dead or invulnerable
         if (IsDead() || damage <= 0)
@@ -69,7 +69,7 @@ namespace ETG
         DamageFeedbackTimer->Start();
 
         // Broadcast damage event
-        OnDamageTaken.Broadcast(damage, damageInstigator);
+        OnDamageTaken.Broadcast(damage,forceMagnitude, damageInstigator);
 
         // Check for death
         if (previousHealth > 0 && CurrentHealth <= 0)

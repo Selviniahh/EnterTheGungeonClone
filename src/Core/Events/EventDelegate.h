@@ -11,15 +11,13 @@ namespace ETG
     {
     public:
         using Callback = std::function<void(Args...)>;
-        // Define a type for the listener handle (can be simple int/size_t)
         using ListenerHandle = size_t;
-        constexpr static ListenerHandle InvalidHandle = -1; // Or similar invalid value
+        constexpr static ListenerHandle InvalidHandle = -1;
 
         // Add a listener and return a handle
         ListenerHandle AddListener(Callback callBack)
         {
             ListenerHandle handle = nextHandle++;
-            // Store handle along with the callback
             Listeners.emplace(handle, std::move(callBack));
             return handle;
         }
@@ -33,23 +31,20 @@ namespace ETG
         // Broadcast the event to all listeners
         void Broadcast(Args... args)
         {
-            // Iterate over map values (callbacks)
             for (const auto& pair : Listeners)
             {
-                pair.second(args...); // Call the callback
+                pair.second(args...);
             }
         }
 
-        // Clear all listeners (keep this if needed, but use RemoveListener for specific cases)
+        //Remove all listeners. So far I only used this 
         void Clear()
         {
             Listeners.clear();
         }
 
     private:
-        // Use a map to associate handles with callbacks
         std::map<ListenerHandle, Callback> Listeners;
-        // Simple counter for generating unique handles
         ListenerHandle nextHandle = 0;
     };
-} // namespace ETG
+}

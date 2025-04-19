@@ -4,6 +4,7 @@
 #include "../../Characters/Hero.h"
 #include "../../Utils/Math.h"
 #include "../EnemyBase.h"
+#include "../../Utils/DirectionUtils.h"
 
 namespace ETG
 {
@@ -29,20 +30,62 @@ namespace ETG
     void EnemyMoveCompBase::Update()
     {
         BaseMoveComp::Update(); // This will handle force updates
-        
-        if (!OwnerEnemy || IsBeingForced) return;
-        
+
+        if (!OwnerEnemy || !OwnerEnemy->CanMove()) return;
+
         UpdateAIMovement();
     }
 
     void EnemyMoveCompBase::UpdateAIMovement()
     {
-        //For now, we won't need this for a very long time. Firstly we need a map editor, then map itself and loader, all procedurally generated which shouldn't take less than 2-3 thousand lines of code
-        //So what we need to worry about is when more enemies are collectively moving to hero, they will bump each other. So one enemy is an obstacle for another one.
-        //After map has been created, we should just use A* to handle all pathfinding.
-        //However, for now I'll just create second bigger collision component. If bigger collision component is colliding with another enemy, we will just halve enemy's velocity until collision is over.
-        //It's best to do this in enemy base as default obstacle handling. When all the map is done, (probably will never) we will remove this and just use A* to handle Heuristic pathfinding.
-        //For now overridden BulletManMoveComp will just move to hero all blindness. 
+        if (!OwnerEnemy || !Hero->IsValid() || !OwnerEnemy->CanMove()) return;
+
+        // Calculate direction and distance to hero
+        const sf::Vector2f directionToHero = GetDirectionToHero();
+        const float distanceToHero = GetDistanceToHero();
+
+        // Update enemy's direction
+        OwnerEnemy->EnemyDir = DirectionUtils::GetDirectionToHero(Hero, OwnerEnemy->GetPosition());
+
+        // Don't change state if currently shooting
+        if (OwnerEnemy->GetState() == EnemyStateEnum::Shooting)
+        {
+            // Still update movement if needed, but don't change state
+            if (distanceToHero > StopDistance)
+            {
+                MaxSpeed = MovementSpeed;
+                sf::Vector2f position = OwnerEnemy->GetPosition();
+                UpdateMovement(directionToHero, position);
+                OwnerEnemy->SetPosition(position);
+            }
+            else
+            {
+                // Gradually slow down if within stop distance
+                Velocity *= 0.9f;
+            }
+            return;
+        }
+
+        // Move if the hero is in range and not too close
+        if (distanceToHero > StopDistance)
+        {
+            // Set the state to running when moving
+            OwnerEnemy->SetState(EnemyStateEnum::Run);
+            MaxSpeed = MovementSpeed;
+
+            // Update movement
+            sf::Vector2f position = OwnerEnemy->GetPosition();
+            UpdateMovement(directionToHero, position);
+            OwnerEnemy->SetPosition(position);
+        }
+        else
+        {
+            // Either at proper distance or in cooldown, just idle
+            OwnerEnemy->SetState(EnemyStateEnum::Idle);
+
+            // Gradually slow down
+            Velocity *= 0.9f;
+        }
     }
 
     sf::Vector2f EnemyMoveCompBase::GetDirectionToHero() const

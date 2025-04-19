@@ -11,7 +11,7 @@ ETG::Magnum::Magnum(const sf::Vector2f& pos) : GunBase(pos,
                                                        100.0f, // ShotSpeed
                                                        200.0f, // Range (should be infinite but I will just give 2000)
                                                        0.0f, // timerForVelocity
-                                                       3.0f, // depth
+                                                       8.0f, // depth
                                                        165, // MaxAmmo
                                                        6, // MagazineSize
                                                        2.0f, // ReloadTime
@@ -26,7 +26,6 @@ ETG::Magnum::Magnum(const sf::Vector2f& pos) : GunBase(pos,
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    CollisionComp->ShowCollisionBounds = true;
 
     Magnum::Initialize();
 }

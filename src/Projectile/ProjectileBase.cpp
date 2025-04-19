@@ -36,7 +36,7 @@ ETG::ProjectileBase::ProjectileBase(const sf::Texture& texture, const sf::Vector
         
         if (heroObj && enemyObj)
         {
-            std::cout << "we need to play impact animation here for " << this->Owner->Owner->GetObjectName() << " 's projectile and then destroy but nevermind " << std::endl;
+            // std::cout << "we need to play impact animation here for " << this->Owner->Owner->GetObjectName() << " 's projectile and then destroy but nevermind " << std::endl;
 
             //This is Hero's projectile that collided with an enemy
             enemyObj->CollisionComp->OnCollisionEnter.Broadcast(CollisionEventData{this, this, eventData.OtherComp,eventData.ImpactPoint}); 

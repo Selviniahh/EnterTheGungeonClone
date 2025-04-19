@@ -14,7 +14,7 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
     500,       // MaxAmmo
     30,        // MagazineSize
     2.0f,      // ReloadTime
-    5.5f,      // Damage
+    2.5f,      // Damage
     17.0f,      // Force
     3.0f)      // Spread (in degrees)
 {
@@ -25,7 +25,6 @@ ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
     CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
     CollisionComp->CollisionRadius = 1.f;
     CollisionComp->SetCollisionEnabled(true);
-    CollisionComp->ShowCollisionBounds = true;
 
     // Call the common initialization
     AK47::Initialize();

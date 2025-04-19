@@ -71,28 +71,42 @@ void ETG::ReloadSlider::OnReloadComplete()
 
 void ETG::ReloadSlider::StartAnimation()
 {
-    //Set initial positions before starting the animation
+    // Set initial positions before starting the animation
     SliderBarPros.Position = Hero->GetPosition() + sf::Vector2f{0, -BarOffsetY};
     SliderValProps.Position = SliderBarPros.Position;
 
-    //Calculate reload progress
+    // Calculate reload progress
     if (Gun && Gun->IsReloading)
     {
         // Update the progress bar
-        auto [TopLeft, TopRight, BottomLeft, BottomRight] //Four corners
+        auto [TopLeft, TopRight, BottomLeft, BottomRight] // Four corners
             = Math::CalculateFourCorner(SliderBarPros.Position, sf::Vector2f(SliderBarPros.Texture->getSize()), SliderBarPros.Origin, SliderBarPros.Scale);
 
         const sf::Vector2f LeftMidPos = sf::Vector2f{TopLeft.x / 2, TopLeft.y / 2} + sf::Vector2f{BottomLeft.x / 2, BottomLeft.y / 2};
         const sf::Vector2f RightMidPos = sf::Vector2f{TopRight.x / 2, TopRight.y / 2} + sf::Vector2f{BottomRight.x / 2, BottomRight.y / 2};
         SliderValProps.Position.x = Math::IntervalLerp(LeftMidPos.x, RightMidPos.x, Gun->ReloadTime, reloadTimer);
         reloadTimer += Globals::FrameTick;
-        std::cout << reloadTimer << std::endl;
 
-        //Finish animation when (SliderX reached at RightMidPos.x) I could've done (reloadTimer >= 0.5) instead. This will also do the same 
-        if (std::abs(SliderValProps.Position.x - RightMidPos.x) < PositionTolerance)
+        // 1. Primary method: Position-based check with tolerance
+        bool positionReached = std::abs(SliderValProps.Position.x - RightMidPos.x) <= PositionTolerance;
+        
+        // 2. Safety method: Timer-based check
+        bool timeComplete = reloadTimer >= Gun->ReloadTime;
+        
+        // 3. Additional safety: If reload time is zero or negative
+        bool invalidReloadTime = Gun->ReloadTime <= 0.0f;
+
+        // Complete the animation if ANY condition is met
+        if (positionReached || timeComplete || invalidReloadTime)
         {
             FinishAnimation();
         }
+    }
+    else
+    {
+        // Fix: If gun is no longer in reloading state but we're still animating
+        // (handles edge case where gun state changes externally)
+        FinishAnimation();
     }
 }
 

@@ -1,10 +1,12 @@
 #include "EnemyBase.h"
+#include <limits>
 #include "../Utils/Math.h"
 #include "../Characters/Hand/Hand.h"
 #include "../Characters/Hero.h"
 #include "../Core/Components/CollisionComponent.h"
 #include "../Managers/Globals.h"
 #include "../Core/Factory.h"
+#include "../Core/Components/BaseHealthComp.h"
 #include "../Projectile/ProjectileBase.h"
 #include "Components/EnemyMoveCompBase.h"
 #include "../Guns/Base/GunBase.h"
@@ -12,13 +14,6 @@
 namespace ETG
 {
     EnemyBase::EnemyBase() : Hand(nullptr), Hero(GameState::GetInstance().GetHero())
-    {
-        EnemyBase::Initialize();
-    }
-
-    EnemyBase::~EnemyBase() = default;
-
-    void EnemyBase::Initialize()
     {
         CollisionComp = ETG::CreateGameObjectAttached<CollisionComponent>(this);
         CollisionComp->CollisionRadius = 4.f;
@@ -28,20 +23,74 @@ namespace ETG
         MoveComp = ETG::CreateGameObjectAttached<EnemyMoveCompBase>(this);
         MoveComp->Initialize();
 
+        // Register force event handlers for the move component
+        MoveComp->OnForceStart.AddListener([this]()
+        {
+            this->SetState(EnemyStateEnum::Hit);
+        });
+
+        MoveComp->OnForceEnd.AddListener([this]()
+        {
+            // Reset to idle state when force ends
+            if (GetState() == EnemyStateEnum::Hit)
+                SetState(EnemyStateEnum::Idle);
+        });
+
+        HealthComp = ETG::CreateGameObjectAttached<BaseHealthComp>(this, 30.f);
+        HealthComp->Initialize();
+
+        EnemyBase::Initialize();
+    }
+
+    EnemyBase::~EnemyBase() = default;
+
+    void EnemyBase::Initialize()
+    {
         CollisionComp->OnCollisionEnter.AddListener([this](const CollisionEventData& eventData)
         {
             // Check if we collided with a projectile
-            if (const auto* projectile = dynamic_cast<ProjectileBase*>(eventData.Other))
+            if (eventData.Other->IsA<ProjectileBase>())
             {
-                HandleProjectileCollision(projectile);
+                auto* projectile = eventData.Other->As<ProjectileBase>();
+
+                //If collision is with our own or another enemy's projectile, ignore it
+                if (projectile->Owner->Owner->IsA<EnemyBase>())
+                    return;
+
+                HealthComp->ApplyDamage(projectile->Damage, projectile->Force, projectile);
             }
+        });
+
+
+        HealthComp->OnDeath.AddListener([this](const GameObjectBase* instigator)
+        {
+            // If dead, ignore the damage
+            if (GetState() == EnemyStateEnum::Die) return;
+
+            // Set enemy state to die
+            SetState(EnemyStateEnum::Die);
+            Depth = std::numeric_limits<float>::max(); //set depth to max value so that it will be drawn bottom of everything
+            const sf::Vector2f knockbackDir = Math::Normalize(Position - instigator->GetPosition());
+            MoveComp->ApplyForce(knockbackDir, KnockBackMagnitudeForDeath, KnockBackDurationForDeath);
+
+            //Clear the delegates to not let any interaction
+            MoveComp->OnForceStart.Clear();
+            MoveComp->OnForceEnd.Clear();
+            HealthComp->OnDamageTaken.Clear();
+            CollisionComp->SetCollisionEnabled(false);
+        });
+
+        //In the future, enemy will take damage from explosive environment %
+        HealthComp->OnDamageTaken.AddListener([this](const float damage, const float forceMagnitude, const GameObjectBase* instigator)
+        {
+            HandleHitForce(instigator->As<ProjectileBase>());
         });
     }
 
     void EnemyBase::Update()
     {
-        if (MoveComp)
-            MoveComp->Update();
+        MoveComp->Update();
+        HealthComp->Update();
 
         GameObjectBase::Update();
     }
@@ -51,29 +100,39 @@ namespace ETG
         GameObjectBase::Draw();
     }
 
-    void EnemyBase::HandleProjectileCollision(const ProjectileBase* projectile)
+    void EnemyBase::SetState(const EnemyStateEnum& state)
     {
-        // Check if this is a hero projectile
-        const auto projectileOwnerGun = dynamic_cast<GunBase*>(projectile->Owner);
-        GameObjectBase* rootOwner = projectileOwnerGun->Owner; //Projectile's owner is a gun, gun's owner can be either another enemy or hero
-        if (!rootOwner) return;
+        EnemyState = state;
 
-        // is this a hero projectile that hit us
-        if (dynamic_cast<class Hero*>(rootOwner))
+        switch (state)
         {
-            // Calculate force direction (from projectile to enemy)
-            const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
-
-            // Get force from projectile
-            const float forceMagnitude = projectile->Force;
-
-            // Apply the force
-            ApplyForce(forceDirection, forceMagnitude, projectileOwnerGun->FireRate / ForceDurationDivider);
+        case EnemyStateEnum::Idle: StateFlags = EnemyStateFlag::StateIdle;
+            break;
+        case EnemyStateEnum::Run: StateFlags = EnemyStateFlag::StateRun;
+            break;
+        case EnemyStateEnum::Shooting: StateFlags = EnemyStateFlag::StateShooting;
+            break;
+        case EnemyStateEnum::Hit: StateFlags = EnemyStateFlag::StateHit;
+            break;
+        case EnemyStateEnum::Die: StateFlags = EnemyStateFlag::StateDie;
+            break;
+        default: break;
         }
     }
 
-    void EnemyBase::ApplyForce(const sf::Vector2f& forceDirection, const float magnitude, const float forceDuration) const
+    //Before calling this function, we already ensured that the projectile is not owned by any enemy 
+    void EnemyBase::HandleHitForce(const ProjectileBase* projectile)
     {
-        MoveComp->ApplyForce(forceDirection, magnitude, forceDuration);
+        const auto* projectileOwnerGun = projectile->Owner->As<GunBase>();
+
+        // Check if this is a hero projectile
+        // Calculate force direction (from projectile to enemy)
+        const sf::Vector2f forceDirection = Math::Normalize(this->Position - projectile->GetPosition());
+
+        // Get force from projectile
+        const float forceMagnitude = projectile->Force;
+
+        // Apply the force
+        MoveComp->ApplyForce(forceDirection, forceMagnitude, projectileOwnerGun->FireRate / ForceDurationDivider);
     }
 }

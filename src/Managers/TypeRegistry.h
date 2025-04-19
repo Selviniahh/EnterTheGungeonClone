@@ -31,9 +31,13 @@
 #include "../Guns/SawedOff/SawedOff.h"
 #include "../Enemy/BulletMan/BulletMan.h"
 #include "../Enemy/BulletMan/Components/BulletManAnimComp.h"
+#include "../Core/TypeID.h"
+
+#define REGISTER_BASE_CLASS(Derived, Base) \
+TypeID::RegisterBaseClass<Derived, Base>();
 
 
-//TODO: This class should be completely automated. A script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
+//TODO: This class should be completely automated. A pre build script that will run inside cmake before any executable should read all the classes with have (GAMECLASS) macro top of the name and
 //TODO: generate all the RegisterType<ClassName> automatically. All source should be gathered in build directory and every file should have suffix "Gen` For example "HeroGen" just like unreal engine
 //TODO: Then instead of taking the source files, cmake should take the files with `Gen` suffix. This way I can avoid calling `RegisterType` for every class and BOOST_DESCRIBE_CLASS.
 //TODO: However I am not sure how ninja builder's incremental build will be affected from this. I should calculate checksums of the source files and if the class changed, then I should run the script to create gen files for only changed classes.
@@ -65,7 +69,7 @@ namespace ETG
                                 return true;
                             }
                         }
-                       
+
                         return false;
                     }
                 };
@@ -108,39 +112,70 @@ namespace ETG
 
         static void InitializeTypeRegistry()
         {
-            //It doesn't matter to add or not the base class if child is added
             RegisterType<GameClass>();
             RegisterType<GameObjectBase>();
             RegisterType<ComponentBase>();
+            REGISTER_BASE_CLASS(ComponentBase, GameObjectBase);
             RegisterType<Scene>();
+            REGISTER_BASE_CLASS(Scene, GameObjectBase);
             RegisterType<Hero>();
+            REGISTER_BASE_CLASS(Hero, GameObjectBase);
             RegisterType<UserInterface>();
+            REGISTER_BASE_CLASS(UserInterface, GameObjectBase);
             RegisterType<InputComponent>();
+            REGISTER_BASE_CLASS(InputComponent, ComponentBase);
             RegisterType<HeroMoveComp>();
+            REGISTER_BASE_CLASS(HeroMoveComp, BaseMoveComp);
             RegisterType<Animation>();
+            REGISTER_BASE_CLASS(Animation, GameClass);
             RegisterType<HeroAnimComp>();
+            REGISTER_BASE_CLASS(HeroAnimComp, BaseAnimComp<HeroStateEnum>);
             RegisterType<GunBase>();
+            REGISTER_BASE_CLASS(GunBase, GameObjectBase);
             RegisterType<RogueSpecial>();
+            REGISTER_BASE_CLASS(RogueSpecial, GunBase);
             RegisterType<RogueSpecialAnimComp>();
+            REGISTER_BASE_CLASS(RogueSpecialAnimComp, BaseAnimComp<GunStateEnum>);
             RegisterType<ProjectileBase>();
+            REGISTER_BASE_CLASS(ProjectileBase, GameObjectBase);
             RegisterType<Hand>();
+            REGISTER_BASE_CLASS(Hand, GameObjectBase);
             RegisterType<ArrowComp>();
+            REGISTER_BASE_CLASS(ArrowComp, ComponentBase);
             RegisterType<MuzzleFlash>();
+            REGISTER_BASE_CLASS(MuzzleFlash, GameObjectBase);
             RegisterType<AmmoBarUI>();
+            REGISTER_BASE_CLASS(AmmoBarUI, GameObjectBase);
             RegisterType<AmmoIndicatorsUI>();
+            REGISTER_BASE_CLASS(AmmoIndicatorsUI, Hero);
             RegisterType<AmmoCounter>();
+            REGISTER_BASE_CLASS(AmmoCounter, GameObjectBase);
             RegisterType<ReloadSlider>();
+            REGISTER_BASE_CLASS(ReloadSlider, GameObjectBase);
             RegisterType<CollisionComponent>();
+            REGISTER_BASE_CLASS(CollisionComponent, ComponentBase);
             RegisterType<ActiveItemBase>();
+            REGISTER_BASE_CLASS(ActiveItemBase, GameObjectBase);
             RegisterType<DoubleShoot>();
+            REGISTER_BASE_CLASS(DoubleShoot, ActiveItemBase);
             RegisterType<PassiveItemBase>();
+            REGISTER_BASE_CLASS(PassiveItemBase, GameObjectBase);
             RegisterType<PlatinumBullets>();
+            REGISTER_BASE_CLASS(PlatinumBullets, PassiveItemBase);
             RegisterType<AK47>();
+            REGISTER_BASE_CLASS(AK47, GunBase);
             RegisterType<SawedOff>();
+            REGISTER_BASE_CLASS(SawedOff, GunBase);
             RegisterType<Magnum>();
+            REGISTER_BASE_CLASS(Magnum, GunBase);
             RegisterType<SawedOffAnimComp>();
+            REGISTER_BASE_CLASS(SawedOffAnimComp, BaseAnimComp<GunStateEnum>);
             RegisterType<BulletMan>();
+            REGISTER_BASE_CLASS(BulletMan, EnemyBase);
             RegisterType<BulletManAnimComp>();
+            REGISTER_BASE_CLASS(BulletManAnimComp, BaseAnimComp<EnemyStateEnum>);
+            RegisterType<EnemyMoveCompBase>();
+            REGISTER_BASE_CLASS(EnemyMoveCompBase, BaseMoveComp);
         }
 
         static inline std::unordered_map<std::type_index, TypeData> RegisteredTypes;
