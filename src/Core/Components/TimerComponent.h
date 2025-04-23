@@ -6,11 +6,26 @@
 
 namespace ETG
 {
+    enum class TimeUnit
+    {
+        Nanosecond,
+        Microsecond,
+        Millisecond,
+        Second,
+        Minute,
+        Hour,
+        Day,
+        Week,
+        Year,
+        Month
+    };
+    BOOST_DESCRIBE_ENUM(TimeUnit,Nanosecond, Microsecond, Millisecond, Second, Minute, Hour, Day, Week, Year, Month)
+    
     class TimerComponent : public ComponentBase 
     {
     public:
         // Constructor that takes total time in seconds
-        explicit TimerComponent(float totalTimeSeconds);
+        explicit TimerComponent(float totalTimeSeconds, TimeUnit unit = TimeUnit::Second);
         ~TimerComponent() override;
 
         // Update function to be called every frame
@@ -22,31 +37,38 @@ namespace ETG
         void Reset();
         void Restart(); // Combines Reset() and Start()
 
-        // Check if timer is up
         [[nodiscard]] bool IsFinished() const;
+        [[nodiscard]] bool IsRunning() const;
 
         // Get remaining and elapsed time
-        [[nodiscard]] float GetRemainingTime() const;
-        [[nodiscard]] float GetElapsedTime() const;
+        [[nodiscard]] float GetRemainingTime(TimeUnit unit = TimeUnit::Second) const;
+        [[nodiscard]] float GetElapsedTime(TimeUnit unit = TimeUnit::Second) const;
 
         // Get percentage complete (0.0 to 1.0)
         [[nodiscard]] float GetProgress() const;
 
-        // Set a new duration
-        void SetDuration(float newTotalTime);
+        void SetDuration(float newDuration, TimeUnit unit = TimeUnit::Second);
 
         // Delegate that broadcasts when timer completes
         EventDelegate<> OnTimerFinished;
+        EventDelegate<> OnTimerStarted;
 
 
     private:
-        float TotalTime; // Total time in seconds
-        float CurrentTime; // Current elapsed time. This will be incremented every frame
-        bool bIsRunning; // Is the timer currently running?
-        bool bIsFinished; // Has the timer completed?
+        // Convert between time units
+        [[nodiscard]] static float ConvertTimeUnit(float time, TimeUnit fromUnit, TimeUnit toUnit);
+        [[nodiscard]] static std::chrono::nanoseconds ConvertToNanos(float time, TimeUnit unit);
+        static float NanoSecToTargetUnit(TimeUnit toUnit, double nanoseconds);
+        [[nodiscard]] std::chrono::nanoseconds CalculateCurrentElapsedTime(const std::chrono::nanoseconds& currentElapsed) const;
+
+        std::chrono::nanoseconds m_TotalDuration{}; // Total duration in nanoseconds (whatever unit is given, it'll be converted to be nanoseconds firstly)
+        std::chrono::steady_clock::time_point m_StartTime; // Point when timer was started (the value at here doesn't matter we will subtract this with end timer) 
+        std::chrono::nanoseconds m_ElapsedTime; // Accumulated time when stopped
+        bool m_IsRunning;
+        bool m_IsFinished{};
 
         BOOST_DESCRIBE_CLASS(TimerComponent, (GameClass),
-                             (TotalTime, bIsRunning, bIsFinished),
+                             (m_TotalDuration, m_StartTime, m_ElapsedTime, m_IsRunning, m_IsFinished),
                              (), ())
     };
 }

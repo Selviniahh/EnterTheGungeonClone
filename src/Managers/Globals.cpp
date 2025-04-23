@@ -1,5 +1,7 @@
 #include "Globals.h"
 #include <filesystem>
+#include <iostream>
+
 #include "SpriteBatch.h"
 
 namespace ETG::Globals
@@ -47,6 +49,7 @@ namespace ETG::Globals
         //Every loop call this will be called. So in every call it will return the total time passed in seconds.   
         ElapsedTimeClock = tickClock.restart();
         FrameTick = ElapsedTimeClock.asSeconds();
+        std::cout << FrameTick << std::endl;
         DeltaTime = FrameTick;
     }
 
