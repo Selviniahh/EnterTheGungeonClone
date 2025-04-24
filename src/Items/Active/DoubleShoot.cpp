@@ -43,7 +43,6 @@ void ETG::DoubleShoot::Initialize()
 void ETG::DoubleShoot::Update()
 {
     ActiveItemBase::Update();
-    CollisionComp->Update();
 
     // Handle deactivation.
     // NOTE: During cooldown this will continusely run. Since the array is not big, in every tick during cooldown stage, trying to find an element in vector is not a problem but will be sooner or later

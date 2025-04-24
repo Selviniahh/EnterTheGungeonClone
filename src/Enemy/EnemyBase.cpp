@@ -89,9 +89,6 @@ namespace ETG
 
     void EnemyBase::Update()
     {
-        MoveComp->Update();
-        HealthComp->Update();
-
         GameObjectBase::Update();
     }
 

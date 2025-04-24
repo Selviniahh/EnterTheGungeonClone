@@ -54,6 +54,8 @@ void ETG::GameObjectBase::Update()
 
 void ETG::GameObjectBase::ComputeDrawProperties()
 {
+    if (!Texture.get()) return; //if texture is not valid just return
+    
     DrawProps.Position = Position + RelativePos;
     DrawProps.Scale = {Scale.x * RelativeScale.x, Scale.y * RelativeScale.y};
     DrawProps.Rotation = Rotation + RelativeRotation;

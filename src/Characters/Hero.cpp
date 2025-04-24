@@ -110,27 +110,17 @@ void ETG::Hero::Initialize()
 
 ETG::Hero::~Hero() = default;
 
-void ETG::Hero::UpdateComponents()
-{
-    CollisionComp->Update();
-    InputComp->Update(*this);
-    MoveComp->Update();
-    HealthComp->Update();
-}
-
 void ETG::Hero::UpdateAnimations()
 {
     if (CanFlipAnims()) AnimationComp->FlipSpritesY<GunBase>(CurrentDirection, *CurrentGun);
     if (CanFlipAnims()) AnimationComp->FlipSpritesX(CurrentDirection, *this);
-    AnimationComp->Update();
 }
 
 void ETG::Hero::UpdateHand() const
 {
     const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(CurrentDirection) ? sf::Vector2f{8.f, 5.f} : sf::Vector2f{-7.f, 5.f};
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
-    Hand->Update();
-
+    
     //If dashing or hit anim playing do not draw gun and hand
     Hand->IsVisible = CanMove();
 }
@@ -142,11 +132,6 @@ void ETG::Hero::UpdateGuns() const
 
     //If dashing or hit anim playing do not draw gun and hand
     CurrentGun->IsVisible = CanMove();
-
-    //Update  all equipped guns (for their projectiles only)
-    //NOTE: if (IsAttachedObjectNeeded()) //Calling this will act like stopping the time for projectiles. If I had some time, I'd implement stop time active item
-    for (const auto guns : EquippedGuns)
-        guns->Update();
 }
 
 void ETG::Hero::HandleShooting() const
@@ -168,12 +153,7 @@ void ETG::Hero::HandleActiveItem() const
 void ETG::Hero::Update()
 {
     GameObjectBase::Update();
-    UpdateComponents();
     UpdateAnimations();
-
-    //NOTE: Reload Text: Will run only if reload needed 
-    ReloadText->Update();
-
     HandleShooting();
     HandleActiveItem();
     UpdateHand();
@@ -185,13 +165,6 @@ void ETG::Hero::Draw()
     if (!IsVisible) return;
     GameObjectBase::Draw();
     SpriteBatch::Draw(GetDrawProperties());
-    CurrentGun->Draw();
-    ReloadText->Draw();
-    Hand->Draw();
-
-    //Draw all equipped guns (for their projectiles only)
-    for (const auto guns : EquippedGuns)
-        guns->Draw();
 
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
 }

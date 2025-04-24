@@ -74,7 +74,6 @@ void ETG::FrameLeftProgressBar::Update()
             progressRect.setPosition(ProgBottomCenter);
             progressRect.setSize({maxWidth, -CurrProgressY});
             IsVisible = true;
-            
         }
 }
 
@@ -83,16 +82,4 @@ void ETG::FrameLeftProgressBar::Draw()
 {
     // Draw the frame background first
     GameObjectBase::Draw();
-
-    // Draw rectangle with higher depth to ensure it appears on top
-    sf::RenderWindow* window = GameState::GetInstance().GetRenderWindow();
-    if (window && activeItem && activeItem->ActiveItemState != ActiveItemState::Ready)
-    {
-        // Fallback direct drawing in case SpriteBatch method fails
-        window->draw(progressRect);
-        
-        // Try SpriteBatch method as well
-        // SpriteBatch::AddDebugCircle(ProgTopCenter, 15);
-        // SpriteBatch::AddDebugCircle(ProgBottomCenter, 15);
-    }
 }

@@ -37,8 +37,6 @@ namespace ETG
     void BaseHealthComp::Update()
     {
         ComponentBase::Update();
-        DamageFeedbackTimer->Update();
-        InvulnerabilityTimer->Update();
     }
 
     bool BaseHealthComp::IsShowingDamageFeedback() const

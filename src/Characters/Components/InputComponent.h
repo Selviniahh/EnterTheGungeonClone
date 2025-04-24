@@ -16,9 +16,8 @@ namespace ETG
     public:
         InputComponent();
         static void HandleDash(const Hero& hero);
-        void Update(Hero& hero) const;
+        void Update() override;
 
-    public:
         void PopulateSpecificWidgets() override;
 
     private:
@@ -26,6 +25,7 @@ namespace ETG
         void UpdateDirection(Hero& hero) const;
         void HandleGunSwitch(Hero& hero) const;
         mutable bool gunSwitchHandled = false; //Do it once
+        Hero* hero = nullptr;
 
         BOOST_DESCRIBE_CLASS(InputComponent, (ComponentBase), (), (), ())
     };

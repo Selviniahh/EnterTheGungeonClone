@@ -29,6 +29,9 @@ void ETG::ReloadSlider::Initialize()
     SliderBarPros.Scale = {0.25f, 0.25f};
     SliderValProps.Scale = {0.25f, 0.25f};
 
+    //Set arbitrary texture
+    // Texture = SliderBar;
+
     GameObjectBase::Initialize();
 }
 

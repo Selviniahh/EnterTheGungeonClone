@@ -56,8 +56,6 @@ void ETG::ProjectileBase::Initialize()
 void ETG::ProjectileBase::Update()
 {
     if (PendingDestroy) return;
-    TimerComp->Update();
-    CollisionComp->Update();
 
     const sf::Vector2f movement = Globals::FrameTick * ProjVelocity;
     Position += movement;

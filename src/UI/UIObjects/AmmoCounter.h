@@ -79,12 +79,5 @@ namespace ETG
 
     inline void AmmoCounter::Draw()
     {
-        // Draw text directly to the window
-        // Note: This doesn't use SpriteBatch since text works differently
-        sf::RenderWindow* window = Globals::Window.get();
-        if (window)
-        {
-            window->draw(ammoText);
-        }
     }
 }

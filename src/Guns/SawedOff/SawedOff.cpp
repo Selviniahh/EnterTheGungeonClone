@@ -8,13 +8,13 @@
 
 ETG::SawedOff::SawedOff(const sf::Vector2f& pos) : GunBase(pos,
                                                            1.8f, // FireRate
-                                                           100.0f, // ShotSpeed
+                                                           250.0f, // ShotSpeed
                                                            200.0f, // Range (should be infinite but I will just give 2000)
                                                            0.0f, // timerForVelocity
                                                            3.0f, // depth
                                                            165, // MaxAmmo
                                                            6, // MagazineSize
-                                                           5.0f, // ReloadTime
+                                                           3.5f, // ReloadTime
                                                            5.5f, // Damage
                                                            50.f, // Force
                                                            3.0f) // Spread (in degrees)
@@ -62,8 +62,6 @@ void ETG::SawedOff::Update()
 {
     MuzzleFlash->Deactivate();
     MuzzleFlash->IsVisible = false;
-    CollisionComp->Update();
-    ArrowComp->Update();
     GunBase::Update();
 }
 

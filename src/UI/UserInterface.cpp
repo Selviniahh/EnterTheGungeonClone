@@ -36,6 +36,36 @@ namespace ETG
         ammoCounter = ETG::CreateGameObjectAttached<AmmoCounter>(this, ammoCounterPos);
     }
 
+    void UserInterface::InitializeAmmoBar()
+    {
+        // Calculate base X position for ammo bars
+        float ammoBarX = RightGunFrame->GetPosition().x + (RightGunFrame->Texture->getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100);
+
+        // Create and position bottom ammo bar
+        ammoBarBottom = CreateGameObjectAttached<AmmoBarUI>(this);
+        ammoBarBottom->SetPosition({ammoBarX, RightGunFrame->GetPosition().y + InitialAmmoBarOffsetY});
+        ammoBarBottom->FlipTexture(false, true);
+
+        // Create top ammo bar with an initial position (will be updated by indicators)
+        ammoBarTop = CreateGameObjectAttached<AmmoBarUI>(this);
+        ammoBarTop->SetPosition({ammoBarX, RightGunFrame->GetPosition().y - InitialAmmoBarOffsetY});
+
+        // Create ammo indicators
+        ammoIndicators = CreateGameObjectAttached<AmmoIndicatorsUI>(this);
+        ammoIndicators->SetGun(CurrentGun);
+        ammoIndicators->SetBottomBar(ammoBarBottom.get());
+        ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing}}); //TODO: Not sure to remove this line or not
+
+        // Set callback for updating the top bar position
+        ammoIndicators->SetTopBarPositionCallback([this](float topY)
+        {
+            if (ammoBarTop)
+            {
+                ammoBarTop->SetPosition({ammoBarTop->GetPosition().x, topY});
+            }
+        });
+    }
+
     void UserInterface::Update()
     {
         GameObjectBase::Update();
@@ -50,7 +80,6 @@ namespace ETG
             ammoIndicators->SetGun(CurrentGun);
             ammoCounter->SetAmmo(CurrentGun->MagazineAmmo, CurrentGun->MaxAmmo);
         }
-        RightGunFrame->Update();
 
         //Get current Active item and update propetries
         if (!GameState::GetInstance().GetEquippedActiveItems().empty())
@@ -59,23 +88,16 @@ namespace ETG
             LeftActiveItemFrame->SetActiveItem(CurrActiveItem);
             LeftProgressBar->SetActiveItem(CurrActiveItem);
         }
-        LeftActiveItemFrame->Update();
-        LeftProgressBar->Update();
-
-        // Update UI components
-        ammoBarBottom->Update(); //For now this update not doing anyhting
-        ammoIndicators->Update(); // This will update top bar position through callback
-        ammoBarTop->Update();
     }
 
-    void UserInterface::Draw()
+    void UserInterface::ManualDraw() const
     {
         if (!IsVisible) return;
 
         // Draw the frame
         RightGunFrame->Draw();
         LeftActiveItemFrame->Draw();
-
+        
         // Draw ammo bars and indicators
         ammoBarBottom->Draw();
         ammoIndicators->Draw(); // Draw indicators between bars
@@ -129,36 +151,6 @@ namespace ETG
         LeftProgressBar->SetPosition({
             progressBarX,
             LeftFramePosition.y
-        });
-    }
-
-    void UserInterface::InitializeAmmoBar()
-    {
-        // Calculate base X position for ammo bars
-        float ammoBarX = RightGunFrame->GetPosition().x + (RightGunFrame->Texture->getSize().x / 2) + (GameScreenSize.x * AmmoBarOffsetPercX / 100);
-
-        // Create and position bottom ammo bar
-        ammoBarBottom = CreateGameObjectAttached<AmmoBarUI>(this);
-        ammoBarBottom->SetPosition({ammoBarX, RightGunFrame->GetPosition().y + InitialAmmoBarOffsetY});
-        ammoBarBottom->FlipTexture(false, true);
-
-        // Create top ammo bar with an initial position (will be updated by indicators)
-        ammoBarTop = CreateGameObjectAttached<AmmoBarUI>(this);
-        ammoBarTop->SetPosition({ammoBarX, RightGunFrame->GetPosition().y - InitialAmmoBarOffsetY});
-
-        // Create ammo indicators
-        ammoIndicators = CreateGameObjectAttached<AmmoIndicatorsUI>(this);
-        ammoIndicators->SetGun(CurrentGun);
-        ammoIndicators->SetBottomBar(ammoBarBottom.get());
-        ammoBarBottom->SetPosition({ammoBarBottom->GetPosition() + sf::Vector2f{0, ammoIndicators->EachAmmoSpacing}}); //TODO: Not sure to remove this line or not
-
-        // Set callback for updating the top bar position
-        ammoIndicators->SetTopBarPositionCallback([this](float topY)
-        {
-            if (ammoBarTop)
-            {
-                ammoBarTop->SetPosition({ammoBarTop->GetPosition().x, topY});
-            }
         });
     }
 

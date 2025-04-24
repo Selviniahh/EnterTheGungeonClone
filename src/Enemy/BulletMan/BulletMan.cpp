@@ -53,8 +53,7 @@ void ETG::BulletMan::Initialize()
 void ETG::BulletMan::Update()
 {
     EnemyBase::Update();
-    CollisionComp->Update();
-
+    
     UpdateAnimations();
     UpdateHandAndGunPositions();
     UpdateShooting();
@@ -66,8 +65,6 @@ void ETG::BulletMan::UpdateAnimations()
     // Update animation Flip sprites based on direction
     if (CanFlipAnims()) AnimationComp->FlipSpritesX(EnemyDir, *this);
     if (CanFlipAnims()) AnimationComp->FlipSpritesY<GunBase>(EnemyDir, *Gun);
-    
-    AnimationComp->Update();
 }
 
 void ETG::BulletMan::UpdateHandAndGunPositions() const
@@ -76,7 +73,6 @@ void ETG::BulletMan::UpdateHandAndGunPositions() const
     const sf::Vector2f HandOffsetForHero = AnimationComp->IsFacingRight(EnemyDir) ? 
         sf::Vector2f{8.f, 5.f} : sf::Vector2f{-8.f, 5.f};
     Hand->SetPosition(Position + Hand->HandOffset + HandOffsetForHero);
-    Hand->Update();
 
     if (Hand && Gun)
     {
@@ -88,8 +84,6 @@ void ETG::BulletMan::UpdateHandAndGunPositions() const
         const float angle = Math::AngleBetween(handPos, Hero->GetPosition());
         Gun->Rotation = angle;
     }
-    
-    Gun->Update();
 }
 
 void ETG::BulletMan::UpdateShooting()
@@ -155,7 +149,4 @@ void ETG::BulletMan::Draw()
     EnemyBase::Draw();
     SpriteBatch::Draw(GetDrawProperties());
     if (CollisionComp) CollisionComp->Visualize(*GameState::GetInstance().GetRenderWindow());
-
-    Gun->Draw();
-    Hand->Draw();
 }

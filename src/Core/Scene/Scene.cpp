@@ -20,28 +20,10 @@ namespace ETG
     void Scene::Update()
     {
         GameObjectBase::Update();
-
-        // Update all spawned enemies
-        for (auto& enemy : enemies)
-        {
-            if (enemy && enemy->IsValid())
-            {
-                enemy->Update();
-            }
-        }
     }
 
     void Scene::Draw()
     {
-        // Draw all spawned enemies
-        for (auto& enemy : enemies)
-        {
-            if (enemy && enemy->IsValid())
-            {
-                enemy->ComputeDrawProperties();
-                enemy->Draw();
-            }
-        }
     }
 
     void Scene::SpawnBulletMan(float x, float y)

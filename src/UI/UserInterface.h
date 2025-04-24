@@ -61,7 +61,7 @@ namespace ETG
         void UpdateGunUIProperties();
         void Update() override;
         void DrawEquippedPassiveItemsAtLeftUI() const;
-        void Draw() override;
+        void ManualDraw() const;
 
         BOOST_DESCRIBE_CLASS(UserInterface, (GameObjectBase),
                              (), (), (CurrentGun, RightFrameOffsetPerc, AmmoBarOffsetPercX, InitialAmmoBarOffsetY, GameScreenSize))

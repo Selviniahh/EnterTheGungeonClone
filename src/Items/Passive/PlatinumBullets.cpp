@@ -46,7 +46,6 @@ void ETG::PlatinumBullets::Initialize()
 void ETG::PlatinumBullets::Update()
 {
     PassiveItemBase::Update();
-    CollisionComp->Update();
 
     //Check if the FireRateIncreasePerc has changed (with only through UI)
     if (FireRateIncreasePerc != PreviousFireRatePerc)

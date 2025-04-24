@@ -20,18 +20,20 @@ namespace ETG
         IsGameObjectUISpecified = true;
         DirectionUtils::PopulateDirectionRanges(DirectionMap);
         // SetObjectNameToSelfClassName();
+
+        hero = GameState::GetInstance().GetHero();
     }
 
-    void InputComponent::Update(Hero& hero) const
+    void InputComponent::Update()
     {
-        UpdateDirection(hero);
-        HandleGunSwitch(hero);
-        HandleDash(hero);
+        UpdateDirection(*hero);
+        HandleGunSwitch(*hero);
+        HandleDash(*hero);
 
         //Reload the gun if R pressed and hero is not dashing 
-        if (!hero.AnimationComp->IsDashing && sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        if (!hero->AnimationComp->IsDashing && sf::Keyboard::isKeyPressed(sf::Keyboard::R))
         {
-            hero.CurrentGun->Reload();
+            hero->CurrentGun->Reload();
         }
     }
 

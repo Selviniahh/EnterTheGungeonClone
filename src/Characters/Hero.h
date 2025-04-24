@@ -25,7 +25,6 @@ namespace ETG
     public:
         explicit Hero(sf::Vector2f Position);
         ~Hero() override;
-        void UpdateComponents();
         void UpdateAnimations();
         void UpdateHand() const;
         void UpdateGuns() const;

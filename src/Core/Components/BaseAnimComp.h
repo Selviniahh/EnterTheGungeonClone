@@ -28,7 +28,7 @@ namespace ETG
         void Initialize() override;
 
         virtual void SetAnimations();
-        void Update(const StateEnum& stateEnum, const AnimationKey& animKey);
+        void SelfUpdate(const StateEnum& stateEnum, const AnimationKey& animKey); 
         void PopulateSpecificWidgets() override;
 
 
@@ -73,7 +73,7 @@ namespace ETG
 
     //-------------------------------------------------------------Definition-------------------------------------------------------------
     template <typename StateEnum>
-    void BaseAnimComp<StateEnum>::Update(const StateEnum& stateEnum, const AnimationKey& animKey)
+    void BaseAnimComp<StateEnum>::SelfUpdate(const StateEnum& stateEnum, const AnimationKey& animKey)
     {
         CurrentState = stateEnum;
         CurrentAnimStateKey = animKey;

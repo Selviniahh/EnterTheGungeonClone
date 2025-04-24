@@ -23,13 +23,15 @@ namespace ETG
             sf::Texture* Texture = nullptr;
         };
 
+        virtual void Initialize();
+        virtual void Draw();
+        virtual void Update();
+
     protected:
         //Push back every GameObject to the SceneObj during initialization.  
         GameObjectBase();
         virtual ~GameObjectBase();
-        virtual void Initialize();
-        virtual void Draw();
-        virtual void Update();
+
         // TypeID::IDType SetTypeID();
 
         //Base position of GameObjects

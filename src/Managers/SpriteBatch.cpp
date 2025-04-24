@@ -65,6 +65,8 @@ void ETG::SpriteBatch::SimpleDraw(const std::shared_ptr<sf::Texture>& tex, const
 
 void ETG::SpriteBatch::Draw(const GameObjectBase::DrawProperties& DrawProperties)
 {
+    if (!DrawProperties.Texture) return;
+    
     sf::Sprite frame;
     frame.setTexture(*DrawProperties.Texture);
     frame.setScale(DrawProperties.Scale);

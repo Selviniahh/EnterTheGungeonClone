@@ -119,7 +119,7 @@ void AnimationManager::Update(T key)
     {
         CurrentAnim = &AnimationDict[variantKey];
         LastTexture = CurrentAnim->Texture;
-        CurrentAnim->Update();
+        CurrentAnim->SelfUpdate();
         LastKey = variantKey;
     }
     else

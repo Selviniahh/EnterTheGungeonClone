@@ -134,7 +134,7 @@ namespace ETG
         //NOTE: I know calling base here and then executing rest of the codes looks weird however, during state changes the base animation's `ChangeAnimStateIfRequired` will restart animation if state has ever changes
         //If the dash functionality below executed before this base, the dash animation will not restart so after executing once `IsDashAnimFinished` will always return true forever
         //One option is to extract  `ChangeAnimStateIfRequired` from base and call here however I believe in every anim state change, generally all animations needs to restart so I don't wanna move a generic function into it's child 
-        BaseAnimComp<HeroStateEnum>::Update(HeroPtr->GetState(), newKey);
+        BaseAnimComp<HeroStateEnum>::SelfUpdate(HeroPtr->GetState(), newKey);
 
         //If Dash animation is complete, Stop Dash and set Current state to idle
         if (IsDashing && DashTimer >= MinDashDuration && IsDashAnimFinished())

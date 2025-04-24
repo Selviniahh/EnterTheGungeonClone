@@ -6,7 +6,6 @@
 #include "SpriteBatch.h"
 #include "Globals.h"
 #include "../Guns/AK-47/AK47.h"
-#include "../Core/Components/CollisionComponent.h"
 #include "../Core/Scene/Scene.h"
 #include "../Characters/Hero.h"
 #include "../UI/UserInterface.h"
@@ -81,15 +80,15 @@ void ETG::GameManager::Update()
         EngineUI.Update();
         Globals::Update();
         InputManager::Update();
-        Hero->Update();
-        UI->Update();
-        Ak47->Update();
-        SawedOff->Update();
-        Magnum->Update();
-        Scene->Update();
-        BulletMan->Update();
-        PlatinumBullets->Update();
-        DoubleShoot->Update();
+
+        auto gameObjects = GameState::GetInstance().GetOrderedSceneObjs();
+        for (auto& object : gameObjects)
+        {
+            if (object && object->IsValid())
+            {
+                object->Update();
+            }
+        }
     }
 
 }
@@ -103,14 +102,17 @@ void ETG::GameManager::Draw()
     Window->setView(Globals::MainView);
 
     GlobSpriteBatch.begin();
-    Hero->Draw();
-    Scene->Draw();
-    BulletMan->Draw();
-    PlatinumBullets->Draw();
-    DoubleShoot->Draw();
-    Ak47->Draw();
-    SawedOff->Draw();
-    Magnum->Draw();
+    auto gameObjects = GameState::GetInstance().GetOrderedSceneObjs();
+    for (const auto& object : gameObjects)
+    {
+        //If object has valid texture and object itself is not UI.
+        //For now only UI should be overlay so I did ugly trick to check if the object is UI or not when drawing here. Later on it's required to make more sophisticated check
+        if (object && object->IsValid() && !object->IsA<UserInterface>() && !object->Owner->IsA<UserInterface>())
+        {
+            object->Draw();
+        }
+    }
+    
     GlobSpriteBatch.end(*Window);
 
     //NOTE: Switch to the default (un-zoomed) view for overlays (UI). These draws will be drawn in screen coords.
@@ -118,11 +120,9 @@ void ETG::GameManager::Draw()
     Window->setView(Window->getDefaultView());
 
     ETG::GlobSpriteBatch.begin();
-    UI->Draw();
+    UI->ManualDraw();
     ETG::GlobSpriteBatch.end(*Window);
-
-    //NOTE: non batch draws here. 
-    // DebugText->Draw(*Window);
+    
     EngineUI.Draw();
 
     //Display the frame after everything is set to be drawn

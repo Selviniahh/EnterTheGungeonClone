@@ -112,47 +112,28 @@ namespace ETG
         // Continue with the rest of the update logic
         ArrowComp->SetPosition(this->Position + Math::RotateVector(Rotation, Scale, ArrowComp->arrowOffset));
         ArrowComp->SetRotation(this->GetDrawProperties().Rotation);
-        ArrowComp->Update();
 
         // Update gun animation.
-        AnimationComp->Update(CurrentGunState, CurrentGunState);
-
-        // Update muzzle flash position and animation.
-        MuzzleFlash->Update();
+        AnimationComp->SelfUpdate(CurrentGunState, CurrentGunState);
 
         // Update projectiles.
         UpdateProjectiles();
-
-        ReloadSlider->Update();
     }
 
     void GunBase::Draw()
     {
-        // Draw projectiles.
-        for (const auto& proj : projectiles)
-        {
-            proj->Draw();
-        }
-
         if (!IsVisible) return; //If dashing, this will be false and self gun shouldn't be drawn however projectiles should be. So we first draw projectiles then we draw self if visible 
         GameObjectBase::Draw();
 
         // Draw the gun.
         SpriteBatch::Draw(GetDrawProperties());
 
-        // Draw the arrow representation.
-        ArrowComp->Draw();
-
-        // Draw the muzzle flash.
-        if (MuzzleFlash->IsVisible) MuzzleFlash->Draw();
-        ReloadSlider->Draw();
     }
 
     void GunBase::UpdateProjectiles()
     {
         for (auto it = projectiles.begin(); it != projectiles.end();)
         {
-            (*it)->Update();
             if ((*it)->IsPendingDestroy())
             {
                 UnregisterGameObject(it->get()->GetObjectName());

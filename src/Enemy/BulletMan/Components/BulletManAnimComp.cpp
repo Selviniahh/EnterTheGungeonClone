@@ -118,7 +118,7 @@ void ETG::BulletManAnimComp::Update()
     }
 
     // Update base animation component with current state and key
-    BaseAnimComp<EnemyStateEnum>::Update(BulletMan->GetState(), newKey);
+    BaseAnimComp<EnemyStateEnum>::SelfUpdate(BulletMan->GetState(), newKey);
 
     // When death animation finishes, pause on the last frame
     if (BulletMan->GetState() == EnemyStateEnum::Die && AnimManagerDict[EnemyStateEnum::Die].IsAnimationFinished())

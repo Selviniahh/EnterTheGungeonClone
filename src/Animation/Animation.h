@@ -40,7 +40,7 @@ public:
     Animation() = default;
 
     /// \brief decrement `AnimTimeLeft` If AnimTimeLeft is 0, increment CurrentFrame, restart CurrentFrame counter
-    void Update();
+    void SelfUpdate(); //NOTE: Not overridden Manager will manually call this 
     void Draw(sf::Vector2f position, float layerDepth, float rotation = 0) const;
     void Draw(const std::shared_ptr<sf::Texture>& texture, sf::Vector2f position, sf::Color color, float rotation, sf::Vector2f origin, sf::Vector2f scale, const float depth) const;
 

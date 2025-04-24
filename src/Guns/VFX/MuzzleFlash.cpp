@@ -36,7 +36,7 @@ namespace ETG
         // Update animation if active
         if (isActive)
         {
-            Animation.Update();
+            Animation.SelfUpdate();
 
             // If animation finished, deactivate
             if (Animation.IsAnimationFinished())

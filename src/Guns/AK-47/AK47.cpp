@@ -6,8 +6,8 @@
 #include "../../Characters/Hero.h"
 
 ETG::AK47::AK47(const sf::Vector2f& pos) : GunBase(pos,
-    0.4f,     // FireRate
-    150.0f,     // ShotSpeed
+    0.28f,     // FireRate
+    300.0f,     // ShotSpeed
     1000.0f,    // Range (should be infinite but I will just give 2000)
     0.0f,      // timerForVelocity
     3.0f,      // depth
@@ -59,8 +59,6 @@ void ETG::AK47::Update()
 {
     MuzzleFlash->Deactivate();
     MuzzleFlash->IsVisible = false;
-    CollisionComp->Update();
-    ArrowComp->Update();
     GunBase::Update();
 }
 
